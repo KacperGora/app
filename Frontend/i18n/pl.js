@@ -6,6 +6,7 @@ export const pl = {
       signIn: 'Zaloguj się',
       signUp: 'Zarejestruj się',
       welcome: 'Witaj',
+      logout: 'Wyloguj',
     },
     login: {
       username: 'Nazwa użytkownika',

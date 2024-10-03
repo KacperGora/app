@@ -26,7 +26,6 @@ const initialEvents: TimelineEvent[] = [
     time: '11:00 AM',
     icon: 'calendar',
   },
-  // Add more events as needed
 ]
 
 const generateHours = () => {
@@ -60,20 +59,24 @@ const Timeline = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
     paddingLeft: 12,
-    // padding: 16,
+  },
+  eventsContainer: {
+    width: 50,
+    borderRightColor: '#d9d9d975',
+    borderRightWidth: 1,
   },
   timelineContainer: {
     flexDirection: 'row',
   },
-  hoursContainer: {
-    width: 80,
-    alignItems: 'flex-end',
-  },
+
   hourText: {
-    height: 40,
+    height: 60,
     lineHeight: 40,
     color: 'gray',
+    fontSize: 12,
+    fontFamily: 'Lato-Regular',
   },
 })
 

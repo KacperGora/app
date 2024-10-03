@@ -1,40 +1,24 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native'
-import { PanGestureHandler, State } from 'react-native-gesture-handler'
-import { generateWeekNames } from './utils'
+import React, { useContext, useState } from 'react'
+import { View, Text, StyleSheet, SafeAreaView, Pressable } from 'react-native'
 import dayjs from 'dayjs'
+import { AuthContext, AuthContextType } from '../../../context/AuthContext'
+import pl from 'dayjs/locale/pl'
+import { useTranslation } from 'react-i18next'
 
 const Topbar = () => {
-  const weekNames = generateWeekNames
+  const { t } = useTranslation()
+  const { login, setIsLoggedIn } = useContext(AuthContext) as AuthContextType
   const [currentWeek, setCurrentWeek] = useState(dayjs().startOf('week'))
 
-  const handleSwipe = (event: any) => {
-    if (event.nativeEvent.state === State.END) {
-      if (event.nativeEvent.translationX > 0) {
-        setCurrentWeek(currentWeek.subtract(1, 'week'))
-      } else {
-        setCurrentWeek(currentWeek.add(1, 'week'))
-      }
-    }
-  }
-
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.topBar}>
       <View>
-        <Text>{dayjs().get('months').toString()}</Text>
+        <Text>{login}</Text>
+        <Text>{dayjs().locale(pl).format('D MMM').toString()}</Text>
       </View>
-      <PanGestureHandler onHandlerStateChange={handleSwipe}>
-        <View style={styles.topBar}>
-          {weekNames.map((day, index) => (
-            <View key={index} style={styles.dayWrapper}>
-              <View>
-                <Text style={styles.dayLabel}>{day}</Text>
-              </View>
-              <Text style={styles.dayNumber}>{currentWeek.add(index, 'day').format('DD')}</Text>
-            </View>
-          ))}
-        </View>
-      </PanGestureHandler>
+      <Pressable onPress={() => setIsLoggedIn(false)}>
+        <Text>{t('global.logout')}</Text>
+      </Pressable>
     </SafeAreaView>
   )
 }
@@ -45,8 +29,7 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 10,
-    marginLeft: 50,
+    padding: 16,
   },
   dayLabel: {
     fontSize: 12,
