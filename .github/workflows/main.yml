@@ -19,4 +19,4 @@ jobs:
           USER: ${{ secrets.RPI_USER }}
           KEY: ${{ secrets.RPI_SSH_KEY }}
         run: |
-          ssh -i $KEY $USER@$HOST 'cd /path/to/your/app && git pull origin main && npm install && pm2 restart <nazwa_aplikacji>'
+          ssh -i $KEY $USER@$HOST 'cd /app/Backend/index.ts && git pull origin main && npm install && pm2 restart backend'
