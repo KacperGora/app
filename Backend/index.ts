@@ -18,6 +18,7 @@ app.use('/event', eventRouter)
 
 app.get('/', (req, res) => {
   res.send('Hello, World!')
+  res.send('siema byku')
 })
 
 app.listen(PORT, () => {
