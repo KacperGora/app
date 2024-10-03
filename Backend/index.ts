@@ -17,7 +17,7 @@ app.use('/api', apiRouter)
 app.use('/event', eventRouter)
 
 app.get('/', (req, res) => {
-  res.send('siema byku')
+  res.send('Good morning Kacperek')
 })
 
 app.listen(PORT, () => {
