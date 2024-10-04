@@ -3,32 +3,23 @@ name: Deploy to Raspberry Pi
 on:
   push:
     branches:
-      - master  # lub inna gałąź
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Debug information
-        run: |
-         echo "Raspberry Pi IP: ${{ secrets.RASPBERRY_PI_IP }}"
-         echo "Username: ${{ secrets.RASPBERRY_PI_USER }}"
-      - name: Copy files to Raspberry Pi
-        run: |
-          scp -i ${{ secrets.RASPBERRY_PI_SSH_KEY }} -r ./* ${{ secrets.RASPBERRY_PI_USER }}@${{ secrets.RASPBERRY_PI_IP }}:/home/admin/app/Backend
-          
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Execute deployment script
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ secrets.RASPBERRY_PI_IP }}
-          username: ${{ secrets.RASPBERRY_PI_USER }}
-          key: ${{ secrets.RASPBERRY_PI_SSH_KEY }}
-          script: |
-            cd /home/admin/app/Backend
-            npm install
-            npm run build
-            npm start
+    - name: Debug SSH Key
+      run: |
+        echo "${{ secrets.RASPBERRY_PI_SSH_KEY }}" | base64 -d > /tmp/ssh_key
+        chmod 600 /tmp/ssh_key
+        ls -l /tmp/ssh_key
+
+    - name: Copy files to Raspberry Pi
+      run: |
+        scp -i /tmp/ssh_key -r ./* ${{ secrets.RASPBERRY_PI_USER }}@${{ secrets.RASPBERRY_PI_IP }}:/home/admin/app/Backend
+      shell: /usr/bin/bash -e {0}
