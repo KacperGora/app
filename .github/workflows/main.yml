@@ -19,6 +19,7 @@ jobs:
           USER: ${{ secrets.RPI_USER }}
           KEY: ${{ secrets.RPI_SSH_KEY }}
         run: |
+          echo "$KEY" > key.pem
           ssh -i <(echo "$KEY") -o StrictHostKeyChecking=no $USER@$HOST "echo Connection successful" || exit 1
 
       - name: Deploy to Raspberry Pi
