@@ -12,13 +12,11 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v4
 
-      # Debugging: Check the current directory and list the files
       - name: List files in working directory
         run: |
           pwd
           ls -al
 
-      # Przejście do odpowiedniego katalogu, jeśli package.json znajduje się w podfolderze
       - name: Install dependencies
         run: |
           cd Backend  # Zmień to, jeśli Twój plik package.json znajduje się w innym katalogu
