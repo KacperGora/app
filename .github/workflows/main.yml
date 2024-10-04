@@ -3,7 +3,7 @@ name: Deploy to Raspberry Pi
 on:
   push:
     branches:
-      - master # Zmień na odpowiednią nazwę gałęzi
+      - master  # Zmien na swoja glowna gałąź, jeśli używasz innej
 
 jobs:
   deploy:
@@ -13,41 +13,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Create SSH key
-        run: |
-          echo "${{ secrets.RPI_SSH_KEY }}" > /tmp/id_rsa
-          chmod 600 /tmp/id_rsa
-
       - name: Test SSH connection
         env:
-          HOST: 192.168.8.162
-          USER: admin
+          HOST: ${{ secrets.RPI_HOST }}
+          USER: ${{ secrets.RPI_USER }}
+          KEY: ${{ secrets.RPI_SSH_KEY }}
         run: |
-          echo "Testing SSH connection..."
-          echo "Connection to $USER@$HOST..."
-          ssh -i /tmp/id_rsa $USER@$HOST "echo Connection successful" || exit 1
+          ssh -i <(echo "$KEY") -o StrictHostKeyChecking=no $USER@$HOST "echo Connection successful" || exit 1
 
       - name: Deploy to Raspberry Pi
         env:
-          HOST: 192.168.8.162
-          USER: admin
-
+          HOST: ${{ secrets.RPI_HOST }}
+          USER: ${{ secrets.RPI_USER }}
+          KEY: ${{ secrets.RPI_SSH_KEY }}
         run: |
-          ssh -i /tmp/id_rsa $USER@$HOST '
-          if [ ! -d "/app/Backend/.git" ]; then
-            echo "Cloning the repository..."
-            git clone https://github.com/user/repo.git /app/Backend || exit 1
-          fi
-          echo "Changing directory to Backend..."
-          cd /app/Backend || exit 1
-          echo "Resetting repository..."
-          git reset --hard HEAD || exit 1
-          git clean -fd || exit 1
-          echo "Pulling latest changes..."
-          git pull origin master -v || exit 1  # Zmień na odpowiednią nazwę gałęzi
-          echo "Installing dependencies..."
-          npm install || exit 1
-          echo "Restarting PM2..."
-          pm2 restart backend || exit 1
-          echo "Deployment completed successfully!"
-          '
+          ssh -i <(echo "$KEY") -o StrictHostKeyChecking=no $USER@$HOST 'cd /path/to/your/app && git pull origin master && npm install && pm2 restart backend'
