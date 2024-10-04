@@ -1,4 +1,4 @@
-name: Deploy to Raspberry Pi
+name: Test SSH Connection to Raspberry Pi
 
 on:
   push:
@@ -6,25 +6,12 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  test-ssh-connection:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-
-    - name: Install dependencies
-      run: npm install
-      working-directory: ./Backend
-
-    - name: Build project
-      run: npm run build
-      working-directory: ./Backend
 
     - name: Debug SSH connection
       env:
@@ -36,20 +23,8 @@ jobs:
         echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan $PI_HOST >> ~/.ssh/known_hosts
-        ssh -v -i ~/.ssh/id_rsa $PI_USER@$PI_HOST echo "SSH connection successful"
-
-    - name: Deploy to Raspberry Pi
-      env:
-        PI_HOST: ${{ secrets.RPI_HOST }}
-        PI_USER: ${{ secrets.RPI_USER }}
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
-      run: |
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan $PI_HOST >> ~/.ssh/known_hosts
         echo "SSH key setup complete"
         ls -la ~/.ssh
-        scp -r ./Backend/dist $PI_USER@$PI_HOST:/home/$PI_USER/app
-        ssh -i ~/.ssh/id_rsa $PI_USER@$PI_HOST 'cd /home/$PI_USER/app && npm install && npm start'
+        cat ~/.ssh/id_rsa
+        ssh -v -i ~/.ssh/id_rsa $PI_USER@$PI_HOST echo "SSH connection successful"
       shell: /usr/bin/bash -e {0}
