@@ -28,7 +28,7 @@ jobs:
           password: ${{ secrets.RPI_PASSWORD }}  # Hasło lub możesz użyć kluczy SSH
           port: 22
           script: |
-            cd /app/backend  # Ścieżka do backendu na Raspberry Pi
+            cd /app/Backend  # Ścieżka do backendu na Raspberry Pi
             git pull origin master  # Pobierz ostatnie zmiany
             npm install  # Zainstaluj zależności
             npm run start  # Uruchom aplikację
