@@ -13,22 +13,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Create SSH key
+        run: |
+          echo "${{ secrets.RPI_SSH_KEY }}" > /tmp/id_rsa
+          chmod 600 /tmp/id_rsa
+
       - name: Test SSH connection
         env:
           HOST: ${{ secrets.RPI_HOST }}
           USER: ${{ secrets.RPI_USER }}
-          KEY: ${{ secrets.RPI_SSH_KEY }}
         run: |
           echo "Testing SSH connection..."
-          ssh -i <(echo "$KEY") $USER@$HOST "echo Connection successful" || exit 1
+          ssh -i /tmp/id_rsa $USER@$HOST "echo Connection successful" || exit 1
 
       - name: Deploy to Raspberry Pi
         env:
           HOST: ${{ secrets.RPI_HOST }}
           USER: ${{ secrets.RPI_USER }}
-          KEY: ${{ secrets.RPI_SSH_KEY }}
         run: |
-          ssh -i <(echo "$KEY") $USER@$HOST '
+          ssh -i /tmp/id_rsa $USER@$HOST '
           if [ ! -d "/app/Backend/.git" ]; then
             echo "Cloning the repository..."
             git clone https://github.com/user/repo.git /app/Backend || exit 1
@@ -39,7 +42,7 @@ jobs:
           git reset --hard HEAD || exit 1
           git clean -fd || exit 1
           echo "Pulling latest changes..."
-          git pull origin master -v || exit 1  
+          git pull origin master -v || exit 1  # Zmień na odpowiednią nazwę gałęzi
           echo "Installing dependencies..."
           npm install || exit 1
           echo "Restarting PM2..."
