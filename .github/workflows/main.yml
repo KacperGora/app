@@ -13,9 +13,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set working directory
-      run: cd Backend
-
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
@@ -28,7 +25,13 @@ jobs:
     - name: Build project
       run: npm run build
       working-directory: ./Backend
-
+    - name: Debug ssh conection
+      run: 
+        ssh -v ${{ secrets.RPI_USER }}@${{ secrets.RPI_HOST }} -i ${{ secrets.SSH_KEY }} echo "SSH connection successful"
+      env:
+         PI_HOST: ${{ secrets.RPI_HOST }}
+         PI_USER: ${{ secrets.RPI_USER }}
+         SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
     - name: Deploy to Raspberry Pi
       env:
         PI_HOST: ${{ secrets.RPI_HOST }}
@@ -39,5 +42,8 @@ jobs:
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan $PI_HOST >> ~/.ssh/known_hosts
+        echo "SSH key setup complete"
+        ls -la ~/.ssh
         scp -r ./Backend/dist $PI_USER@$PI_HOST:/home/$PI_USER/app
         ssh $PI_USER@$PI_HOST 'cd /home/$PI_USER/app && npm install && npm start'
+      shell: /usr/bin/bash -e {0}
