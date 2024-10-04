@@ -1,18 +1,34 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+name: CI/CD for Expo React Native Backend
+on:
+  push:
+    branches:
+      - master  # Wybierz główną gałąź, np. main
+
 jobs:
-  Explore-GitHub-Actions:
+  deploy:
     runs-on: ubuntu-latest
+    
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
+      - name: Checkout code
         uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+
+      - name: Install dependencies
         run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+          npm install
+
+      - name: Build the project
+        run: |
+          npm run build
+
+      - name: Deploy to Raspberry Pi
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.RPI_HOSTHOST }}  # IP Twojego Raspberry Pi
+          username: ${{ secrets.RPI_USER }}  # Nazwa użytkownika na Pi
+          password: ${{ secrets.RPI_PASSWORD }}  # Hasło lub możesz użyć kluczy SSH
+          port: 22
+          script: |
+            cd /app/backend  # Ścieżka do backendu na Raspberry Pi
+            git pull origin master  # Pobierz ostatnie zmiany
+            npm install  # Zainstaluj zależności
+            npm run start  # Uruchom aplikację
