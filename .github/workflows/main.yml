@@ -1,54 +1,42 @@
-name: Test SSH Connection to Raspberry Pi
-
+name: CI/CD for Expo React Native Backend
 on:
   push:
     branches:
-      - master
+      - master  # Upewnij się, że używasz właściwej gałęzi
 
 jobs:
-  test-ssh-connection:
+  deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository code
+        uses: actions/checkout@v4
 
-      - name: Debug SSH connection
-        env:
-          PI_HOST: ${{ secrets.RPI_HOST }}
-          PI_USER: ${{ secrets.RPI_USER }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+      - name: List files in working directory
         run: |
-          set -e
+          pwd
+          ls -al
 
-          echo "Starting SSH connection test"
+      - name: Install dependencies
+        run: |
+          cd Backend  # Zmień to, jeśli Twój plik package.json znajduje się w innym katalogu
+          npm install
 
-          # Create .ssh directory
-          mkdir -p ~/.ssh
-          echo "Created .ssh directory"
+      - name: Build the project
+        run: |
+          cd Backend  # Znowu upewnij się, że jesteś w odpowiednim katalogu
+          npm run build
 
-          # Save SSH private key
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "Saved and set permissions for SSH private key"
-
-          # Add host to known hosts
-          ssh-keyscan $PI_HOST >> ~/.ssh/known_hosts
-          echo "Added $PI_HOST to known hosts"
-
-          # List contents of .ssh directory
-          echo "Listing contents of .ssh directory:"
-          ls -la ~/.ssh
-
-          # Print SSH private key (for debugging purposes, remove in production)
-          echo "Printing SSH private key:"
-          cat ~/.ssh/id_rsa
-
-          # Check SSH key file format
-          echo "Checking SSH key file format:"
-          file ~/.ssh/id_rsa
-
-          # Attempt SSH connection
-          echo "Attempting SSH connection to $PI_USER@$PI_HOST"
-          ssh -v -i ~/.ssh/id_rsa $PI_USER@$PI_HOST echo "SSH connection successful"
-        shell: /usr/bin/bash -e {0}
+      - name: Deploy to Raspberry Pi
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.RPI_HOST }}
+          username: ${{ secrets.RPI_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            echo "Deploying to Raspberry Pi"
+            cd /app/Backend  # Ścieżka na Raspberry Pi do katalogu backendu
+            git pull origin master  # Pobranie ostatnich zmian
+            npm install  # Instalacja zależności
+            npm run start  # Uruchomienie aplikacji
