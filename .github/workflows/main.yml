@@ -13,7 +13,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Debug SSH connection
+    - name: Debug SSH connections
       env:
         PI_HOST: ${{ secrets.RPI_HOST }}
         PI_USER: ${{ secrets.RPI_USER }}
