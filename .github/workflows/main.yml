@@ -14,12 +14,13 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd Backend  # Change this to the correct directory if needed
           npm install
 
       - name: Build the project
         run: |
+          cd Backend  # Change this to the correct directory if needed
           npm run build
-
       - name: Deploy to Raspberry Pi
         run: |
           ssh admin@192.168.8.162 'cd /home/admin/app && git pull && npm install && npm run build && pm2 restart all' 
