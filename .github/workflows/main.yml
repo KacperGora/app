@@ -35,6 +35,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
+            echo "Deploying to Raspberry Pi ${host} as ${username} using key ${key}"
             cd /app/Backend  # Ścieżka na Raspberry Pi do katalogu backendu
             git pull origin master  # Pobranie ostatnich zmian
             npm install  # Instalacja zależności
