@@ -25,6 +25,7 @@ jobs:
 
       - name: Debug SSH Connection
         run: |
+          set -x  # Enable script debugging
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
@@ -47,7 +48,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
-            cd /home/admin/app/Backend
+            cd /home/admin/app
             git pull
             npm install
             npm run build
