@@ -2,33 +2,42 @@ name: CI/CD for Expo React Native Backend
 on:
   push:
     branches:
-      - master  # Wybierz główną gałąź, np. main
+      - master  # Upewnij się, że używasz właściwej gałęzi
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
+      - name: Checkout repository code
         uses: actions/checkout@v4
 
+      # Debugging: Check the current directory and list the files
+      - name: List files in working directory
+        run: |
+          pwd
+          ls -al
+
+      # Przejście do odpowiedniego katalogu, jeśli package.json znajduje się w podfolderze
       - name: Install dependencies
         run: |
+          cd Backend  # Zmień to, jeśli Twój plik package.json znajduje się w innym katalogu
           npm install
 
       - name: Build the project
         run: |
+          cd backend  # Znowu upewnij się, że jesteś w odpowiednim katalogu
           npm run build
 
       - name: Deploy to Raspberry Pi
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.RPI_HOSTHOST }}  # IP Twojego Raspberry Pi
-          username: ${{ secrets.RPI_USER }}  # Nazwa użytkownika na Pi
-          password: ${{ secrets.RPI_PASSWORD }}  # Hasło lub możesz użyć kluczy SSH
+          host: ${{ secrets.PI_HOST }}
+          username: ${{ secrets.PI_USER }}
+          password: ${{ secrets.PI_PASSWORD }}
           port: 22
           script: |
-            cd /app/Backend  # Ścieżka do backendu na Raspberry Pi
-            git pull origin master  # Pobierz ostatnie zmiany
-            npm install  # Zainstaluj zależności
-            npm run start  # Uruchom aplikację
+            cd /app/Backend  # Ścieżka na Raspberry Pi do katalogu backendu
+            git pull origin master  # Pobranie ostatnich zmian
+            npm install  # Instalacja zależności
+            npm run start  # Uruchomienie aplikacji
