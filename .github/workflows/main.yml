@@ -19,6 +19,8 @@ jobs:
           PI_USER: ${{ secrets.RPI_USER }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
         run: |
+          set -e
+
           echo "Starting SSH connection test"
 
           # Create .ssh directory
