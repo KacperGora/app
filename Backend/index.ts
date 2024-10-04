@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
   res.send('Good morning Kacperek')
 })
 app.get('/elo', (req, res) => {
-  res.send('Elo Kacperek co tam')
+  res.send('Elo Kacperek co tm')
 })
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)
