@@ -2,7 +2,7 @@ name: CI/CD for Expo React Native Backend
 on:
   push:
     branches:
-      - main  # Wybierz główną gałąź, np. main
+      - master 
 
 jobs:
   deploy:
