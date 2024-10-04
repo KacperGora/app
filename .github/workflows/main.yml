@@ -42,6 +42,10 @@ jobs:
           echo "Printing SSH private key:"
           cat ~/.ssh/id_rsa
 
+          # Check SSH key file format
+          echo "Checking SSH key file format:"
+          file ~/.ssh/id_rsa
+
           # Attempt SSH connection
           echo "Attempting SSH connection to $PI_USER@$PI_HOST"
           ssh -v -i ~/.ssh/id_rsa $PI_USER@$PI_HOST echo "SSH connection successful"
