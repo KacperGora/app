@@ -17,11 +17,9 @@ jobs:
          echo "Raspberry Pi IP: ${{ secrets.RASPBERRY_PI_IP }}"
          echo "Username: ${{ secrets.RASPBERRY_PI_USER }}"
       - name: Copy files to Raspberry Pi
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ secrets.RASPBERRY_PI_IP }}
-          username: ${{ secrets.RASPBERRY_PI_USER }}
-          key: ${{ secrets.RASPBERRY_PI_SSH_KEY }}
+        run: |
+          scp -i ${{ secrets.RASPBERRY_PI_SSH_KEY }} -r ./* ${{ secrets.RASPBERRY_PI_USER }}@${{ secrets.RASPBERRY_PI_IP }}:/home/admin/app/Backend
+          
 
       - name: Execute deployment script
         uses: appleboy/ssh-action@v0.1.3
