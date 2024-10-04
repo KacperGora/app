@@ -3,7 +3,7 @@ name: Deploy to Raspberry Pi
 on:
   push:
     branches:
-      - master  # Zmień na nazwę swojej gałęzi
+      - develop  # Zmień na odpowiednią nazwę gałęzi
 
 jobs:
   deploy:
@@ -20,7 +20,7 @@ jobs:
           KEY: ${{ secrets.RPI_SSH_KEY }}
         run: |
           echo "Testing SSH connection..."
-          ssh -i $KEY $USER@$HOST "echo Connection successful" || exit 1
+          ssh -i <(echo "$KEY") $USER@$HOST "echo Connection successful" || exit 1
 
       - name: Deploy to Raspberry Pi
         env:
@@ -28,7 +28,7 @@ jobs:
           USER: ${{ secrets.RPI_USER }}
           KEY: ${{ secrets.RPI_SSH_KEY }}
         run: |
-          ssh -i $KEY $USER@$HOST '
+          ssh -i <(echo "$KEY") $USER@$HOST '
           if [ ! -d "/app/Backend/.git" ]; then
             echo "Cloning the repository..."
             git clone https://github.com/user/repo.git /app/Backend || exit 1
