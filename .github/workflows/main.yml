@@ -10,21 +10,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Debug SSH connections
-      env:
-        PI_HOST: ${{ secrets.RPI_HOST }}
-        PI_USER: ${{ secrets.RPI_USER }}
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
-      run: |
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan $PI_HOST >> ~/.ssh/known_hosts
-        echo "SSH key setup complete"
-        ls -la ~/.ssh
-        cat ~/.ssh/id_rsa
-        ssh -v -i ~/.ssh/id_rsa $PI_USER@$PI_HOST echo "SSH connection successful"
-      shell: /usr/bin/bash -e {0}
+      - name: Debug SSH connection
+        env:
+          PI_HOST: ${{ secrets.RPI_HOST }}
+          PI_USER: ${{ secrets.RPI_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          echo "Starting SSH connection test"
+
+          # Create .ssh directory
+          mkdir -p ~/.ssh
+          echo "Created .ssh directory"
+
+          # Save SSH private key
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "Saved and set permissions for SSH private key"
+
+          # Add host to known hosts
+          ssh-keyscan $PI_HOST >> ~/.ssh/known_hosts
+          echo "Added $PI_HOST to known hosts"
+
+          # List contents of .ssh directory
+          echo "Listing contents of .ssh directory:"
+          ls -la ~/.ssh
+
+          # Print SSH private key (for debugging purposes, remove in production)
+          echo "Printing SSH private key:"
+          cat ~/.ssh/id_rsa
+
+          # Attempt SSH connection
+          echo "Attempting SSH connection to $PI_USER@$PI_HOST"
+          ssh -v -i ~/.ssh/id_rsa $PI_USER@$PI_HOST echo "SSH connection successful"
+        shell: /usr/bin/bash -e {0}
