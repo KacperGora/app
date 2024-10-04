@@ -21,7 +21,10 @@ jobs:
         run: |
           cd Backend  # Change this to the correct directory if needed
           npm run build
-      - name: Deploy to Raspberry Pi
+      - name: Debug SSH Connection
         run: |
-          ssh admin@192.168.8.162 'cd /home/admin/app && git pull && npm install && npm run build && pm2 restart all' 
-          
+          ssh -v ${{ secrets.RPI_USER }}@${{ secrets.RPI_HOST }} 'echo "SSH connection successful"'
+        env:
+          RPI_HOST: ${{ secrets.RPI_HOST }}
+          RPI_USER: ${{ secrets.RPI_USER }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
