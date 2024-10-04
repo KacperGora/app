@@ -1,55 +1,33 @@
-name: CI/CD for Expo React Native Backend
+name: Deploy to Raspberry Pi
 
 on:
   push:
     branches:
-      - master 
+      - main  # lub inna gałąź
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: |
-          cd Backend  # Change this to the correct directory if needed
-          npm install
-
-      - name: Build the project
-        run: |
-          cd Backend  # Change this to the correct directory if needed
-          npm run build
-
-      - name: Debug SSH Connection
-        run: |
-          set -x  # Enable script debugging
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.RPI_HOST }} >> ~/.ssh/known_hosts
-          echo "SSH key setup complete"
-          ls -la ~/.ssh
-          cat ~/.ssh/id_rsa
-          ssh -v -i ~/.ssh/id_rsa ${{ secrets.RPI_USER }}@${{ secrets.RPI_HOST }} 'echo "SSH connection successful"'
-        shell: /usr/bin/bash -e {0}
-        env:
-          RPI_HOST: ${{ secrets.RPI_HOST }}
-          RPI_USER: ${{ secrets.RPI_USER }}
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-
-      - name: Deploy to Raspberry Pi
-        uses: appleboy/ssh-action@master
+      - name: Copy files to Raspberry Pi
+        uses: appleboy/ssh-action@v0.1.3
         with:
-          host: ${{ secrets.RPI_HOST }}
-          username: ${{ secrets.RPI_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
+          host: ${{ secrets.RASPBERRY_PI_IP }}
+          username: ${{ secrets.RASPBERRY_PI_USER }}
+          key: ${{ secrets.RASPBERRY_PI_SSH_KEY }}
+
+      - name: Execute deployment script
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ secrets.RASPBERRY_PI_IP }}
+          username: ${{ secrets.RASPBERRY_PI_USER }}
+          key: ${{ secrets.RASPBERRY_PI_SSH_KEY }}
           script: |
-            cd /home/admin/app
-            git pull
+            cd /home/admin/app/Backend
             npm install
             npm run build
-            pm2 restart all
+            npm start
