@@ -12,11 +12,13 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v4
 
+      # Debugging: Check the current directory and list the files
       - name: List files in working directory
         run: |
           pwd
           ls -al
 
+      # Przejście do odpowiedniego katalogu, jeśli package.json znajduje się w podfolderze
       - name: Install dependencies
         run: |
           cd Backend  # Zmień to, jeśli Twój plik package.json znajduje się w innym katalogu
@@ -28,14 +30,13 @@ jobs:
           npm run build
 
       - name: Deploy to Raspberry Pi
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.RPI_HOST }}
           username: ${{ secrets.RPI_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
-            echo "Deploying to Raspberry Pi"
             cd /app/Backend  # Ścieżka na Raspberry Pi do katalogu backendu
             git pull origin master  # Pobranie ostatnich zmian
             npm install  # Instalacja zależności
