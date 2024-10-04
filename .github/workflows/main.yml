@@ -24,6 +24,7 @@ jobs:
           USER: admin
         run: |
           echo "Testing SSH connection..."
+          echo "Connection to $USER@$HOST..."
           ssh -i /tmp/id_rsa $USER@$HOST "echo Connection successful" || exit 1
 
       - name: Deploy to Raspberry Pi
