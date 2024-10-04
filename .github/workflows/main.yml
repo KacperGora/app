@@ -3,7 +3,7 @@ name: Deploy to Raspberry Pi
 on:
   push:
     branches:
-      - master  # Zmień na odpowiednią nazwę gałęzi
+      - master # Zmień na odpowiednią nazwę gałęzi
 
 jobs:
   deploy:
@@ -20,16 +20,17 @@ jobs:
 
       - name: Test SSH connection
         env:
-          HOST: ${{ secrets.RPI_HOST }}
-          USER: ${{ secrets.RPI_USER }}
+          HOST: 192.168.8.162
+          USER: admin
         run: |
           echo "Testing SSH connection..."
           ssh -i /tmp/id_rsa $USER@$HOST "echo Connection successful" || exit 1
 
       - name: Deploy to Raspberry Pi
         env:
-          HOST: ${{ secrets.RPI_HOST }}
-          USER: ${{ secrets.RPI_USER }}
+          HOST: 192.168.8.162
+          USER: admin
+
         run: |
           ssh -i /tmp/id_rsa $USER@$HOST '
           if [ ! -d "/app/Backend/.git" ]; then
