@@ -28,7 +28,7 @@ jobs:
           npm run build
 
       - name: Deploy to Raspberry Pi
-        uses: appleboy/ssh-action@v0.1.6
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.RPI_HOST }}
           username: ${{ secrets.RPI_USER }}
