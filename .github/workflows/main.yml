@@ -13,6 +13,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Set working directory
+      run: cd Backend
+
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
@@ -20,9 +23,11 @@ jobs:
 
     - name: Install dependencies
       run: npm install
+      working-directory: ./Backend
 
     - name: Build project
       run: npm run build
+      working-directory: ./Backend
 
     - name: Deploy to Raspberry Pi
       env:
@@ -34,5 +39,5 @@ jobs:
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan $PI_HOST >> ~/.ssh/known_hosts
-        scp -r ./dist $PI_USER@$PI_HOST:/home/$PI_USER/app
+        scp -r ./Backend/dist $PI_USER@$PI_HOST:/home/$PI_USER/app
         ssh $PI_USER@$PI_HOST 'cd /home/$PI_USER/app && npm install && npm start'
