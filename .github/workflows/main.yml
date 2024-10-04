@@ -26,7 +26,7 @@ jobs:
 
       - name: Build the project
         run: |
-          cd backend  # Znowu upewnij się, że jesteś w odpowiednim katalogu
+          cd Backend  # Znowu upewnij się, że jesteś w odpowiednim katalogu
           npm run build
 
       - name: Deploy to Raspberry Pi
