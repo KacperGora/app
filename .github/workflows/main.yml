@@ -17,9 +17,9 @@ jobs:
        echo "Zawartość katalogu przed dodaniem klucza:"
        ls -la ~/.ssh || echo "Katalog ~/.ssh nie istnieje."
        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+       chmod 600 ~/.ssh/id_rsa  # Ustawienie odpowiednich uprawnień
        echo "Zawartość katalogu po dodaniu klucza:"
        ls -la ~/.ssh
-       chmod 600 ~/.ssh/id_rsa
        ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts
        echo "Zawartość pliku id_rsa:"
        cat ~/.ssh/id_rsa
