@@ -20,5 +20,5 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to Raspberry Pi
+      - name: Deploy to Raspberry Piu
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.RASPBERRY_PI_IP }} "command_to_run"
