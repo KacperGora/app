@@ -3,23 +3,21 @@ name: Deploy to Raspberry Pi
 on:
   push:
     branches:
-      - master
+      - master  # lub inna gałąź, na którą chcesz reagować
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Debug SSH Key
+    - name: Setup SSH
       run: |
-        echo "${{ secrets.RASPBERRY_PI_SSH_KEY }}" | base64 -d > /tmp/ssh_key
-        chmod 600 /tmp/ssh_key
-        ls -l /tmp/ssh_key
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts
 
-    - name: Copy files to Raspberry Pi
-      run: |
-        scp -i /tmp/ssh_key -r ./* ${{ secrets.RASPBERRY_PI_USER }}@${{ secrets.RASPBERRY_PI_IP }}:/home/admin/app/Backend
-      shell: /usr/bin/bash -e {0}
+    - name: Deploy to Raspberry Pi
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.RASPBERRY_PI_IP }} "command_to_run"
