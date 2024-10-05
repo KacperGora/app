@@ -9,23 +9,22 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Debug SSH Setup
+    - name: Setup SSH
       run: |
-       ls -la ~/.ssh  # Sprawdź, jakie pliki są w .ssh
-       cat ~/.ssh/id_rsa  # Wyświetl klucz (upewnij się, że nie jest to na produkcji)
-       cat ~/.ssh/known_hosts  # Sprawdź znane hosty
-
-    - name: Debugging SSH Setup
-      run: |
-        pwd  # Pokaż aktualny katalog roboczy
-        ls -la  # Sprawdź zawartość katalogu
-        mkdir -p ~/.ssh
-        ls -la ~/.ssh  # Sprawdź, czy katalog został utworzony
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
-        ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts
-        cat ~/.ssh/known_hosts  # Sprawdź, czy host został dodany
-        
-
+       set -x
+       echo "Tworzenie katalogu .ssh"
+       mkdir -p ~/.ssh
+       echo "Zawartość katalogu przed dodaniem klucza:"
+       ls -la ~/.ssh || echo "Katalog ~/.ssh nie istnieje."
+       echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+       echo "Zawartość katalogu po dodaniu klucza:"
+       ls -la ~/.ssh
+       chmod 600 ~/.ssh/id_rsa
+       ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts
+       echo "Zawartość pliku id_rsa:"
+       cat ~/.ssh/id_rsa
+       echo "Zawartość pliku known_hosts:"
+       cat ~/.ssh/known_hosts
     - name: Setup SSH
       run: |
         set -x
