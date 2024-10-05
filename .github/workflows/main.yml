@@ -9,30 +9,32 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Setup SSH
-      run: |
-       set -x
-       echo "Tworzenie katalogu .ssh"
-       mkdir -p ~/.ssh
-       echo "Zawartość katalogu przed dodaniem klucza:"
-       ls -la ~/.ssh || echo "Katalog ~/.ssh nie istnieje."
-       echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-       chmod 600 ~/.ssh/id_rsa  # Ustawienie odpowiednich uprawnień
-       echo "Zawartość katalogu po dodaniu klucza:"
-       ls -la ~/.ssh
-       ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts
-       echo "Zawartość pliku id_rsa:"
-       cat ~/.ssh/id_rsa
-       echo "Zawartość pliku known_hosts:"
-       cat ~/.ssh/known_hosts
+
     - name: Setup SSH
       run: |
         set -x
+        echo "Tworzenie katalogu .ssh"
         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
-        ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts
+        echo "Zawartość katalogu przed dodaniem klucza:"
+        ls -la ~/.ssh || echo "Katalog ~/.ssh nie istnieje."
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/id_rsa
+        echo "Zawartość katalogu po dodaniu klucza:"
+        ls -la ~/.ssh
+
+        # Dodajemy znane hosty
+        echo "Dodawanie znanych hostów:"
+        ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts || echo "Błąd podczas dodawania znanych hostów"
+
+        echo "Zawartość pliku id_rsa:"
+        cat ~/.ssh/id_rsa
+        echo "Zawartość pliku known_hosts:"
+        cat ~/.ssh/known_hosts
 
     - name: Deploy to Raspberry Pi
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.RASPBERRY_PI_IP }} "command_to_run"
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        echo "Próba połączenia SSH"
+        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.RASPBERRY_PI_IP }} "echo 'Połączenie udane!'" || echo "Błąd przy próbie połączenia SSH"
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.RASPBERRY_PI_IP }} "command_to_run"
