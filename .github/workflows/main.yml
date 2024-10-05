@@ -3,21 +3,22 @@ name: Deploy to Raspberry Pi
 on:
   push:
     branches:
-      - master  # lub inna gałąź, na którą chcesz reagować
+      - master # lub inna gałąź, na którą chcesz reagować
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Setup SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts
+      - name: Setup SSH
+        run: |
+          set -x
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts
 
-    - name: Deploy to Raspberry Pi
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.RASPBERRY_PI_IP }} "command_to_run"
+      - name: Deploy to Raspberry Pi
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.RASPBERRY_PI_IP }} "command_to_run"
