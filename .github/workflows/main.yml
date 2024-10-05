@@ -9,7 +9,11 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
+    - name: Debug SSH Setup
+      run: |
+       ls -la ~/.ssh  # Sprawdź, jakie pliki są w .ssh
+       cat ~/.ssh/id_rsa  # Wyświetl klucz (upewnij się, że nie jest to na produkcji)
+       cat ~/.ssh/known_hosts  # Sprawdź znane hosty
     - name: Setup SSH
       run: |
         set -x
