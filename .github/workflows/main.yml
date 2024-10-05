@@ -14,6 +14,18 @@ jobs:
        ls -la ~/.ssh  # Sprawdź, jakie pliki są w .ssh
        cat ~/.ssh/id_rsa  # Wyświetl klucz (upewnij się, że nie jest to na produkcji)
        cat ~/.ssh/known_hosts  # Sprawdź znane hosty
+
+    - name: Debugging SSH Setup
+      run: |
+        pwd  # Pokaż aktualny katalog roboczy
+        ls -la  # Sprawdź zawartość katalogu
+        mkdir -p ~/.ssh
+        ls -la ~/.ssh  # Sprawdź, czy katalog został utworzony
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+        ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts
+        cat ~/.ssh/known_hosts  # Sprawdź, czy host został dodany
+        
+
     - name: Setup SSH
       run: |
         set -x
