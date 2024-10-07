@@ -13,7 +13,7 @@ jobs:
     - name: Setup SSH
       run: |
         set -x
-        echo "Tworzenie katalogu .ssh"
+        echo "Tworzenie katalogu a .ssh"
         mkdir -p ~/.ssh
         echo "Zawartość katalogu przed dodaniem klucza:"
         ls -la ~/.ssh || echo "Katalog ~/.ssh nie istnieje."
