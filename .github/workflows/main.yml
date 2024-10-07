@@ -1,27 +1,35 @@
-name: Deploy to Raspberry Pi
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - master  # lub inna główna gałąź
+      - master
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # lub inna wersja Node.js
 
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Install dependencies for backend
+        working-directory: ./Backend
+        run: npm install
 
-    - name: Copy files to Raspberry Pi
-      run: |
-        scp -r ./ admin@192.168.8.162:/home/admin/testapp
+      - name: Install dependencies for frontend
+        working-directory: ./Frontend
+        run: npm install
 
-    - name: Restart PM2 service
-      run: |
-        ssh admin@192.168.8.162 'pm2 restart all'
+      - name: Run tests for frontend
+        working-directory: ./Frontend
+        run: npm test
+
+      - name: Deploy to Raspberry Pi
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} admin@raspberrypi 'bash -s' < ./deploy.sh
