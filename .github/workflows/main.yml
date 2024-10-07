@@ -18,14 +18,9 @@ jobs:
         with:
           node-version: '16'  # lub inna wersja Node.js
 
-      - name: Install dependencies for backend
-        working-directory: ./Backend
-        run: npm install
-
-      - name: Install dependencies for frontend
-        working-directory: ./Frontend
-        run: npm install
-
       - name: Deploy to Raspberry Pi
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_KEY }} admin@192.168.8.162 'bash -s' < ./scripts/deploy.sh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
+          chmod 600 id_rsa
+          ssh -o StrictHostKeyChecking=no -i id_rsa admin@192.168.8.162 'bash -s' < ./scripts/deploy.sh
+          rm id_rsa  # opcjonalnie, aby usunąć klucz po użyciu
