@@ -10,7 +10,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Setup SSH
+    - name: Setup SSHh
       run: |
         set -x
         echo "Tworzenie katalogu a .ssh"
