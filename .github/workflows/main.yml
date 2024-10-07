@@ -1,40 +1,27 @@
-on: 
+name: Deploy to Raspberry Pi
+
+on:
   push:
     branches:
-      - master
+      - master  # lub inna główna gałąź
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Setup SSHh
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Copy files to Raspberry Pi
       run: |
-        set -x
-        echo "Tworzenie katalogu a .ssh"
-        mkdir -p ~/.ssh
-        echo "Zawartość katalogu przed dodaniem klucza:"
-        ls -la ~/.ssh || echo "Katalog ~/.ssh nie istnieje."
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        eval "$(ssh-agent -s)"
-        ssh-add ~/.ssh/id_rsa
-        echo "Zawartość katalogu po dodaniu klucza:"
-        ls -la ~/.ssh
+        scp -r ./ admin@192.168.8.162:/home/admin/testapp
 
-        # Dodajemy znane hosty
-        echo "Dodawanie znanych hostów:"
-        ssh-keyscan -H ${{ secrets.RASPBERRY_PI_IP }} >> ~/.ssh/known_hosts || echo "Błąd podczas dodawania znanych hostów"
-
-        echo "Zawartość pliku id_rsa:"
-        cat ~/.ssh/id_rsa
-        echo "Zawartość pliku known_hosts:"
-        cat ~/.ssh/known_hosts
-
-    - name: Deploy to Raspberry Pi
+    - name: Restart PM2 service
       run: |
-        echo "Próba połączenia SSH"
-        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.RASPBERRY_PI_IP }} "echo 'Połączenie udane!'" || echo "Błąd przy próbie połączenia SSH"
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.RASPBERRY_PI_IP }} "command_to_run"
+        ssh admin@192.168.8.162 'pm2 restart all'
