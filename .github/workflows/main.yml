@@ -22,5 +22,5 @@ jobs:
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
           chmod 600 id_rsa
-          ssh -o StrictHostKeyChecking=no -i id_rsa admin@192.168.8.162 'bash -s' < ./scripts/deploy.sh
+          ssh -o StrictHostKeyChecking=no -i id_rsa admin@46.112.108.11 'bash -s' < ./scripts/deploy.sh
           rm id_rsa  # opcjonalnie, aby usunąć klucz po użyciu

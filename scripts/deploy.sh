@@ -1,10 +1,12 @@
 #!/bin/bash
 
 # Przechodzimy do katalogu backend
-cd /home/admin/app/Backend
+
+
+cd Backend
 
 # Pull najnowszych zmian
-git pull origin main
+git pull origin master
 
 # Instalujemy zależności
 npm install
@@ -13,9 +15,9 @@ npm install
 pm2 restart all  # lub użyj innego narzędzia do zarządzania procesami
 
 # Przechodzimy do katalogu frontend
-cd /home/admin/app/Frontend
+cd Frontend
 # Pull najnowszych zmian
-git pull origin main
+git pull origin master
 
 # Instalujemy zależności
 npm install
