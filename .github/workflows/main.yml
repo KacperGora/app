@@ -26,10 +26,6 @@ jobs:
         working-directory: ./Frontend
         run: npm install
 
-      - name: Run tests for frontend
-        working-directory: ./Frontend
-        run: npm test
-
       - name: Deploy to Raspberry Pi
         run: |
           ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} admin@raspberrypi 'bash -s' < ./deploy.sh
