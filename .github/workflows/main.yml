@@ -19,22 +19,24 @@ jobs:
         with:
           node-version: '20.9.0' # Ustaw wersję Node.js
 
-      # Krok 3: Instalacja zależności
+      # Krok 3: Przejdź do folderu Backend
+      - name: Change directory to Backend
+        run: cd Backend || exit 1  # Upewnij się, że folder istnieje
+
+      # Krok 4: Instalacja zależności projektu
       - name: Install dependencies
         run: |
-          cd app/Backend  # Przejdź do folderu Backend
+          cd Backend # Upewnij się, że jesteśmy w folderze Backend
           npm install
 
-      # Krok 4: Budowanie projektu (jeśli jest wymagane)
+      # Krok 5: Budowanie projektu
       - name: Run build
         run: |
-          cd app/Backend  # Przejdź do folderu Backend
-          npm run build   # Wykonaj budowanie projektu, jeśli jest
+          cd Backend # Upewnij się, że jesteśmy w folderze Backend
+          npm run build
 
-      # Krok 5: Restart serwera (np. PM2)
+      # Krok 6: Restart serwera (np. PM2)
       - name: Restart server
         run: |
-          cd app/Backend  # Przejdź do folderu Backend
-          pm2 stop backend || true  # Zatrzymaj aplikację, jeśli działa
-          pm2 start index.ts --name "backend"  # Uruchom aplikację
-
+          pm2 stop all || true  # Zatrzymaj wszystkie instancje aplikacji
+          pm2 restart backend || pm2 start npm --name "backend" -- run start # Restartuj lub uruchom aplikację, jeśli nie istnieje
