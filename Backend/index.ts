@@ -17,7 +17,7 @@ app.use('/api', apiRouter)
 app.use('/event', eventRouter)
 
 app.get('/', (req, res) => {
-  res.send('amigo!')
+  res.send('amigo siemanko!')
 })
 
 app.get('/elo', (req, res) => {
