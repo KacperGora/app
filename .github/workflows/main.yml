@@ -9,39 +9,25 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
-      # Krok 1: Checkout kodu z repozytorium
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Krok 2: Instalacja Node.js w wersji 20.9.0
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20.9.0'
 
-      # Krok 3: Przejdź do folderu Backend i wykonaj git pull
-      - name: Pull latest changes
-        run: |
-          cd Backend
-          git pull origin master
-
-      # Krok 4: Instalacja zależności projektu
       - name: Install dependencies
         run: |
-          cd Backend
+          cd ~/app/Backend
           npm install
 
-      # Krok 5: Budowanie projektu
-      - name: Run build
+      - name: Pull latest changes
         run: |
-          cd Backend
-          npm run build
+          cd ~/app/Backend
+          git pull origin master
 
-      # Krok 6: Restart serwera (np. PM2)
-      - name: Restart server
-        env:
-          NODE_ENV: production
-          PORT: 3000 # lub inny port, który używasz
+      - name: Restart PM2 application
         run: |
           pm2 stop backend || true
-          pm2 start ./index.ts --name "backend"
+          pm2 start index.js --name "backend"
