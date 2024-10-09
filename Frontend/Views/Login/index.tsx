@@ -10,6 +10,7 @@ interface LoginForm {
   username: string
   password: string
 }
+
 const LoginScreen = () => {
   const { setIsLoggedIn, setLogin, setUserId } = useContext(AuthContext) as AuthContextType
   const [remindChecked, setRemindChecked] = useState(false)
@@ -32,6 +33,7 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     try {
+      console.log('loginForm:', loginForm);
       const response = await api.post('auth/login', { username, password })
       const { data } = response
       const {

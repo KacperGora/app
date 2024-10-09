@@ -12,5 +12,10 @@ export const pl = {
       username: 'Nazwa użytkownika',
       password: 'Hasło',
     },
+    navigation: {
+      appointments: 'Wizyty',
+      clients: 'Klienci',
+      company: 'Firma',
+    },
   },
 }

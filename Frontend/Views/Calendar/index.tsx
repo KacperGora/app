@@ -11,6 +11,7 @@ import ModalComponent from '../../components/Modal'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import api from '../../helpers/api'
 import { AuthContext, AuthContextType } from '../../context/AuthContext'
+import { colors } from '../../theme/theme'
 
 const Calendar = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date())
@@ -43,42 +44,43 @@ const Calendar = () => {
         console.error('Error:', error)
       }
     }
-    fetchList()
+    // fetchList()
   }, [])
-console.log(events);
+  console.log(events)
   return (
     <>
       {addEventModal && <ModalComponent visible={addEventModal} toggleModal={toggleEventModal} />}
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <SafeAreaView style={{ flex: 1 }}>
-          <View style={styles.wrapper}>
-            <Topbar />
-            <SingleDayBarItem
-              onPressDayNumber={toggleEventModal}
-              locale={'pl'}
-              onDragCreateEventEnd={_onDragCreateEnd}
-              onPressBackground={toggleEventModal}
-              allowDragToCreate
-              events={events}
-              allowPinchToZoom
-              useHaptic
-              theme={{
-                nowIndicatorColor: '#FF0000',
-                headerContainer: {
-                  backgroundColor: '#f5f5f5',
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 2,
-                  },
-                  shadowOpacity: 0.25,
-                  borderBottomWidth: 2,
-                  borderBottomColor: '#ddd',
+        {/* <SafeAreaView> */}
+        <View style={styles.wrapper}>
+          <Topbar />
+          <SingleDayBarItem
+            onPressDayNumber={toggleEventModal}
+            locale={'pl'}
+            onDragCreateEventEnd={_onDragCreateEnd}
+            onPressBackground={toggleEventModal}
+            allowDragToCreate
+            events={events}
+            spaceFromBottom={0}
+            allowPinchToZoom
+            useHaptic
+            theme={{
+              nowIndicatorColor: '#FF0000',
+              headerContainer: {
+                backgroundColor: '#f5f5f5',
+                shadowColor: '#000',
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
                 },
-              }}
-            />
-          </View>
-        </SafeAreaView>
+                shadowOpacity: 0.25,
+                borderBottomWidth: 2,
+                borderBottomColor: '#ddd',
+              },
+            }}
+          />
+        </View>
+        {/* </SafeAreaView> */}
       </GestureHandlerRootView>
     </>
   )
