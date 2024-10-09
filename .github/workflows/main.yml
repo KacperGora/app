@@ -39,6 +39,9 @@ jobs:
 
       # Krok 6: Restart serwera (np. PM2)
       - name: Restart server
+        env:
+          NODE_ENV: production
+          PORT: 3000 # lub inny port, który używasz
         run: |
           pm2 stop backend || true
-          pm2 start backend || pm2 start npm --name "backend" -- run start
+          pm2 start ./index.ts --name "backend"
