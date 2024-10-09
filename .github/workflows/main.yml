@@ -36,4 +36,4 @@ jobs:
       - name: Restart server
         run: |
           pm2 stop all || true  # Zatrzymaj wszystkie instancje aplikacji
-          pm2 start npm --name "index" -- run start # Uruchom ponownie aplikację
+          pm2 restart index || pm2 start npm --name "index" -- run start # Restartuj lub uruchom aplikację, jeśli nie istnieje
