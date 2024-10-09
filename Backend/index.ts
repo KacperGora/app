@@ -17,7 +17,7 @@ app.use('/api', apiRouter)
 app.use('/event', eventRouter)
 
 app.get('/', (req, res) => {
-  res.send('test usiemano!')
+  res.send('Finał testów')
 })
 
 app.get('/elo', (req, res) => {
