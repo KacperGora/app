@@ -30,4 +30,4 @@ jobs:
       - name: Restart PM2 application
         run: |
           pm2 stop backend || true
-          pm2 start index.js --name "backend"
+          pm2 start index.ts --name "backend"
