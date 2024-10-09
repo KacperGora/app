@@ -17,26 +17,28 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.9.0' # Ustaw wersję Node.js
+          node-version: '20.9.0'
 
-      # Krok 3: Przejdź do folderu Backend
-      - name: Change directory to Backend
-        run: cd Backend || exit 1  # Upewnij się, że folder istnieje
+      # Krok 3: Przejdź do folderu Backend i wykonaj git pull
+      - name: Pull latest changes
+        run: |
+          cd Backend
+          git pull origin master
 
       # Krok 4: Instalacja zależności projektu
       - name: Install dependencies
         run: |
-          cd Backend # Upewnij się, że jesteśmy w folderze Backend
+          cd Backend
           npm install
 
       # Krok 5: Budowanie projektu
       - name: Run build
         run: |
-          cd Backend # Upewnij się, że jesteśmy w folderze Backend
+          cd Backend
           npm run build
 
       # Krok 6: Restart serwera (np. PM2)
       - name: Restart server
         run: |
-          pm2 stop all || true  # Zatrzymaj wszystkie instancje aplikacji
-          pm2 restart backend || pm2 start npm --name "backend" -- run start # Restartuj lub uruchom aplikację, jeśli nie istnieje
+          pm2 stop backend || true
+          pm2 start backend || pm2 start npm --name "backend" -- run start
