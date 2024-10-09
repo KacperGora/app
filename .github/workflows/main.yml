@@ -21,7 +21,9 @@ jobs:
       # Krok 3: Przejdź do folderu Backend
       - name: Change directory to Backend
         run: cd Backend 
-             git pull origin master
+      
+      - name: Pull 
+        run: git pull origin master
       # Krok 4: Instalacja zależności projektu
       - name: Install dependencies
         run: |
