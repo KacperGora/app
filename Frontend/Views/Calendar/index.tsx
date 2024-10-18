@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import api from '../../helpers/api'
 import { AuthContext, AuthContextType } from '../../context/AuthContext'
 import { colors } from '../../theme/theme'
+import BottomSheet from '../../components/BottomSheet'
 
 const Calendar = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date())
@@ -51,6 +52,11 @@ const Calendar = () => {
     <>
       {addEventModal && <ModalComponent visible={addEventModal} toggleModal={toggleEventModal} />}
       <GestureHandlerRootView style={{ flex: 1 }}>
+        <BottomSheet>
+          <View>
+            <Text>xds</Text>
+          </View>
+        </BottomSheet>
         {/* <SafeAreaView> */}
         <View style={styles.wrapper}>
           <Topbar />

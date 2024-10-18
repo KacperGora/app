@@ -3,10 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export type AuthContextType = {
   isLoggedIn: boolean | null
-  setIsLoggedIn: Dispatch<SetStateAction<boolean | null>>
   login: string
-  setLogin: Dispatch<SetStateAction<string>>
   userId: string
+  setIsLoggedIn: Dispatch<SetStateAction<boolean | null>>
+  setLogin: Dispatch<SetStateAction<string>>
   setUserId: Dispatch<SetStateAction<string>>
 }
 

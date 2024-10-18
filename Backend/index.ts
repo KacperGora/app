@@ -5,6 +5,7 @@ import { authMiddleware } from './authMiddleware'
 import apiRouter from './routes/apiRouter'
 import router from './routes/authRoutes'
 import eventRouter from './routes/eventRoutes'
+import clientRouter from './routes/clientRoutes'
 
 const app = express()
 
@@ -15,6 +16,7 @@ connectDb(MONGO_URI)
 app.use('/auth', router)
 app.use('/api', apiRouter)
 app.use('/event', eventRouter)
+app.use('/client', authMiddleware, clientRouter)
 
 app.get('/', (req, res) => {
   res.send('Finał testów')

@@ -1,6 +1,8 @@
 import 'intl-pluralrules'
 import React, { useCallback, useContext, useEffect } from 'react'
-import { ActivityIndicator, SafeAreaView } from 'react-native'
+import { ActivityIndicator, SafeAreaView, AppRegistry } from 'react-native'
+import { name as appName } from './package.json'
+
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
@@ -20,6 +22,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Customers from './Views/Customers'
 import Company from './Views/Company'
 import { colors } from './theme/theme'
+AppRegistry.registerComponent(appName, () => App)
 
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
@@ -95,15 +98,15 @@ const HomeTabs = () => (
 const AppNavigator = ({ isLoggedIn }: { isLoggedIn: boolean }) => (
   <NavigationContainer>
     <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={isLoggedIn ? 'HomeTabs' : 'Welcome'}>
-        {isLoggedIn ? (
-          <Stack.Screen name='HomeTabs' component={HomeTabs} />
-        ) : (
-          <>
-            <Stack.Screen name='Welcome' component={WelcomeScreen} />
-            <Stack.Screen name='Login' component={LoginScreen} />
-            <Stack.Screen name='Register' component={Register} />
-          </>
-        )}
+      {isLoggedIn ? (
+        <Stack.Screen name='HomeTabs' component={HomeTabs} />
+      ) : (
+        <>
+          <Stack.Screen name='Welcome' component={WelcomeScreen} />
+          <Stack.Screen name='Login' component={LoginScreen} />
+          <Stack.Screen name='Register' component={Register} />
+        </>
+      )}
     </Stack.Navigator>
   </NavigationContainer>
 )
