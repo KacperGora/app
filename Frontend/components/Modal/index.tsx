@@ -18,14 +18,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({ visible, toggleModal })
           toggleModal()
         }}
       >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Hello World!</Text>
-            <Pressable style={[styles.button, styles.buttonClose]} onPress={toggleModal}>
-              <Text style={styles.textStyle}>Close</Text>
-            </Pressable>
-          </View>
-        </View>
+        
       </Modal>
     </View>
   )

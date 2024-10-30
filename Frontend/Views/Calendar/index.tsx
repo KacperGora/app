@@ -1,96 +1,125 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useRef, useState, useEffect, forwardRef, useMemo } from 'react'
 import 'intl-pluralrules'
-import { View, StyleSheet, Text } from 'react-native'
-import { GestureHandlerRootView, HandlerStateChangeEvent, PanGestureHandlerEventPayload, State } from 'react-native-gesture-handler'
-import Topbar from '../../modules/Calendar/Topbar'
-import SingleDayBarItem from '@howljs/calendar-kit'
-import MonthConfig from '@howljs/calendar-kit'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useModal } from '../../helpers/hooks'
-import ModalComponent from '../../components/Modal'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import api from '../../helpers/api'
-import { AuthContext, AuthContextType } from '../../context/AuthContext'
-import { colors } from '../../theme/theme'
-import BottomSheet from '../../components/BottomSheet'
+import { View, StyleSheet } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { CalendarContainer, CalendarHeader, CalendarBody, CalendarKitHandle, OnCreateEventResponse } from '@howljs/calendar-kit'
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
+import dayjs from 'dayjs'
+import { debounce } from 'lodash'
+import { useModal } from '@helpers/hooks'
+import api from '@helpers/api'
+import { DATE_FORMAT_FULL_MONTH_WITH_YEAR } from '@helpers/constants'
+import CreateEventForm from '@modules/Calendar/CreateEventForm'
+import { CALENDAR_ENUM, calendarContainerConfig, handleChange } from './utils'
 
-const Calendar = () => {
-  const [currentWeek, setCurrentWeek] = useState(new Date())
-  const { userId } = useContext(AuthContext) as AuthContextType
+export interface EventForm {
+  start: string
+  end: string
+  service: string
+  notes: string
+  clientId: string
+}
 
-  const [events, setEvents] = useState<any[]>([])
+const { withoutWeekends } = CALENDAR_ENUM
+
+export type CalendarRouteProp = {
+  params: {
+    mode: number
+    onMonthChange: (date: string) => void
+  }
+}
+
+const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(({ params }, ref) => {
+  const bottomSheetRef = useRef<BottomSheet>(null)
   const [addEventModal, toggleEventModal] = useModal()
-  console.log(userId)
-  const _onDragCreateEnd = async () => {
-    const token = await AsyncStorage.getItem('token')
-    try {
-      const response = await api.post(
-        'event/create',
-        { title: 'new title', start: new Date(), end: new Date(), userId: userId, description: 'new description' },
-        { headers: { Authorization: `Bearer ${token}` } },
-      )
+  const [events, setEvents] = useState<any[]>([])
+  const [eventForm, setEventForm] = useState<EventForm>({
+    start: '',
+    end: '',
+    service: '',
+    clientId: '',
+    notes: '',
+  })
+  const { mode } = useMemo(() => params, [params])
+  const handleEventChange = (event: OnCreateEventResponse) => {
+    const {
+      start: { dateTime: start },
+      end: { dateTime: end },
+    } = event
+    setEventForm((prev) => ({
+      ...prev,
+      start,
+      end,
+      service: 'Sukces',
+    }))
+    toggleEventModal()
+  }
 
-      console.log(response)
+  const handleSheetChanges = useCallback((index: number) => {
+    if (index === -1) {
+      toggleEventModal()
+    }
+  }, [])
+
+  const fetchList = async () => {
+    try {
+      const { data } = await api.get('event/getEvents')
+      const parseEvents = data.map((event: any) => ({
+        ...event,
+        title: `${event.service} - ${event.clientName}`,
+        start: { dateTime: event.start },
+        end: { dateTime: event.end },
+        color: '#4285F4',
+      }))
+      setEvents(parseEvents)
     } catch (error) {
-      console.error('Error:', error)
+      console.error('Error fetching events', error)
     }
   }
 
-  useEffect(() => {
-    const fetchList = async () => {
-      try {
-        const response = await api.get(`event/getEvents/66da9a5c0e279d7297e322c4`)
-        setEvents(response.data)
-      } catch (error) {
-        console.error('Error:', error)
-      }
-    }
-    // fetchList()
-  }, [])
-  console.log(events)
+  const handleDateChange = (date: string) => {
+    console.log('date', date);
+    const { onMonthChange } = params
+    onMonthChange(dayjs(date).locale('pl').format(DATE_FORMAT_FULL_MONTH_WITH_YEAR))
+  }
+
+  const handleDragCreateEventEnd = (event: OnCreateEventResponse) => {
+    handleEventChange(event)
+  }
+
+  const handleRefresh = () => {
+    fetchList()
+  }
+
   return (
-    <>
-      {addEventModal && <ModalComponent visible={addEventModal} toggleModal={toggleEventModal} />}
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <BottomSheet>
-          <View>
-            <Text>xds</Text>
-          </View>
+    <GestureHandlerRootView>
+      <View style={styles.wrapper}>
+        <CalendarContainer
+          ref={ref}
+          events={events}
+          scrollByDay={false}
+          firstDay={0}
+          hideWeekDays={mode === withoutWeekends ? [5, 6] : []}
+          numberOfDays={mode}
+          onDateChanged={handleDateChange}
+          onDragCreateEventEnd={handleDragCreateEventEnd}
+          onRefresh={handleRefresh}
+          {...calendarContainerConfig}
+        >
+          <CalendarHeader />
+          <CalendarBody showNowIndicator />
+        </CalendarContainer>
+      </View>
+      {addEventModal && (
+        <BottomSheet enablePanDownToClose ref={bottomSheetRef} onChange={handleSheetChanges} snapPoints={['80%']}>
+          <BottomSheetView>
+            <CreateEventForm onEventCreateRequest={fetchList} initialState={eventForm} />
+          </BottomSheetView>
         </BottomSheet>
-        {/* <SafeAreaView> */}
-        <View style={styles.wrapper}>
-          <Topbar />
-          <SingleDayBarItem
-            onPressDayNumber={toggleEventModal}
-            locale={'pl'}
-            onDragCreateEventEnd={_onDragCreateEnd}
-            onPressBackground={toggleEventModal}
-            allowDragToCreate
-            events={events}
-            spaceFromBottom={0}
-            allowPinchToZoom
-            useHaptic
-            theme={{
-              nowIndicatorColor: '#FF0000',
-              headerContainer: {
-                backgroundColor: '#f5f5f5',
-                shadowColor: '#000',
-                shadowOffset: {
-                  width: 0,
-                  height: 2,
-                },
-                shadowOpacity: 0.25,
-                borderBottomWidth: 2,
-                borderBottomColor: '#ddd',
-              },
-            }}
-          />
-        </View>
-        {/* </SafeAreaView> */}
-      </GestureHandlerRootView>
-    </>
+      )}
+    </GestureHandlerRootView>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {
@@ -98,41 +127,6 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     flex: 1,
-  },
-  calendarContainer: {
-    flex: 1,
-  },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 10,
-    backgroundColor: '#f5f5f5',
-  },
-  dayLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  timeline: {
-    flexDirection: 'row',
-    flex: 1,
-  },
-  hourList: {
-    width: 60,
-  },
-  hourCell: {
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  dayColumns: {
-    flex: 1,
-  },
-  dayColumn: {
-    flex: 1,
-    borderLeftWidth: 1,
-    borderLeftColor: '#ddd',
   },
 })
 

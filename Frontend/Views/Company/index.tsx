@@ -1,12 +1,23 @@
 import React from 'react'
-import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
+import { SafeAreaView, View, Text, StyleSheet, Dimensions } from 'react-native'
+import FinanceView from '../../modules/Company/Finance'
+import CompanyStatistics from '../../modules/Company/CompanyStatistic'
+import { ScrollView } from 'react-native-gesture-handler'
+import { Title } from 'react-native-paper'
+import { colors } from '../../theme/theme'
+import Carousel from 'react-native-reanimated-carousel'
+const width = Dimensions.get('window').width
 
 const Company = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <Text>Firma</Text>
-      </View>
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <View>
+          <Title style={styles.heading}>Finanse firmowe</Title>
+        </View>
+        <CompanyStatistics />
+        <FinanceView />
+      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -16,9 +27,11 @@ export default Company
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: colors.background,
   },
-  input: {
-    marginBottom: 12,
+  heading: {
+    marginBottom: 16,
+    color: colors.textPrimary,
+    fontWeight: '600',
   },
 })

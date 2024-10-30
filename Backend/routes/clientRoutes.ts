@@ -1,10 +1,12 @@
-import { Router } from 'express'
-import { authMiddleware } from '../authMiddleware'
-import { addClient } from '../controllers/clientControllers'
+import express from 'express'
+import { addClient, deleteClient, getClients } from '../controllers/clientControllers'
+import {} from '../'
+import authMiddleware from '../middleware/authMiddleWare'
 
-const clientRouter = Router()
+const router = express.Router()
 
-// clientRouter.get('/list', authMiddleware, null)
-clientRouter.post(`/addClient`, authMiddleware, addClient)
+router.post('/addClient', authMiddleware as any, addClient as any)
+router.get('/getClient', authMiddleware as any, getClients as any)
+router.post('/delete', authMiddleware as any, deleteClient as any)
 
-export default clientRouter
+export default router

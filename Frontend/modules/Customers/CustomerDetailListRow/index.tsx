@@ -1,47 +1,70 @@
 import dayjs from 'dayjs'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { DEFAULT_DATE_FORMAT } from '../../../helpers/constants'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { DEFAULT_DATE_FORMAT, DEFAULT_DATE_FORMAT_WITH_TIME } from '../../../helpers/constants'
 import { Swipeable } from 'react-native-gesture-handler'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { EventForm } from '../../../Views/Calendar'
 
 export interface Customer {
   name: string
-  phone: string
+  lastName: string
+  phoneNumber: string
   lastVisit: string
+  id: string
+  events: EventForm[]
 }
+
+type PhoneMethod = 'tel' | 'sms'
 
 interface Props {
-  navigation: StackNavigationProp<any>
-  item: Customer
-  onSwipeLeft: (customer: Customer) => void // Dodano props do obsługi akcji swipe
+  customer: Customer
 }
 
-const CustomerDetailListRow: React.FC<Props> = ({ navigation, item, onSwipeLeft }) => {
-  const handlePress = (customer: Customer) => {
-    navigation.navigate('CustomerDetail', { customer })
+const CustomerDetailListRow: React.FC<Props> = ({ customer }) => {
+  const { lastName, name, lastVisit, phoneNumber, events } = customer
+  console.log(customer)
+  const handlePhonePress = (type: PhoneMethod) => () => {
+    let url = `${type}:${phoneNumber}`
+    if (type === 'sms') {
+      url += `?body=${encodeURIComponent('Przypomnienie o wizycie w salonie dnia: ' + dayjs().format(DEFAULT_DATE_FORMAT))}`
+    }
+    Linking.openURL(url)
   }
 
-  const { name, phone, lastVisit } = item
+  const handleSwipeableOpen = (direction: 'left' | 'right') => {
+    if (direction === 'right') {
+      console.log('Swiped right')
+    }
+  }
+  const handleDeleteCustomer = () => {
+    console.log('Delete customer')
+  }
 
-  // Funkcja do renderowania zawartości po lewej stronie
   const renderLeftAction = () => {
     return (
-      <View style={styles.leftAction}>
-        <Text style={styles.leftActionText}>Usuń</Text>
-      </View>
+      <TouchableOpacity onPress={handleDeleteCustomer} style={styles.leftAction}>
+        <Icon name='delete-outline' size={24} color='red' style={styles.leftActionIcon} />
+      </TouchableOpacity>
     )
   }
 
   return (
-    <Swipeable renderLeftActions={renderLeftAction} onSwipeableLeftOpen={() => onSwipeLeft(item)}>
-      <TouchableOpacity onPress={() => handlePress(item)} activeOpacity={0.7}>
-        <View style={styles.item}>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.phone}>{phone}</Text>
-          <Text style={styles.lastVisit}>{`Ostatnia wizyta: ${dayjs(lastVisit).locale('pl').format(DEFAULT_DATE_FORMAT)}`}</Text>
-        </View>
-      </TouchableOpacity>
-    </Swipeable>
+    <TouchableOpacity>
+      <Swipeable renderLeftActions={renderLeftAction} onSwipeableOpen={handleSwipeableOpen}>
+        <TouchableOpacity style={styles.item} accessibilityLabel={`Customer ${name} ${lastName}`}>
+          <Text style={styles.name}>{`${name} ${lastName}`}</Text>
+          <View style={styles.phoneWrapper}>
+            <TouchableOpacity onPress={handlePhonePress('tel')} accessibilityLabel={`Call ${name}`}>
+              <Text style={styles.phone}>{phoneNumber}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handlePhonePress('sms')} accessibilityLabel={`Send SMS to ${name}`}>
+              <Icon name='message-outline' size={24} color='#666' />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.lastVisit}>{`Ostatnia wizyta: ${dayjs(events[0].start).format(DEFAULT_DATE_FORMAT_WITH_TIME)}`}</Text>
+        </TouchableOpacity>
+      </Swipeable>
+    </TouchableOpacity>
   )
 }
 
@@ -77,15 +100,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
   },
+
+  phoneWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
   leftAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'flex-end',
-    backgroundColor: '#ff3d00', // Kolor akcji
-    width: 80,
-    paddingHorizontal: 10,
+    width: 50,
   },
-  leftActionText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+  leftActionIcon: {},
 })

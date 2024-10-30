@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import { createEvent, getEvents } from '../controllers/evenetsControllers'
-import { authMiddleware } from '../authMiddleware'
+import authMiddleware from '../middleware/authMiddleWare'
 
 const eventRouter = Router()
 
 eventRouter.post('/create', authMiddleware, createEvent)
-eventRouter.get(`/getEvents/:id`, authMiddleware, getEvents)
+eventRouter.get(`/getEvents/`, authMiddleware, getEvents)
 
 export default eventRouter

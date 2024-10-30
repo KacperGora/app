@@ -2,7 +2,6 @@ import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import User from '../models/User'
-import { SECRET_KEY } from '../authMiddleware'
 
 export const calendar = async (req: Request, res: Response) => {
   try {

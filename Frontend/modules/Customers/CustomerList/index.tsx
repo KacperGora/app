@@ -1,54 +1,90 @@
-import dayjs from 'dayjs'
-import React, { useState, useEffect } from 'react'
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button, SafeAreaView } from 'react-native'
-import { DEFAULT_DATE_FORMAT } from '../../../helpers/constants'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { View, Text, FlatList, StyleSheet, SafeAreaView } from 'react-native'
+import api from '../../../helpers/api'
 import CustomerDetailListRow, { Customer } from '../CustomerDetailListRow'
 import { useModal } from '../../../helpers/hooks'
-import BottomSheet from '../../../components/BottomSheet'
-import CustomerForm from '../CustomerForm'
+import BottomSheet, { TouchableOpacity } from '@gorhom/bottom-sheet'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { colors } from '../../../theme/theme'
+import { Chip, RadioButton, Searchbar } from 'react-native-paper'
+import { Switch } from 'react-native-gesture-handler'
+import { useTranslation } from 'react-i18next'
 
-const CustomerList: React.FC<any> = ({ navigation }) => {
-  const [openAddCustomerForm, toggleAddCustomerForm] = useModal()
-  const [customers, setCustomers] = useState([
-    { id: '1', name: 'Jan Kowalski', phone: '123456789', lastVisit: '2024-09-01' },
-    { id: '2', name: 'Anna Nowak', phone: '987654321', lastVisit: '2024-09-10' },
-    { id: '3', name: 'Anna Nowak', phone: '987654321', lastVisit: '2024-09-10' },
-    { id: '4', name: 'Anna ', phone: '987654321', lastVisit: '2024-09-10' },
-  ])
+const fetchClientList = async () => {
+  const { data } = await api.get('/client/getClient')
+  return data
+}
 
-  const handleSwipeLeft = (customer: Customer) => {
-    console.log('Przesunięto w lewo dla klienta:', customer.name)
+const CustomerList = () => {
+  const { t } = useTranslation()
+  const [isFormVisible, toggleForm] = useModal()
+
+  const bottomSheetRef = useRef<BottomSheet>(null)
+
+  const [serachQuery, setSearchQuery] = useState('')
+  const [isSwitchOn, setIsSwitchOn] = useState(false)
+  const [clients, setClients] = useState<Customer[]>([])
+
+  const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn)
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index)
+  }, [])
+
+  const searchHandler = useCallback((value: string) => {
+    setSearchQuery(value)
+    setClients(clients.filter((client) => client.name.includes(value)))
+  }, [])
+
+  const navigateToCustomerDetail = (customer: Customer) => {
+    console.log('Navigate to customer detail', customer)
   }
-
-  const addCustomer = (newCustomer: any) => {
-    setCustomers((prev) => [...prev, { id: Date.now().toString(), ...newCustomer, lastVisit: new Date().toISOString().split('T')[0] }])
-  }
-
-  const bottomSheetRef = React.useRef<{ openSheet: () => void; closeSheet: () => void }>(null)
 
   useEffect(() => {
-    if (openAddCustomerForm) {
-      bottomSheetRef.current?.openSheet()
-    } else {
-      bottomSheetRef.current?.closeSheet()
-    }
-  }, [openAddCustomerForm])
+    console.log('fetching clients');
+    fetchClientList().then((data) => {
+      setClients(data)
+    })
+  }, [])
+  const renderItem = ({ item }: { item: Customer }) => (
+    <TouchableOpacity onPress={() => navigateToCustomerDetail(item)}>
+      <CustomerDetailListRow customer={item} />
+    </TouchableOpacity>
+  )
 
   return (
-    <>
-      <SafeAreaView>
-        <FlatList
-          data={customers}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <CustomerDetailListRow navigation={navigation} item={item} onSwipeLeft={handleSwipeLeft} />}
-        />
-        <Button title='Dodaj Klienta' onPress={toggleAddCustomerForm} />
-      </SafeAreaView>
-      {/* <BottomSheet ref={bottomSheetRef}> */}
-        <CustomerForm />
-      {/* </BottomSheet> */}
-    </>
+    <SafeAreaView style={styles.container}>
+      <Searchbar
+        placeholder={t('global.search')}
+        mode='view'
+        style={{ backgroundColor: '#fff' }}
+        value={serachQuery}
+        onChangeText={searchHandler}
+        onClearIconPress={() => setSearchQuery('')}
+      />
+      <FlatList data={clients} keyExtractor={(item) => item.id} renderItem={renderItem} />
+    </SafeAreaView>
   )
 }
 
 export default CustomerList
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.textPrimary,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  headerWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+})
