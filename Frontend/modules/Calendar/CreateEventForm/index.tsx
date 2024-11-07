@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Dimensions,
@@ -9,17 +9,22 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput as RNTextInput,
+  Linking,
 } from 'react-native'
 import { TextInput, Text, Button, Title } from 'react-native-paper'
-import api from '../../../helpers/api'
+import api from '@helpers/api'
 import { useQuery } from 'react-query'
 import { Customer } from '../../Customers/CustomerDetailListRow'
-import { fromDateString } from '../../../helpers/toString'
-import { DEFAULT_DATE_FORMAT_WITH_TIME } from '../../../helpers/constants'
-import TextInputWithCounter from '../../../components/TextInputWithCounter'
-import DatePicker from '../../../components/DatePicker'
-import Loader from '../../../components/Loader'
+import { fromDateString } from '@helpers/toString'
+import { DEFAULT_DATE_FORMAT_WITH_TIME } from '@helpers/constants'
+import TextInputWithCounter from '@components/TextInputWithCounter'
+import DatePicker from '@components/DatePicker'
+import Loader from '@components/Loader'
 import { colors } from '../../../theme/theme'
+import dayjs from 'dayjs'
+import Input from '@components/TextInputWithCounter'
+import { Link } from '@react-navigation/native'
+import { set } from 'lodash'
 
 const width = Dimensions.get('window').width
 
@@ -29,15 +34,29 @@ type EventForm = {
   clientId: string
   service: string
   notes?: string
+  price?: number
 }
 
 type CreateEventFormProps = {
   onEventCreateRequest: () => void
   initialState?: EventForm
 }
+const fetchUserList = async () => {
+  const { data } = await api.get('/client/getClient')
+  console.log(data)
+  return data
+}
+
+const fetchServiceList = async () => {
+  const { data } = await api.get('/company/getServices')
+  return data
+}
 
 const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest, initialState }) => {
   const { t } = useTranslation()
+  const { data: clientList = [], isLoading = false } = useQuery<Customer[]>('clientList', fetchUserList, { enabled: true })
+  const { data: serviceList = [] } = useQuery<any[]>('serviceList', fetchServiceList, { enabled: true })
+
   const [form, setForm] = useState<EventForm>({
     start: initialState?.start || '',
     end: initialState?.end || '',
@@ -46,16 +65,10 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
     service: initialState?.service || 'Manicure klasyczny',
   })
   const [clientSearch, setClientSearch] = useState('')
+  const [serviceSearch, setServiceSearch] = useState('')
   const [filteredClients, setFilteredClients] = useState<Customer[]>([])
-  const [showStartDatePicker, setShowStartDatePicker] = useState(false)
+  const [filteredServices, setFilteredServices] = useState<any[]>([])
 
-  const fetchUserList = async () => {
-    const { data } = await api.get('/client/getClient')
-    console.log(data)
-    return data
-  }
-
-  const { data: clientList = [], isLoading } = useQuery<Customer[]>('clientList', fetchUserList)
   const handleChange = (name: keyof EventForm, value: string) => {
     setForm({ ...form, [name]: value })
   }
@@ -66,31 +79,71 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
     setFilteredClients(filtered)
   }
 
+  const handleServiceSearch = (text: string) => {
+    setServiceSearch(text)
+    const filtered: any[] = serviceList.filter((service: any) => service.serviceName.toLowerCase().includes(text.toLowerCase()))
+    setFilteredServices(filtered)
+  }
   const handleClientSelect = (client: Customer) => {
     setForm((prev) => ({ ...prev, clientId: client.id }))
     setClientSearch(client.name)
     setFilteredClients([])
   }
 
+  const handleServiceSelect = (service: any) => {
+    const duration = service.serviceDuration
+    const startDate = dayjs(form.start)
+    if (startDate.isValid()) {
+      const end = startDate.add(duration, 'minutes').toISOString()
+      setForm((prev) => ({ ...prev, service: service.serviceName, end }))
+    } else {
+      console.error('Invalid start date:', form.start)
+    }
+    setForm((prev) => ({ ...prev, price: service.price }))
+    setServiceSearch(service.serviceName)
+    setFilteredServices([])
+  }
+
   const handleSubmit = async () => {
-    console.log(form.clientId)
-    await api.post('/event/create', form)
+    try {
+      await api.post('/event/create', form)
+      const foundClientPhoneNumber = clientList.find((client) => client.id === form.clientId)?.phoneNumber
+      if (foundClientPhoneNumber) {
+        Linking.openURL(
+          `sms:${foundClientPhoneNumber}?body=${encodeURIComponent(
+            `Przypomnienie o wizycie ${form.service} w salonie dnia: ` + dayjs(form.start).format(DEFAULT_DATE_FORMAT_WITH_TIME),
+          )}`,
+        )
+      }
+    } catch (error) {
+      console.error('Error creating event:', error)
+    }
     onEventCreateRequest()
   }
+
+  useEffect(() => {
+    setForm(
+      initialState || {
+        start: '',
+        end: '',
+        clientId: '',
+        service: '',
+      },
+    )
+  }, [initialState])
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView contentContainerStyle={styles.container}>
         <Title style={styles.formTitle}>{t('calendar.addNewVisit')}</Title>
-        {isLoading ? (
+        {!isLoading ? (
           <Loader />
         ) : (
           <>
-            <TextInput
+            <Input
               style={styles.input}
               value={clientSearch}
               onChangeText={handleClientSearch}
-              mode='outlined'
               label={t('form.selectClient')}
               placeholder={t('form.typeToSearch')}
             />
@@ -103,12 +156,30 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
                 ))}
               </View>
             )}
-            <TextInput
+
+            <Input
               style={styles.input}
-              label={t('calendar.service')}
-              value={form.service}
-              onChangeText={(value) => handleChange('service', value)}
-              mode='outlined'
+              value={serviceSearch}
+              onChangeText={handleServiceSearch}
+              label={t('form.selectService')}
+              placeholder={t('form.typeToSearch')}
+            />
+            {filteredServices.length > 0 && (
+              <View style={styles.suggestionsContainer}>
+                {filteredServices.map((client) => (
+                  <TouchableOpacity key={client.id} onPress={() => handleServiceSelect(client)} style={styles.suggestion}>
+                    <Text style={styles.element}>{`${client.serviceName}`}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+            <Input
+              keyboardType='numeric'
+              placeholder='Cena'
+              onChangeText={(v) => handleChange('price', v)}
+              style={styles.input}
+              value={form.price?.toString()}
+              label={t('form.price')}
             />
             <DatePicker
               label={t('calendar.startDate')}
@@ -151,7 +222,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 16,
     width: width,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
   },
   suggestionsContainer: {
     backgroundColor: '#fff',

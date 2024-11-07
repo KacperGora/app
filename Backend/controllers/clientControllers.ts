@@ -14,9 +14,10 @@ interface CustomRequest extends Request {
 }
 
 export const getClients = async (req: CustomRequest, res: Response): Promise<void> => {
+  console.log('getClients')
   const userId = req.user?.userId
   const foundUser = await User.findById(userId).populate('clientsID')
-
+  console.log(foundUser)
   if (!foundUser) {
     res.status(400).send('User not found')
     return
@@ -25,7 +26,7 @@ export const getClients = async (req: CustomRequest, res: Response): Promise<voi
   const userClientsId = foundUser.clientsID
   const clients = await Client.find({ id: { $in: userClientsId } })
   const eventsForClients = await Event.find({ clientId: { $in: userClientsId } })
-
+  console.log(clients)
   const clientsWithEvents = clients.map((client) => {
     const clientEvents = eventsForClients.filter((event) => event.clientId === client.id)
     return {

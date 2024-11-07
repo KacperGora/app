@@ -1,8 +1,8 @@
 import mongoose, { Schema } from 'mongoose'
 
 interface EventDocument extends Document {
-  clientId: string // upewnij się, że clientID ma poprawny typ
-  // inne pola modelu Event
+  clientId: string
+  userId: string
 }
 interface Event extends Document {
   service: string
@@ -11,6 +11,7 @@ interface Event extends Document {
   end: Date
   userId: string
   clientId: string
+  price: number
 }
 
 const EventSchema: Schema = new Schema({
@@ -18,6 +19,7 @@ const EventSchema: Schema = new Schema({
   notes: { type: String, required: false },
   start: { type: Date, required: true },
   end: { type: Date, required: true },
+  price: { type: Number, required: true },
   clientId: { type: String, required: true },
   userId: { type: String, required: true },
 })

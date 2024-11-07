@@ -6,6 +6,7 @@ import api from '../../helpers/api'
 import { Text, TextInput, Button } from 'react-native-paper'
 import { useQuery } from 'react-query'
 import Loader from '../../components/Loader'
+import { useTranslation } from 'react-i18next'
 
 interface LoginForm {
   username: string
@@ -13,6 +14,7 @@ interface LoginForm {
 }
 
 const LoginScreen = () => {
+  const { t } = useTranslation()
   const { setIsLoggedIn, setLogin, setUserId } = useContext(AuthContext) as AuthContextType
   const [remindChecked, setRemindChecked] = useState(false)
   const [loginForm, setLoginForm] = useState<LoginForm>({
@@ -49,6 +51,7 @@ const LoginScreen = () => {
       await AsyncStorage.setItem('login', login)
     },
     onError: (error) => {
+      console.log(error)
       console.error('Login failed:', error)
     },
   })
@@ -61,16 +64,32 @@ const LoginScreen = () => {
     refetch()
   }
 
+  const handleForgotPassword = async () => {
+    try {
+      await api.post('auth/change-password', { username: 'Gorinek', password: 'Gazeta93.' })
+      alert('Password changed successfully')
+    } catch (error: any) {
+      console.log(error.response.data.error)
+      alert(error.response.data.error)
+    }
+  }
+
   if (isLoading) {
     return <Loader />
   }
   return (
     <View style={styles.container}>
-      <Text variant='headlineMedium'>Login</Text>
-      <TextInput mode='outlined' label='Username' value={username} onChangeText={handleInputChange('username')} style={styles.input} />
+      <Text variant='headlineMedium'>{t('global.signIn')}</Text>
       <TextInput
         mode='outlined'
-        label='Password'
+        label={t('global.login')}
+        value={username}
+        onChangeText={handleInputChange('username')}
+        style={styles.input}
+      />
+      <TextInput
+        mode='outlined'
+        label={t('global.password')}
         value={password}
         onChangeText={handleInputChange('password')}
         secureTextEntry
@@ -78,6 +97,9 @@ const LoginScreen = () => {
       />
       <Button mode='contained' onPress={handleLogin} disabled={isLoading}>
         {isLoading ? 'Logging in...' : 'Login'}
+      </Button>
+      <Button mode='text' onPress={handleForgotPassword}>
+        {t('form.forgotPassword')}
       </Button>
     </View>
   )

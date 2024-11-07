@@ -1,34 +1,26 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { View, Text, FlatList, StyleSheet, SafeAreaView } from 'react-native'
-import api from '../../../helpers/api'
+import { FlatList, StyleSheet, SafeAreaView } from 'react-native'
 import CustomerDetailListRow, { Customer } from '../CustomerDetailListRow'
-import { useModal } from '../../../helpers/hooks'
+import api from '@helpers/api'
+import { useModal } from '@helpers/hooks'
 import BottomSheet, { TouchableOpacity } from '@gorhom/bottom-sheet'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { colors } from '../../../theme/theme'
-import { Chip, RadioButton, Searchbar } from 'react-native-paper'
-import { Switch } from 'react-native-gesture-handler'
+import { Searchbar } from 'react-native-paper'
 import { useTranslation } from 'react-i18next'
 
 const fetchClientList = async () => {
   const { data } = await api.get('/client/getClient')
+  console.log(data);
+  console.log('success');
   return data
 }
 
 const CustomerList = () => {
   const { t } = useTranslation()
-  const [isFormVisible, toggleForm] = useModal()
-
-  const bottomSheetRef = useRef<BottomSheet>(null)
 
   const [serachQuery, setSearchQuery] = useState('')
   const [isSwitchOn, setIsSwitchOn] = useState(false)
   const [clients, setClients] = useState<Customer[]>([])
-
-  const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn)
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index)
-  }, [])
 
   const searchHandler = useCallback((value: string) => {
     setSearchQuery(value)
@@ -39,18 +31,19 @@ const CustomerList = () => {
     console.log('Navigate to customer detail', customer)
   }
 
-  useEffect(() => {
-    console.log('fetching clients');
-    fetchClientList().then((data) => {
-      setClients(data)
-    })
-  }, [])
   const renderItem = ({ item }: { item: Customer }) => (
     <TouchableOpacity onPress={() => navigateToCustomerDetail(item)}>
       <CustomerDetailListRow customer={item} />
     </TouchableOpacity>
   )
-
+  
+  useEffect(() => {
+    console.log('fetching clients')
+    fetchClientList().then((data) => {
+      setClients(data)
+    })
+  }, [])
+  
   return (
     <SafeAreaView style={styles.container}>
       <Searchbar

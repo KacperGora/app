@@ -1,16 +1,16 @@
-import React, { useState, useRef, useMemo } from 'react'
+import React, { useState, useRef } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createDrawerNavigator } from '@react-navigation/drawer'
-import CustomerList from '../../modules/Customers/CustomerList'
-import CustomerDetail from '../../modules/Customers/CustomerDetail'
+import CustomerList from '@modules/Customers/CustomerList'
+import CustomerDetail from '@modules/Customers/CustomerDetail'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { TouchableOpacity, View, StyleSheet, TouchableWithoutFeedback } from 'react-native'
-import Statistics from '../../modules/Customers/Statistics'
+import { TouchableOpacity, View, StyleSheet, Keyboard } from 'react-native'
+import Statistics from '@modules/Customers/Statistics'
 import { colors } from '../../theme/theme'
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
-import CustomerForm from '../../modules/Customers/CustomerForm'
+import BottomSheet from '@gorhom/bottom-sheet'
+import CustomerForm from '@modules/Customers/CustomerForm'
 import { ToggleButton } from 'react-native-paper'
-import { t } from 'i18next'
+import BottomSheetFormWrapper from '@components/BottomSheetFormWrapper'
 
 type ToggleEnum = 'day' | 'week' | 'month'
 
@@ -21,21 +21,14 @@ const Stack = createStackNavigator()
 const Drawer = createDrawerNavigator()
 
 const CustomerListWithDrawer = () => {
-  const [toggleForm, setToggleForm] = useState(false)
   const [toggle, setToggle] = useState<ToggleEnum>('day')
 
   const bottomSheetRef = useRef<BottomSheet>(null)
-  const snapPoints = useMemo(() => ['12%', '75%'], [])
 
   const onFormToggle = () => {
-    setToggleForm(!toggleForm)
-    if (!toggleForm) {
-      bottomSheetRef.current?.expand()
-    } else {
-      bottomSheetRef.current?.close()
-    }
+    bottomSheetRef.current?.expand()
+    Keyboard.dismiss()
   }
-
   return (
     <>
       <Drawer.Navigator
@@ -89,28 +82,9 @@ const CustomerListWithDrawer = () => {
         </Drawer.Screen>
       </Drawer.Navigator>
 
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        style={{
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 12,
-          },
-          shadowOpacity: 0.58,
-          shadowRadius: 16.0,
-          elevation: 24,
-        }}
-        snapPoints={snapPoints}
-        onChange={(index) => setToggleForm(index !== -1)}
-        enablePanDownToClose
-        backdropComponent={({ animatedIndex, style }) => toggleForm && <View style={[style, backdropStyle.backdrop]} />}
-      >
-        <BottomSheetView>
-          <CustomerForm onSubmit={() => {}} />
-        </BottomSheetView>
-      </BottomSheet>
+      <BottomSheetFormWrapper ref={bottomSheetRef}>
+        <CustomerForm onSubmit={() => {}} />
+      </BottomSheetFormWrapper>
     </>
   )
 }
@@ -128,15 +102,4 @@ const Customers = () => (
   </Stack.Navigator>
 )
 
-export const backdropStyle = StyleSheet.create({
-  backdrop: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Półprzezroczysty czarny kolor
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    
-  },
-})
 export default Customers

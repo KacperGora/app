@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { View, TextInput, StyleSheet, Text, ScrollView, TextBase } from 'react-native'
-import { Button } from 'react-native-paper'
+import { View, StyleSheet, Text, ScrollView, TextBase } from 'react-native'
+import { Button, TextInput } from 'react-native-paper'
 import api from '../../../helpers/api'
 import { useTranslation } from 'react-i18next'
 import { colors } from '../../../theme/theme'
@@ -19,7 +19,7 @@ type Props = {
 
 const CustomerForm: React.FC<Props> = ({ onSubmit }) => {
   const { t } = useTranslation()
-
+  console.log('CustomerForm')
   const [clientForm, setClientForm] = useState<Client>({ name: '', lastName: '', phoneNumber: '', notes: '' })
 
   const handleChange = (key: string) => (value: string) => {
@@ -44,12 +44,19 @@ const CustomerForm: React.FC<Props> = ({ onSubmit }) => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>{t('client.addCustomer')}</Text>
       <View style={styles.formWrapper}>
-        <TextInput style={styles.input} placeholder={t('form.name')} value={clientForm.name} onChangeText={handleChange('name')} />
+        <TextInput
+          mode='outlined'
+          style={styles.input}
+          placeholder={t('form.name')}
+          value={clientForm.name}
+          onChangeText={handleChange('name')}
+        />
         <TextInput
           style={styles.input}
           placeholder={t('form.lastName')}
           value={clientForm.lastName}
           onChangeText={handleChange('lastName')}
+          mode='outlined'
         />
         <TextInput
           style={styles.input}
@@ -57,6 +64,7 @@ const CustomerForm: React.FC<Props> = ({ onSubmit }) => {
           value={clientForm.phoneNumber}
           onChangeText={handleChange('phoneNumber')}
           keyboardType='phone-pad'
+          mode='outlined'
         />
         <TextInputWithCounter
           maxLength={500}
@@ -64,7 +72,7 @@ const CustomerForm: React.FC<Props> = ({ onSubmit }) => {
           placeholder='Notatki'
           value={clientForm.notes || ''}
           multiline
-          style={[styles.input, styles.textArea]}
+          style={[styles.textArea]}
         />
 
         <Button mode='elevated' onPress={handleSubmit} style={styles.button}>
@@ -90,14 +98,10 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 8,
     backgroundColor: '#fff',
   },
   textArea: {
-    height: 100, // Adjust the height as needed
+    height: 100,
   },
   button: {
     marginTop: 20,
@@ -105,8 +109,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   formWrapper: {
-    gap: 16
-  }
+    gap: 16,
+  },
 })
 
 export default CustomerForm

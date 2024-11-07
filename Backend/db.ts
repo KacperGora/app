@@ -1,12 +1,13 @@
-import mongoose from 'mongoose'
+import * as dotenv from 'dotenv'
+dotenv.config()
 
-export const connectDb = async (uri: string) => {
-  try {
-    await mongoose.connect(uri)
-    console.log('Connected to MongoDB')
-  } catch (error) {
-    console.error('Error connecting to MongoDB:', error)
-    process.exit(1) // Exit the process with failure
-  }
-}
+const pgp = require('pg-promise')()
+const db = pgp({
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+})
 
+export default db

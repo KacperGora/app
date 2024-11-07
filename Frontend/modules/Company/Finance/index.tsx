@@ -2,10 +2,15 @@ import React, { useState } from 'react'
 import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native'
 import { ToggleButton, Card, Title, Button } from 'react-native-paper'
 import { colors } from '../../../theme/theme'
+import api from '@helpers/api'
 
 const FinanceView = () => {
   const [selectedRange, setSelectedRange] = useState('miesięczny')
 
+  const fetchEventsIncome = () => {
+    api.get('/events/income')
+  }
+  console.log(fetchEventsIncome());
   const finances = {
     dailyRevenue: 400,
     weeklyRevenue: 2800,

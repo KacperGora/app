@@ -21,18 +21,19 @@ const refreshToken = async () => {
 }
 
 api.interceptors.request.use(async (config) => {
-  const token = await AsyncStorage.getItem('token')
-  if (token) {
-    const decoded = jwtDecode(token)
-    if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-      const newToken = await refreshToken()
-      if (newToken) {
-        config.headers['Authorization'] = `Bearer ${newToken}`
-      }
-    } else {
-      config.headers['Authorization'] = `Bearer ${token}`
-    }
-  }
+  // const token = await AsyncStorage.getItem('token')
+  // if (token) {
+  //   const decodedToken = jwtDecode(token)
+  //   const currentTime = Date.now() / 1000
+  //   if (decodedToken.exp && decodedToken.exp < currentTime) {
+  //     const newToken = await refreshToken()
+  //     if (newToken) {
+  //       config.headers['Authorization'] = `Bearer ${newToken}`
+  //     }
+  //   } else {
+  //     config.headers['Authorization'] = `Bearer ${token}`
+  //   }
+  // }
   return config
 })
 

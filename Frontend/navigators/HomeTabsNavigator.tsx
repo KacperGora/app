@@ -3,8 +3,8 @@ import { colors } from 'theme/theme'
 import CalendarDrawerNavigator from './CalendarDrawerNavigator'
 import i18n from 'i18n/i18n'
 import Customers from '@views/Customers'
-import Company from '@views/Company'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import CompanyDrawerNavigator from './CompanyDrawerNavigator'
 
 const Tab = createBottomTabNavigator()
 
@@ -32,7 +32,7 @@ export const HomeTabs = () => (
     />
     <Tab.Screen
       name={i18n.t('navigation.company')}
-      component={Company}
+      component={CompanyDrawerNavigator}
       options={{
         tabBarIcon: ({ color, size }) => <Icon name='briefcase' color={color} size={size} />,
       }}

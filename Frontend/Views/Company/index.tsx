@@ -6,17 +6,18 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { Title } from 'react-native-paper'
 import { colors } from '../../theme/theme'
 import Carousel from 'react-native-reanimated-carousel'
+
 const width = Dimensions.get('window').width
 
 const Company = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      <ScrollView style={{ paddingHorizontal: 16 }}>
         <View>
-          <Title style={styles.heading}>Finanse firmowe</Title>
+          <Title style={styles.heading}>Firmowy dashoboard</Title>
         </View>
-        <CompanyStatistics />
-        <FinanceView />
+        {/* <CompanyStatistics /> */}
+        {/* <FinanceView /> */}
       </ScrollView>
     </SafeAreaView>
   )

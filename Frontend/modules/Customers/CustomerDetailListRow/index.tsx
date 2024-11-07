@@ -61,7 +61,7 @@ const CustomerDetailListRow: React.FC<Props> = ({ customer }) => {
               <Icon name='message-outline' size={24} color='#666' />
             </TouchableOpacity>
           </View>
-          <Text style={styles.lastVisit}>{`Ostatnia wizyta: ${dayjs(events[0].start).format(DEFAULT_DATE_FORMAT_WITH_TIME)}`}</Text>
+          {/* <Text style={styles.lastVisit}>{`Ostatnia wizyta: ${dayjs(events[0].start).format(DEFAULT_DATE_FORMAT_WITH_TIME)}`}</Text> */}
         </TouchableOpacity>
       </Swipeable>
     </TouchableOpacity>
