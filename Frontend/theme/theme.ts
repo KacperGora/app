@@ -1,11 +1,11 @@
 export const colors = {
-  primary: '#F7CAC9', // Blush Pink
-  secondary: '#C4B283', // Soft Gold
-  background: '#FFFFFF', // White
-  textPrimary: '#2C3E50', // Midnight Blue
-  textSecondary: '#D1D5DB', // Cool Gray
-  accent: '#E6E6FA', // Lavender
-  error: '#FF6B6B', // Czerwony dla błędów
+  primary: '#F7CAC9',
+  secondary: '#C4B283',
+  background: '#FFFFFF',
+  textPrimary: '#2C3E50',
+  textSecondary: '#D1D5DB',
+  accent: '#E6E6FA',
+  error: '#FF6B6B',
 }
 
 export const typography = {

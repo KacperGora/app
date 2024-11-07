@@ -26,18 +26,12 @@ const Register = () => {
   }
 
   const handleRegister = async () => {
-    const validationResult = registerSchema.safeParse({ username, password, confirmPassword })
-    if (!validationResult.success) {
-      const errorMessages = validationResult.error.errors.map((err) => err.message).join('\n')
-      alert(errorMessages)
-      return
-    }
-
     try {
       const response = await api.post('auth/register', { username, password })
       alert('Registered successfully')
     } catch (error: any) {
-      alert(error.response.data)
+      console.log(error.response.data.error);
+      alert(error.response.data.error)
     }
   }
 

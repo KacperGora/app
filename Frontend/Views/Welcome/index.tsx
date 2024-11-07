@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { View, StyleSheet, ImageBackground } from 'react-native'
+import { View, StyleSheet, ImageBackground, Dimensions, Image } from 'react-native'
 import { Button, Text, Title } from 'react-native-paper'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
+import api from '@helpers/api'
 
 export type RootStackParamList = {
   navigate(arg0: string): void
@@ -15,7 +16,7 @@ const WelcomeScreen = () => {
   const { t } = useTranslation()
 
   return (
-    <ImageBackground source={require('../../assets/images/splash.png')} style={styles.background}>
+    <>
       <View style={styles.overlay}>
         <View style={styles.container}>
           <Text style={styles.title}>{t('global.welcome')}</Text>
@@ -27,14 +28,20 @@ const WelcomeScreen = () => {
           </Button>
         </View>
       </View>
-    </ImageBackground>
+      <Image source={require('../../assets/images/splash.png')} style={styles.background} />
+    </>
   )
 }
 
 const styles = StyleSheet.create({
   background: {
-    flex: 1,
-    resizeMode: 'cover',
+    overlayColor: 'rgba(0, 0, 0, 0.5)',
+    objectFit: 'scale-down',
+    zIndex: -1,
+    left: 0,
+    position: 'absolute',
+    bottom: 0,
+    maxWidth: '100%',
   },
   overlay: {
     flex: 1,
