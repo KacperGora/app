@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { TextInput, Button, Title } from 'react-native-paper'
-import axios from 'axios'
-import { z } from 'zod'
-import { registerSchema } from './schema'
-import { globalStyles } from '../../styles'
 import { useTranslation } from 'react-i18next'
 import api from '../../helpers/api'
 
@@ -30,7 +26,6 @@ const Register = () => {
       const response = await api.post('auth/register', { username, password })
       alert('Registered successfully')
     } catch (error: any) {
-      console.log(error.response.data.error);
       alert(error.response.data.error)
     }
   }

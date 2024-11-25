@@ -23,16 +23,17 @@ const languageDetector: LanguageDetectorModule = {
         console.error('Error fetching language from AsyncStorage:', err)
       })
 
-    if (!detectedLanguage) {
-      const locale =
-        Platform.OS === 'ios'
-          ? NativeModules.SettingsManager.settings.AppleLocale || NativeModules.SettingsManager.settings.AppleLanguages[0]
-          : NativeModules.I18nManager.localeIdentifier
+    // if (!detectedLanguage) {
+    //   const locale =
+    //     Platform.OS === 'ios'
+    //       ? NativeModules.SettingsManager.settings.AppleLocale || NativeModules.SettingsManager.settings.AppleLanguages[0]
+    //       : NativeModules.I18nManager.localeIdentifier
 
-      detectedLanguage = locale ? locale.split('_')[0] : 'pl'
-    }
+    //   detectedLanguage = locale ? locale.split('_')[0] : 'pl'
+    // }
+    detectedLanguage = 'pl'
 
-    return detectedLanguage
+    return 'pl'
   },
   init: () => {},
   cacheUserLanguage: (language: string) => {
@@ -46,7 +47,7 @@ i18n
   .use(languageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng: 'en',
+    fallbackLng: 'pl',
     resources: {
       pl,
     },

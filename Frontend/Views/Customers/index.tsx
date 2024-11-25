@@ -29,6 +29,12 @@ const CustomerListWithDrawer = () => {
     bottomSheetRef.current?.expand()
     Keyboard.dismiss()
   }
+
+  const onFormClose = () => {
+    bottomSheetRef.current?.close()
+    Keyboard.dismiss()
+  }
+
   return (
     <>
       <Drawer.Navigator
@@ -83,7 +89,7 @@ const CustomerListWithDrawer = () => {
       </Drawer.Navigator>
 
       <BottomSheetFormWrapper ref={bottomSheetRef}>
-        <CustomerForm onSubmit={() => {}} />
+        <CustomerForm onSubmit={onFormClose} />
       </BottomSheetFormWrapper>
     </>
   )

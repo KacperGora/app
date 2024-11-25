@@ -55,12 +55,9 @@ const CompanyServicesForm = () => {
     }
   }
 
-  useEffect(() => {
-    // validateForm()
-  }, [serviceName, serviceDescription, servicePrice, serviceDuration])
+  useEffect(() => {}, [serviceName, serviceDescription, servicePrice, serviceDuration])
 
   const handleSubmit = async () => {
-    // console.log('Form data:', { serviceName, serviceDescription, servicePrice, serviceDuration })
     await api.post('/company/addService', {
       serviceName,
       serviceDescription,

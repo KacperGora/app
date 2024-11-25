@@ -2,21 +2,20 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import api from '../../../helpers/api'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 
 const handleDelete = async (customer: any) => {
   if (!customer) return
   try {
     await api.post('/client/delete', { clientId: '1a2b3c4d5e6f7a8b9c0d1e2f' })
   } catch (error) {
-    console.log(error);
     throw new Error('Error deleting client')
   }
 }
 
 const CustomerDetail: React.FC<any> = ({ route }) => {
   const { customer } = route.params
-  const { isLoading, status, error } = useQuery('deleteCustomer', handleDelete, { enabled: false })
+  // const { isLoading, status, error } = useQuery('deleteCustomer', handleDelete, { enabled: false })
 
   return (
     <View style={styles.container}>

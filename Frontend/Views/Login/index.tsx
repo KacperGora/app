@@ -1,106 +1,93 @@
-import React, { useState, useContext } from 'react'
-import { View, StyleSheet } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { AuthContext, AuthContextType } from '../../context/AuthContext'
-import api from '../../helpers/api'
-import { Text, TextInput, Button } from 'react-native-paper'
-import { useQuery } from 'react-query'
-import Loader from '../../components/Loader'
+import React, { useContext, useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import api from '@helpers/api'
 import { useTranslation } from 'react-i18next'
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
+import { TextInput, Button } from 'react-native-paper'
+import { useNavigation, NavigationProp } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { AuthContext, AuthContextType } from 'context/AuthContext'
+import { Customer } from '@modules/Customers/CustomerDetailListRow'
 
-interface LoginForm {
+type Form = {
   username: string
   password: string
 }
 
+export type RootStackParamList = {
+  Register: string
+  CustomerDetail: { customer: Customer }
+}
+
 const LoginScreen = () => {
-  const { t } = useTranslation()
   const { setIsLoggedIn, setLogin, setUserId } = useContext(AuthContext) as AuthContextType
-  const [remindChecked, setRemindChecked] = useState(false)
-  const [loginForm, setLoginForm] = useState<LoginForm>({
-    username: '',
-    password: '',
-  })
 
-  const { username, password } = loginForm
+  const { navigate } = useNavigation<NavigationProp<RootStackParamList>>()
+  const { t } = useTranslation()
 
-  const login = async () => {
-    const response = await api.post('auth/login', { username, password })
-    return response.data
+  const [form, setForm] = useState<Form>({ username: '', password: '' })
+  const [passwordVisible, setPasswordVisible] = useState(false)
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible((prev) => !prev)
   }
 
-  const storeToken = async (token: string) => {
-    try {
-      await AsyncStorage.setItem('token', token)
-    } catch (error) {
-      console.error('Error storing token', error)
-    }
+  const handleFormChange = (name: keyof Form) => (value: string) => {
+    setForm((prev) => ({ ...prev, [name]: value }))
   }
-
-  const { data, error, isLoading, refetch } = useQuery('login', login, {
-    enabled: false,
-    onSuccess: async (data) => {
-      const {
-        token,
-        user: { login, id },
-      } = data
-      setLogin(login)
+  const { mutate } = useMutation({
+    mutationFn: async () => {
+      const { data } = await api.post('/auth/login', form)
+      return data
+    },
+    onSuccess: (data) => {
+      AsyncStorage.setItem('token', data.token)
+      AsyncStorage.setItem('refreshToken', data.refresh_token)
+      setLogin(data.user.username)
+      setUserId(data.user.id)
       setIsLoggedIn(true)
-      setUserId(id)
-      storeToken(token)
-      await AsyncStorage.setItem('login', login)
     },
     onError: (error) => {
-      console.log(error)
-      console.error('Login failed:', error)
+      console.error('Login failed', error)
     },
   })
 
-  const handleInputChange = (key: keyof LoginForm) => (value: string) => {
-    setLoginForm({ ...loginForm, [key]: value })
-  }
-
-  const handleLogin = () => {
-    refetch()
-  }
-
-  const handleForgotPassword = async () => {
-    try {
-      await api.post('auth/change-password', { username: 'Gorinek', password: 'Gazeta93.' })
-      alert('Password changed successfully')
-    } catch (error: any) {
-      console.log(error.response.data.error)
-      alert(error.response.data.error)
-    }
-  }
-
-  if (isLoading) {
-    return <Loader />
-  }
   return (
     <View style={styles.container}>
-      <Text variant='headlineMedium'>{t('global.signIn')}</Text>
-      <TextInput
-        mode='outlined'
-        label={t('global.login')}
-        value={username}
-        onChangeText={handleInputChange('username')}
-        style={styles.input}
-      />
-      <TextInput
-        mode='outlined'
-        label={t('global.password')}
-        value={password}
-        onChangeText={handleInputChange('password')}
-        secureTextEntry
-        style={styles.input}
-      />
-      <Button mode='contained' onPress={handleLogin} disabled={isLoading}>
-        {isLoading ? 'Logging in...' : 'Login'}
-      </Button>
-      <Button mode='text' onPress={handleForgotPassword}>
-        {t('form.forgotPassword')}
-      </Button>
+      <View style={styles.header}>
+        <View style={styles.gradient}>
+          <Text style={styles.appName}>Appointment</Text>
+          <Text style={styles.tagline}>Zarządzaj biznesem w prosty sposób</Text>
+        </View>
+      </View>
+      <View style={styles.wave}></View>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <View style={styles.form}>
+          <TextInput
+            label='Nazwa użytkownika'
+            mode='outlined'
+            style={styles.input}
+            keyboardType='email-address'
+            onChangeText={handleFormChange('username')}
+          />
+          <TextInput
+            label='Hasło'
+            mode='outlined'
+            style={styles.input}
+            onChangeText={handleFormChange('password')}
+            secureTextEntry={!passwordVisible}
+          />
+          <Button mode='contained' onPress={() => mutate()} style={styles.button}>
+            Zaloguj
+          </Button>
+          <TouchableOpacity onPress={togglePasswordVisibility}>
+            <Text style={{ textAlign: 'right', color: '#ff9a9e' }}>Pokaż hasło</Text>
+          </TouchableOpacity>
+          <Button onPress={() => navigate({ name: 'Register', params: '' })} uppercase={false} style={styles.signupButton}>
+            {t('login.dontHaveAccount')}
+          </Button>
+        </View>
+      </KeyboardAvoidingView>
     </View>
   )
 }
@@ -108,15 +95,63 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    flex: 1,
+    position: 'relative',
+    height: 80,
+  },
+  gradient: {
+    flex: 0.95,
     justifyContent: 'center',
-    padding: 16,
+    alignItems: 'center',
+    backgroundColor: '#ff9a9e',
+    borderBottomLeftRadius: 100,
+    borderBottomRightRadius: 100,
+  },
+  appName: {
+    fontSize: 42,
+    fontWeight: 'bold',
+    color: '#fff',
+    width: '100%',
+    textAlign: 'center',
+    fontFamily: 'Lato-Regular',
+  },
+  wave: {
+    position: 'absolute',
+    bottom: 0,
+    elevation: 1,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+  },
+  tagline: {
+    fontSize: 18,
+    color: '#fff',
+    marginTop: 10,
+    fontWeight: '500',
+    fontFamily: 'Lato-B',
+  },
+  form: {
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    backgroundColor: '#fff',
+    height: '60%',
   },
   input: {
-    marginBottom: 12,
+    marginBottom: 20,
+    backgroundColor: '#fff',
+    borderColor: '#fff',
   },
-  errorText: {
-    color: 'red',
+  button: {
     marginTop: 10,
+    borderRadius: 8,
+  },
+  signupButton: {
+    marginTop: 20,
   },
 })
 

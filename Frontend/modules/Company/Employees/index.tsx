@@ -41,7 +41,6 @@ type Employee = {
 
 const EmployeeItem: React.FC<Employee> = ({ name, position, experience, contact, imageSrc }) => {
   const { t } = useTranslation()
-  console.log(imageSrc)
 
   return (
     <View style={styles.itemContainer}>

@@ -1,9 +1,5 @@
 import { Request, Response } from 'express'
-import Event from '../models/Event'
-import User from '../models/User'
-import Client, { IClient } from '../models/Client'
-import { v4 as uuidv4 } from 'uuid'
-import twilio from 'twilio'
+import { createDataBaseEvent, getDatabaseEvents } from '../models/Event'
 interface CustomRequest extends Request {
   user: {
     userId: string
@@ -11,87 +7,21 @@ interface CustomRequest extends Request {
     iat: number
   }
 }
-// const accountSid = 'ACa949bc54b73f214505a774ba6a6609a7'
-// const authToken = '03cbd96803839699892931ece299d5a4'
-// const client = require('twilio')(accountSid, authToken)
-// const client = twilio(accountSid, authToken)
 
-export const getEvents = async (req: CustomRequest, res: Response) => {
-  console.log('getEvents')
-  const userId = req.user.userId
+export const getEvents = async (req: Request, res: Response) => {
+  const userId = req.user.id
   try {
-    const events = await Event.find({ userId: userId }).populate('userId')
-    const eventsWithClientName = await Promise.all(
-      events.map(async (event) => {
-        const client = (await Client.findOne({
-          id: event.clientId,
-        })) as IClient
-        return {
-          ...event.toObject(),
-          clientName: `${client.name} ${client.lastName}`,
-        }
-      }),
-    )
-    console.log(eventsWithClientName)
-    res.status(200).json(eventsWithClientName)
+    const events = await getDatabaseEvents(userId)
+    res.status(200).json(events)
   } catch (error) {
     res.status(500).json({ message: 'Error getting events', error: (error as Error).message })
   }
 }
 
-export const createEvent = async (req: CustomRequest, res: Response) => {
-  const userId = req.user.userId
-  const foundUser = await User.findById(userId)
-  if (!foundUser) {
-    res.status(400).send('User not found')
-    return
-  }
-  const { service, start, end, clientId, notes, price } = req.body
-  const foundClient = await Client.findOne({ id: clientId })
-  if (!foundClient) {
-    res.status(400).send('Client not found')
-    return
-  }
-  try {
-    const newEvent = new Event({
-      service,
-      start,
-      end,
-      clientId,
-      notes,
-      userId,
-      price,
-      id: uuidv4(),
-    })
-    foundUser.eventsID.push(newEvent.id)
-    await foundUser.save()
-    await newEvent.save()
+export const createEvent = async (req: Request, res: Response) => {
+  const userId = req.user.id
 
-    // const foundClientPhoneNumber = foundClient.phoneNumber
-    // if (foundClientPhoneNumber) {
-    //   client.messages
-    //     .create({
-    //       body: `Przypomnienie o wizycie ${service} w salonie dnia: ${start}`,
-    //       from: '+48732444567',
-    //       to: foundClientPhoneNumber,
-    //     })
-    //     .then((message) => console.log(message.sid))
-    //     .catch((error) => console.error('Error sending SMS:', error))
-    // }
-    res.status(201).send('Event added successfully')
-  } catch (error) {
-    console.error('Error adding event:', error)
-    res.status(500).send('Error adding event')
-  }
+  await createDataBaseEvent({ ...req.body, userId })
 }
 
-export const getEventsIncome = async (req: CustomRequest, res: Response) => {
-  // const userId = req.user.userId
-  // try {
-  //   const events = await Event.find({ userId: userId })
-  //   const income = events.reduce((acc, event) => acc + event., 0)
-  //   res.status(200).json({ income })
-  // } catch (error) {
-  //   res.status(500).json({ message: 'Error getting income', error: (error as Error).message })
-  // }
-}
+export const getEventsIncome = async (req: CustomRequest, res: Response) => {}

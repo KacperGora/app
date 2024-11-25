@@ -40,11 +40,8 @@ export const useAuth = () => {
     const checkToken = async () => {
       try {
         const token = await AsyncStorage.getItem('token')
-        const login = await AsyncStorage.getItem('login')
+        console.log(token)
         setIsLoggedIn(!!token)
-        if (login) {
-          setLogin(login)
-        }
       } catch (error) {
         console.error('Error getting token', error)
       } finally {

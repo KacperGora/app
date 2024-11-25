@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import { TextInput, Text, Button, Title } from 'react-native-paper'
 import api from '@helpers/api'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import { Customer } from '../../Customers/CustomerDetailListRow'
 import { fromDateString } from '@helpers/toString'
 import { DEFAULT_DATE_FORMAT_WITH_TIME } from '@helpers/constants'
@@ -43,7 +43,6 @@ type CreateEventFormProps = {
 }
 const fetchUserList = async () => {
   const { data } = await api.get('/client/getClient')
-  console.log(data)
   return data
 }
 
@@ -54,9 +53,14 @@ const fetchServiceList = async () => {
 
 const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest, initialState }) => {
   const { t } = useTranslation()
-  const { data: clientList = [], isLoading = false } = useQuery<Customer[]>('clientList', fetchUserList, { enabled: true })
-  const { data: serviceList = [] } = useQuery<any[]>('serviceList', fetchServiceList, { enabled: true })
-
+  const { data: clientList = [], isLoading = false } = useQuery<Customer[]>({
+    queryKey: ['clientList'],
+    queryFn: fetchUserList,
+  })
+  const { data: serviceList = [] } = useQuery<any[]>({
+    queryKey: ['serviceList'],
+    queryFn: fetchServiceList,
+  })
   const [form, setForm] = useState<EventForm>({
     start: initialState?.start || '',
     end: initialState?.end || '',
@@ -86,7 +90,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
   }
   const handleClientSelect = (client: Customer) => {
     setForm((prev) => ({ ...prev, clientId: client.id }))
-    setClientSearch(client.name)
+    setClientSearch(`${client.name} ${client.lastName}`)
     setFilteredClients([])
   }
 
@@ -136,7 +140,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView contentContainerStyle={styles.container}>
         <Title style={styles.formTitle}>{t('calendar.addNewVisit')}</Title>
-        {!isLoading ? (
+        {isLoading ? (
           <Loader />
         ) : (
           <>
@@ -149,11 +153,14 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
             />
             {filteredClients.length > 0 && (
               <View style={styles.suggestionsContainer}>
-                {filteredClients.map((client) => (
-                  <TouchableOpacity key={client.id} onPress={() => handleClientSelect(client)} style={styles.suggestion}>
-                    <Text style={styles.element}>{`${client.name} ${client.lastName}`}</Text>
-                  </TouchableOpacity>
-                ))}
+                  {filteredClients.map((client) => {
+                  
+                    return (
+                      <TouchableOpacity key={client.id} onPress={() => handleClientSelect(client)} style={styles.suggestion}>
+                        <Text style={styles.element}>{`${client.name} ${client.lastName}`}</Text>
+                      </TouchableOpacity>
+                    )
+                })}
               </View>
             )}
 

@@ -14,6 +14,11 @@ export const pl = {
     login: {
       username: 'Nazwa użytkownika',
       password: 'Hasło',
+      showPassword: 'Pokaż hasło',
+      dontHaveAccount: 'Nie masz konta?',
+      username: 'Nazwa użytkownika',
+      password: 'Hasło',
+      sing: 'Zaloguj',
     },
     navigation: {
       appointments: 'Wizyty',

@@ -19,11 +19,10 @@ type Props = {
 
 const CustomerForm: React.FC<Props> = ({ onSubmit }) => {
   const { t } = useTranslation()
-  console.log('CustomerForm')
   const [clientForm, setClientForm] = useState<Client>({ name: '', lastName: '', phoneNumber: '', notes: '' })
 
   const handleChange = (key: string) => (value: string) => {
-    setClientForm({ ...clientForm, [key]: value })
+    setClientForm((prev) => ({ ...prev, [key]: value }))
   }
 
   const onClientSave = async (client: Client) => {
@@ -35,8 +34,8 @@ const CustomerForm: React.FC<Props> = ({ onSubmit }) => {
   }
 
   const handleSubmit = () => {
-    const { name: firstName, lastName, phoneNumber } = clientForm
-    onClientSave({ name: firstName, lastName, phoneNumber })
+    const { name: firstName, lastName, phoneNumber, notes } = clientForm
+    onClientSave({ name: firstName, lastName, phoneNumber, notes })
     onSubmit()
   }
 

@@ -21,10 +21,11 @@ import api from '@helpers/api'
 import { DATE_FORMAT_FULL_MONTH_WITH_YEAR } from '@helpers/constants'
 import CreateEventForm from '@modules/Calendar/CreateEventForm'
 import { CALENDAR_ENUM, calendarContainerConfig, handleChange } from './utils'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import { colors } from 'theme/theme'
 import { Ionicons } from '@expo/vector-icons'
 import BottomSheetFormWrapper from '@components/BottomSheetFormWrapper'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export interface EventForm {
   start: string
@@ -72,8 +73,8 @@ const fetchList = async () => {
   const parseEvents = data.map((event: any) => ({
     ...event,
     title: `${event.service} - ${event.clientName}`,
-    start: { dateTime: event.start },
-    end: { dateTime: event.end },
+    start: { dateTime: event.startTime },
+    end: { dateTime: event.endTime },
     color: '#4285F4',
   }))
 
@@ -83,8 +84,10 @@ const fetchList = async () => {
 const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(({ params }, ref) => {
   const { mode } = useMemo(() => params, [params])
 
-  const { data, isLoading } = useQuery('events', fetchList, { enabled: true })
-
+  const { data, isLoading } = useQuery({
+    queryKey: ['events'],
+    queryFn: fetchList,
+  })
   const bottomSheetRef = useRef<BottomSheet>(null)
   // const [events, setEvents] = useState<any[]>([])
   const [eventForm, setEventForm] = useState<EventForm>({
@@ -103,6 +106,7 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(({ params }, r
       </View>
     )
   }, [])
+  
 
   const renderResourceHeaderItem = useCallback(
     (item: HeaderItemProps) => {

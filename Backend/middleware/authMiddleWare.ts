@@ -12,20 +12,14 @@ type User = {
   iat: number
 }
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers['authorization']?.split(' ')[1]
-  console.log(token, 'token');
-  if (!token) {
-    return res.status(401).send('Access denied. No token provided.')
-  }
+export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+  if (!token) return res.sendStatus(401)
 
-  try {
-    const decoded = jwt.verify(token, SECRET_KEY as string) as User
-    ;(req as CustomRequest).user = decoded
+  jwt.verify(token, process.env.SECRET_KEY as string, (err, user) => {
+    if (err) return res.sendStatus(403)
+    req.user = user
     next()
-  } catch (error) {
-    res.status(401).send('Invalid token.')
-  }
+  })
 }
-
-export default authMiddleware

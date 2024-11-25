@@ -10,7 +10,6 @@ const FinanceView = () => {
   const fetchEventsIncome = () => {
     api.get('/events/income')
   }
-  console.log(fetchEventsIncome());
   const finances = {
     dailyRevenue: 400,
     weeklyRevenue: 2800,

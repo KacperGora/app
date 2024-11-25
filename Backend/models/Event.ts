@@ -1,29 +1,24 @@
-import mongoose, { Schema } from 'mongoose'
+import db from '../db'
 
-interface EventDocument extends Document {
-  clientId: string
-  userId: string
+export const createDataBaseEvent = async (event: any) => {
+  const { service, start, end, client_id, notes, price, userId } = event
+  let query = `
+    INSERT INTO events (service, start_time, end_time, client_id, notes, price, user_id)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+  `
+  const values = [service, start, end, client_id, notes, Number(price), userId]
+  try {
+    return await db.none(query, values)
+  } catch (error) {
+    console.error('Error creating event:', error)
+    throw error
+  }
 }
-interface Event extends Document {
-  service: string
-  notes: string
-  start: Date
-  end: Date
-  userId: string
-  clientId: string
-  price: number
+
+export const getDatabaseEvents = async (userId: string) => {
+  const query = `
+    SELECT * FROM events
+    WHERE user_id = $1
+  `
+  return db.manyOrNone(query, [userId])
 }
-
-const EventSchema: Schema = new Schema({
-  service: { type: String, required: true },
-  notes: { type: String, required: false },
-  start: { type: Date, required: true },
-  end: { type: Date, required: true },
-  price: { type: Number, required: true },
-  clientId: { type: String, required: true },
-  userId: { type: String, required: true },
-})
-
-const Event = mongoose.model<EventDocument>('Event', EventSchema)
-
-export default Event

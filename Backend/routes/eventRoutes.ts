@@ -1,11 +1,10 @@
 import { Router } from 'express'
 import { createEvent, getEvents } from '../controllers/evenetsControllers'
-import authMiddleware from '../middleware/authMiddleWare'
+import { authenticateToken } from '../middleware/authMiddleWare'
 
 const eventRouter = Router()
-
-eventRouter.post('/create', authMiddleware, createEvent as any)
-eventRouter.get(`/getEvents/`, authMiddleware, getEvents as any)
-// eventRouter.get('/getIncome', authMiddleware, getEventsIncome as any)
+eventRouter.use(authenticateToken)
+eventRouter.post('/create', createEvent)
+eventRouter.get(`/getEvents/`, getEvents)
 
 export default eventRouter
