@@ -1,6 +1,6 @@
 import db from '../db'
 
-type Client = {
+export type Client = {
   name: string
   last_name: string
   phone_number: string
@@ -30,36 +30,12 @@ export const createClient = async (client: Client) => {
 }
 
 export const getAllClients = async (userId: string) => {
+  console.log(userId)
   const query = `
     SELECT * FROM clients
     WHERE user_id = $1
   `
   const clients = await db.manyOrNone(query, [userId])
-
-  for (const client of clients) {
-    const closestFutureEvent = await db.oneOrNone(
-      `
-      SELECT * FROM events
-      WHERE user_id = $1 AND client_id = $2 AND start_time > NOW()
-      ORDER BY start_time ASC
-      LIMIT 1
-    `,
-      [userId, client.id],
-    )
-
-    const latestPastEvent = await db.oneOrNone(
-      `
-      SELECT * FROM events
-      WHERE user_id = $1 AND client_id = $2 AND start_time < NOW()
-      ORDER BY start_time DESC
-      LIMIT 1
-    `,
-      [userId, client.id],
-    )
-
-    client.closestFutureEvent = closestFutureEvent
-    client.latestPastEvent = latestPastEvent
-  }
 
   return clients
 }

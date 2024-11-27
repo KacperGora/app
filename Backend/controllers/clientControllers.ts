@@ -1,15 +1,6 @@
 import { Request, Response } from 'express'
-import { v4 as uuidv4 } from 'uuid'
 import { findUserById } from '../models/User'
 import { createClient, getAllClients } from '../models/Client'
-
-interface CustomRequest extends Request {
-  user: {
-    id: string
-    exp: number
-    iat: number
-  }
-}
 
 export const getClients = async (req: Request, res: Response): Promise<void> => {
   const userId = req.user.id
@@ -19,10 +10,10 @@ export const getClients = async (req: Request, res: Response): Promise<void> => 
     return
   }
   try {
-    const clients = await getAllClients(foundUser.id)
-    console.log(clients)
+    const clients = await getAllClients(userId)
     res.status(200).json(clients)
   } catch (error) {
+    console.log(error)
     res.status(500).send('Error getting clients')
   }
 }

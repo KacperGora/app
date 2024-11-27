@@ -14,7 +14,6 @@ import {
 import { TextInput, Text, Button, Title } from 'react-native-paper'
 import api from '@helpers/api'
 import { useQuery } from '@tanstack/react-query'
-import { Customer } from '../../Customers/CustomerDetailListRow'
 import { fromDateString } from '@helpers/toString'
 import { DEFAULT_DATE_FORMAT_WITH_TIME } from '@helpers/constants'
 import TextInputWithCounter from '@components/TextInputWithCounter'
@@ -25,6 +24,9 @@ import dayjs from 'dayjs'
 import Input from '@components/TextInputWithCounter'
 import { Link } from '@react-navigation/native'
 import { set } from 'lodash'
+import { fromIntervalToMinutes } from '@helpers/transformers'
+import { Service } from '@modules/Company/CompanyServices'
+import { Customer } from '@modules/Customers/CustomerList'
 
 const width = Dimensions.get('window').width
 
@@ -57,7 +59,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
     queryKey: ['clientList'],
     queryFn: fetchUserList,
   })
-  const { data: serviceList = [] } = useQuery<any[]>({
+  const { data: serviceList = [] } = useQuery<Service[]>({
     queryKey: ['serviceList'],
     queryFn: fetchServiceList,
   })
@@ -71,7 +73,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
   const [clientSearch, setClientSearch] = useState('')
   const [serviceSearch, setServiceSearch] = useState('')
   const [filteredClients, setFilteredClients] = useState<Customer[]>([])
-  const [filteredServices, setFilteredServices] = useState<any[]>([])
+  const [filteredServices, setFilteredServices] = useState<Service[]>([])
 
   const handleChange = (name: keyof EventForm, value: string) => {
     setForm({ ...form, [name]: value })
@@ -85,40 +87,42 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
 
   const handleServiceSearch = (text: string) => {
     setServiceSearch(text)
-    const filtered: any[] = serviceList.filter((service: any) => service.serviceName.toLowerCase().includes(text.toLowerCase()))
+    const filtered: any[] = serviceList.filter((service: Service) => service.name.toLowerCase().includes(text.toLowerCase()))
     setFilteredServices(filtered)
   }
+
   const handleClientSelect = (client: Customer) => {
     setForm((prev) => ({ ...prev, clientId: client.id }))
     setClientSearch(`${client.name} ${client.lastName}`)
     setFilteredClients([])
   }
 
-  const handleServiceSelect = (service: any) => {
-    const duration = service.serviceDuration
+  const handleServiceSelect = (service: Service) => {
+    const durationMinutes = fromIntervalToMinutes(service.duration)
     const startDate = dayjs(form.start)
     if (startDate.isValid()) {
-      const end = startDate.add(duration, 'minutes').toISOString()
-      setForm((prev) => ({ ...prev, service: service.serviceName, end }))
+      const end = startDate.add(durationMinutes, 'minutes').toISOString()
+      setForm((prev) => ({ ...prev, service: service.name, end }))
     } else {
       console.error('Invalid start date:', form.start)
     }
     setForm((prev) => ({ ...prev, price: service.price }))
-    setServiceSearch(service.serviceName)
+    setServiceSearch(service.name)
     setFilteredServices([])
   }
 
   const handleSubmit = async () => {
+    console.log('form', form)
     try {
       await api.post('/event/create', form)
-      const foundClientPhoneNumber = clientList.find((client) => client.id === form.clientId)?.phoneNumber
-      if (foundClientPhoneNumber) {
-        Linking.openURL(
-          `sms:${foundClientPhoneNumber}?body=${encodeURIComponent(
-            `Przypomnienie o wizycie ${form.service} w salonie dnia: ` + dayjs(form.start).format(DEFAULT_DATE_FORMAT_WITH_TIME),
-          )}`,
-        )
-      }
+      // const foundClientPhoneNumber = clientList.find((client) => client.id === form.clientId)?.phoneNumber
+      // if (foundClientPhoneNumber) {
+      //   Linking.openURL(
+      //     `sms:${foundClientPhoneNumber}?body=${encodeURIComponent(
+      //       `Przypomnienie o wizycie ${form.service} w salonie dnia: ` + dayjs(form.start).format(DEFAULT_DATE_FORMAT_WITH_TIME),
+      //     )}`,
+      //   )
+      // }
     } catch (error) {
       console.error('Error creating event:', error)
     }
@@ -153,13 +157,12 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
             />
             {filteredClients.length > 0 && (
               <View style={styles.suggestionsContainer}>
-                  {filteredClients.map((client) => {
-                  
-                    return (
-                      <TouchableOpacity key={client.id} onPress={() => handleClientSelect(client)} style={styles.suggestion}>
-                        <Text style={styles.element}>{`${client.name} ${client.lastName}`}</Text>
-                      </TouchableOpacity>
-                    )
+                {filteredClients.map((client) => {
+                  return (
+                    <TouchableOpacity key={client.id} onPress={() => handleClientSelect(client)} style={styles.suggestion}>
+                      <Text style={styles.element}>{`${client.name} ${client.lastName}`}</Text>
+                    </TouchableOpacity>
+                  )
                 })}
               </View>
             )}
@@ -175,7 +178,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
               <View style={styles.suggestionsContainer}>
                 {filteredServices.map((client) => (
                   <TouchableOpacity key={client.id} onPress={() => handleServiceSelect(client)} style={styles.suggestion}>
-                    <Text style={styles.element}>{`${client.serviceName}`}</Text>
+                    <Text style={styles.element}>{`${client.name}`}</Text>
                   </TouchableOpacity>
                 ))}
               </View>

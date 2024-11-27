@@ -1,10 +1,9 @@
 import i18n from 'i18n/i18n'
 import * as z from 'zod'
+
 export const serviceFormSchema = z.object({
   serviceName: z.string().min(1, { message: i18n.t('validation.fieldRequired') }),
-  serviceDescription: z
-    .string()
-    .optional(),
+  serviceDescription: z.string().optional(),
   servicePrice: z.union([
     z.number({ invalid_type_error: i18n.t('validation.mustBeNumber') }).positive({ message: i18n.t('validation.mustBePositiveNumber') }),
     z
@@ -32,5 +31,38 @@ export const get15stepValue = (text: string) => {
     return rounded.toString()
   } else {
     return ''
+  }
+}
+
+
+
+export const validateServiceForm = ({
+  serviceName,
+  serviceDescription,
+  servicePrice,
+  serviceDuration,
+}: {
+  serviceName: string
+  serviceDescription: string
+  servicePrice: string
+  serviceDuration: string
+}) => {
+  const formData = {
+    serviceName,
+    serviceDescription,
+    servicePrice,
+    serviceDuration,
+  }
+  try {
+    serviceFormSchema.parse(formData)
+    return
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      const errorMessages: { [key: string]: string } = {}
+      err.errors.forEach((error) => {
+        errorMessages[error.path[0]] = error.message
+      })
+      return errorMessages
+    }
   }
 }

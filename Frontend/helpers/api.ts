@@ -48,7 +48,6 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config
-
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       const refreshToken = await AsyncStorage.getItem('refreshToken')
@@ -66,7 +65,7 @@ api.interceptors.response.use(
         return Promise.reject(error)
       }
     }
-    return Promise.reject(error)
+    return Promise.reject(error.response.data)
   },
 )
 

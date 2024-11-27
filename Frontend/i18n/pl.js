@@ -59,6 +59,11 @@ export const pl = {
       mutlitleBy15: 'Wartość musi być wielokrotnością 15',
       mustBeInteger: 'Wartość musi być liczbą całkowitą',
     },
+    filters: {
+      search: 'Szukaj',
+      reset: 'Resetuj',
+      searchForService: 'Szukaj usługi',
+    },
     client: {
       clientBase: 'Baza klientów',
       addCustomer: 'Dodaj klienta',

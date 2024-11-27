@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createEvent, getEvents } from '../controllers/evenetsControllers'
+import { createEvent, getEvents } from '../controllers/eventsControllers'
 import { authenticateToken } from '../middleware/authMiddleWare'
 
 const eventRouter = Router()

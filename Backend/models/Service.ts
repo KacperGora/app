@@ -23,7 +23,7 @@ export const dbCreateService = async (service: Service) => {
   }
 }
 
-export const dbGetServices = async (userId: string, query: { search?: string, sortBy?: string, sortOrder?: 'ASC' | 'DESC' }) => {
+export const dbGetServices = async (userId: string, query: { search?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }) => {
   let dbQuery = `
     SELECT * FROM services
     WHERE user_id = $1

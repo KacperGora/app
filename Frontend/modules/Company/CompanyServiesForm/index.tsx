@@ -1,72 +1,59 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
+import { StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import { TextInput, Button, Text, Divider } from 'react-native-paper'
 import { debounce } from 'lodash'
-import { get15stepValue, serviceFormSchema } from './utils'
-import * as z from 'zod'
+import { get15stepValue, validateServiceForm } from './utils'
 import api from '@helpers/api'
+import { useMutation } from '@tanstack/react-query'
 
 const CompanyServicesForm = () => {
   const { t } = useTranslation()
-  const [serviceName, setServiceName] = useState('')
-  const [serviceDescription, setServiceDescription] = useState('')
-  const [servicePrice, setServicePrice] = useState('')
-  const [serviceDuration, setServiceDuration] = useState('')
+  const [form, setForm] = useState({
+    serviceName: '',
+    serviceDescription: '',
+    servicePrice: '',
+    serviceDuration: '',
+  })
+  const { serviceName, serviceDescription, servicePrice, serviceDuration } = form
 
-  const [errors, setErrors] = useState({ serviceName: '', serviceDescription: '', servicePrice: '', serviceDuration: '' })
+  const [hasErrors, setHasErrors] = useState(false)
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string } | undefined>(undefined)
 
   const handleServiceDurationChange = useCallback(
     debounce((text) => {
-      setServiceDuration(get15stepValue(text))
+      const value = get15stepValue(text)
+      setForm((prev) => ({ ...prev, serviceDuration: value }))
     }, 300),
     [],
   )
 
-  const validateForm = () => {
-    const formData = {
-      serviceName,
-      serviceDescription,
-      servicePrice,
-      serviceDuration,
-    }
-
-    try {
-      serviceFormSchema.parse(formData)
-      setErrors({
-        serviceName: '',
-        serviceDescription: '',
-        servicePrice: '',
-        serviceDuration: '',
+  const { mutate, error } = useMutation({
+    mutationFn: async () => {
+      await api.post('/company/addService', {
+        serviceName,
+        serviceDescription,
+        servicePrice,
+        serviceDuration,
       })
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        const errorMessages: { [key: string]: string } = {}
-        err.errors.forEach(({ path, message }) => {
-          errorMessages[path[0]] = message
-        })
-        setErrors({
-          serviceName: errorMessages.serviceName || '',
-          serviceDescription: errorMessages.serviceDescription || '',
-          servicePrice: errorMessages.servicePrice || '',
-          serviceDuration: errorMessages.serviceDuration || '',
-        })
-      }
-    }
+    },
+    onSuccess: (data) => {
+      console.log('Service added', data)
+    },
+    onError: (error) => {
+      console.log('Error adding service', error)
+    },
+  })
+
+  const handleFormChange = (key: keyof typeof form) => (value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }))
   }
 
-  useEffect(() => {}, [serviceName, serviceDescription, servicePrice, serviceDuration])
-
-  const handleSubmit = async () => {
-    await api.post('/company/addService', {
-      serviceName,
-      serviceDescription,
-      servicePrice,
-      serviceDuration,
-    })
-  }
-
-  const isReadOnlyButton = Object.values(errors).some((error) => Boolean(error.length))
+  useEffect(() => {
+    const errors = validateServiceForm({ serviceName, serviceDescription, servicePrice, serviceDuration })
+    setFormErrors(errors)
+    setHasErrors(errors ? Object.keys(errors).length > 0 : false)
+  }, [serviceName, serviceDescription, servicePrice, serviceDuration])
 
   return (
     <KeyboardAvoidingView
@@ -83,67 +70,58 @@ const CompanyServicesForm = () => {
         <TextInput
           mode='outlined'
           value={serviceName}
-          onChangeText={setServiceName}
-          onBlur={validateForm}
-          onFocus={() => setErrors((prev) => ({ ...prev, serviceName: '' }))}
+          onChangeText={handleFormChange('serviceName')}
           label={t('form.serviceName')}
           placeholder={t('form.serviceNamePlaceholder')}
           style={styles.input}
-          error={!!errors.serviceName}
+          error={!!formErrors?.serviceName}
         />
-        {errors.serviceName && <Text style={styles.errorText}>{errors.serviceName}</Text>}
+        {formErrors?.serviceName && <Text style={styles.errorText}>{formErrors.serviceName}</Text>}
 
         <TextInput
           placeholder={t('form.serviceDescriptionPlaceholder')}
           mode='outlined'
           value={serviceDescription}
-          onChangeText={setServiceDescription}
-          onBlur={validateForm}
-          onFocus={() => setErrors((prev) => ({ ...prev, serviceDescription: '' }))}
+          onChangeText={handleFormChange('servicePrice')}
           label={t('form.serviceDescription')}
           style={styles.input}
           multiline
-          error={!!errors.serviceDescription}
+          error={!!formErrors?.serviceDescription}
         />
-        {errors.serviceDescription && <Text style={styles.errorText}>{errors.serviceDescription}</Text>}
+        {formErrors?.serviceDescription && <Text style={styles.errorText}>{formErrors.serviceDescription}</Text>}
 
         <TextInput
           label={t('form.servicePrice')}
           mode='outlined'
           value={servicePrice}
-          onChangeText={setServicePrice}
-          onBlur={validateForm}
-          onFocus={() => setErrors((prev) => ({ ...prev, servicePrice: '' }))}
+          onChangeText={handleFormChange('servicePrice')}
           placeholder={t('form.servicePricePlaceholder')}
           keyboardType='numbers-and-punctuation'
           style={styles.input}
-          error={!!errors.servicePrice}
+          error={!!formErrors?.servicePrice}
         />
-        {errors.servicePrice && <Text style={styles.errorText}>{errors.servicePrice}</Text>}
-
+        {formErrors?.servicePrice && <Text style={styles.errorText}>{formErrors.servicePrice}</Text>}
         <TextInput
           mode='outlined'
           value={serviceDuration}
           onChangeText={(text) => {
-            setServiceDuration(text)
+            setForm((prev) => ({ ...prev, serviceDuration: text }))
             handleServiceDurationChange(text)
           }}
-          onBlur={validateForm}
           label={t('form.serviceDuration')}
           placeholder={t('form.serviceDurationPlaceholder')}
           keyboardType='numeric'
-          onFocus={() => setErrors((prev) => ({ ...prev, servicePrice: '' }))}
           style={styles.input}
-          error={!!errors.serviceDuration}
+          error={!!formErrors?.serviceDuration}
         />
         <Text style={styles.helperText}>{t('form.serviceDurationHelper')}</Text>
-        {errors.serviceDuration && <Text style={styles.errorText}>{errors.serviceDuration}</Text>}
+        {formErrors?.serviceDuration && <Text style={styles.errorText}>{formErrors.serviceDuration}</Text>}
 
         <Button
-          disabled={isReadOnlyButton}
+          disabled={hasErrors}
           mode='contained'
-          onPress={handleSubmit}
-          style={[styles.submitButton, isReadOnlyButton && styles.buttonReadOnly]}
+          onPress={() => mutate()}
+          style={[styles.submitButton, hasErrors && styles.buttonReadOnly]}
         >
           {t('form.save')}
         </Button>
@@ -177,13 +155,11 @@ const styles = StyleSheet.create({
   },
   buttonReadOnly: {
     backgroundColor: '#cdcdcd',
-    color: '#fff',
   },
   errorText: {
-    color: 'red',
     fontSize: 12,
-    marginTop: -10,
     marginBottom: 10,
+    color: '#f00',
   },
   helperText: {
     fontSize: 12,

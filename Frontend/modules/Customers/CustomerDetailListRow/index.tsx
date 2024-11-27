@@ -6,15 +6,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { EventForm } from '../../../Views/Calendar'
 import { useNavigation } from '@react-navigation/native'
 
-export interface Customer {
-  name: string
-  lastName: string
-  phoneNumber: string
-  lastVisit: string
-  id: string
-  events: EventForm[]
-}
-
 type PhoneMethod = 'tel' | 'sms'
 
 interface Props {
@@ -23,10 +14,12 @@ interface Props {
 
 import { NavigationProp } from '@react-navigation/native'
 import { RootStackParamList } from '../../../Views/Login'
+import { Customer } from '../CustomerList'
 
 const CustomerDetailListRow: React.FC<Props> = ({ customer }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
-  const { lastName, name, lastVisit, phoneNumber, events } = customer
+  const { lastName, name, phoneNumber } = customer
+  console.log(name, phoneNumber)
   const isContactDisplayed = Boolean(phoneNumber)
   const handlePhonePress = (type: PhoneMethod) => () => {
     let url = `${type}:${phoneNumber}`
@@ -35,7 +28,6 @@ const CustomerDetailListRow: React.FC<Props> = ({ customer }) => {
     }
     Linking.openURL(url)
   }
-
   const handleSwipeableOpen = (direction: 'left' | 'right') => {
     if (direction === 'right') {
     }
@@ -60,7 +52,7 @@ const CustomerDetailListRow: React.FC<Props> = ({ customer }) => {
       {isContactDisplayed && (
         <View style={styles.phoneWrapper}>
           <TouchableOpacity onPress={handlePhonePress('tel')} accessibilityLabel={`Call ${name}`}>
-            <Text style={styles.phone}>{phoneNumber}</Text>
+            <Text style={styles.phone}>{}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handlePhonePress('sms')} accessibilityLabel={`Send SMS to ${name}`}>
             <Icon name='message-outline' size={24} color='#666' />

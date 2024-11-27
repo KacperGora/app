@@ -20,7 +20,7 @@ export const getEvents = async (req: Request, res: Response) => {
 
 export const createEvent = async (req: Request, res: Response) => {
   const userId = req.user.id
-
+  
   await createDataBaseEvent({ ...req.body, userId })
 }
 

@@ -87,6 +87,7 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(({ params }, r
   const { data, isLoading } = useQuery({
     queryKey: ['events'],
     queryFn: fetchList,
+    enabled: true,
   })
   const bottomSheetRef = useRef<BottomSheet>(null)
   // const [events, setEvents] = useState<any[]>([])
@@ -164,6 +165,7 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(({ params }, r
           firstDay={0}
           hideWeekDays={mode === withoutWeekends ? [5, 6] : []}
           numberOfDays={mode}
+          
           // isLoading={isLoading}
           onDateChanged={handleDateChange}
           onDragCreateEventEnd={handleDragCreateEventEnd}

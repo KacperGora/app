@@ -10,7 +10,6 @@ export const createDataBaseEvent = async (event: any) => {
   try {
     return await db.none(query, values)
   } catch (error) {
-    console.error('Error creating event:', error)
     throw error
   }
 }

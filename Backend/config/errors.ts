@@ -39,4 +39,9 @@ export const errors: Errors = {
     message: 'Token required',
     code: 'TOKEN_REQUIRED',
   },
+  SERVICE_EXISTS: {
+    status: 400,
+    message: 'Service already exists',
+    code: 'SERVICE_EXISTS',
+  },
 }
