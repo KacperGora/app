@@ -11,8 +11,8 @@
       "navigation/*": ["navigation/*"],
       "utils/*": ["utils/*"],
       "assets/*": ["assets/*"],
-      "types/*": ["types/*"],
-      "@helpers/*": ["helpers/*"]
+      "@helpers/*": ["helpers/*"],
+      "@types/*" : ["types/*"]
     }
   }
 }

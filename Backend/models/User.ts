@@ -1,48 +1,48 @@
 import db from '../db'
-import { v4 as uuidv4 } from 'uuid'
-import { validate } from 'uuid'
 
-type User = {
+type UserRecord = {
+  id: string
   username: string
-  password: string
-}
-export const createUser = async (user: User) => {
-  const { username, password } = user
-  const query = `
-    INSERT INTO users (username, password)
-    VALUES ($1, $2)
-    RETURNING id, username
-  `
-  return db.one(query, [username, password])
+  password?: string
+  refresh_token?: string
 }
 
-export const findUser = async (username: string) => {
+export const createUser = async (user: { username: string; password: string }) => {
+  const { username, password } = user
+  const query = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username'
+  return db.one<UserRecord>(query, [username, password])
+}
+
+export const findUserByKey = async (key: string, value: string): Promise<UserRecord | null> => {
+  if (!['id', 'username'].includes(key)) {
+    throw new Error('Invalid key')
+  }
+
   const query = `
     SELECT * FROM users
-    WHERE username = $1
+    WHERE ${key} = $1
   `
-  return db.oneOrNone(query, [username])
+  return await db.oneOrNone<UserRecord>(query, [value])
 }
 
-export const updateUserPassword = async (username: string, password: string) => {
+export const updateUserPassword = async (username: string, password: string): Promise<void> => {
   const query = `
     UPDATE users
     SET password = $1
     WHERE username = $2
   `
-  return db.none(query, [password, username])
+  await db.none(query, [password, username])
 }
 
-export const findUserById = async (id: string) => {
-  const parsedId = id?.trim()
-  if (validate(parsedId)) {
+export const saveRefreshToken = async (userId: string, token: string): Promise<void> => {
+  try {
     const query = `
-    SELECT * FROM users
-    WHERE id = $1`
-    return db.oneOrNone(query, [parsedId])
+     UPDATE users
+     SET refresh_token = $1
+     WHERE id = $2
+   `
+    await db.none(query, [token, userId])
+  } catch (error) {
+    throw error
   }
-}
-
-export const saveRefreshToken = async (userId: string, token: string) => {
-  await db.query('UPDATE users SET refresh_token = $1 WHERE id = $2', [token, userId])
 }

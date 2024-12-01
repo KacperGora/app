@@ -1,46 +1,50 @@
 import axios from 'axios'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { jwtDecode } from 'jwt-decode'
+import * as SecureStore from 'expo-secure-store'
+import { toCamelCase, toSnakeCase } from './utils'
 
-const toCamelCase = (obj: any): any => {
-  if (Array.isArray(obj)) {
-    return obj.map((v) => toCamelCase(v))
-  } else if (obj && typeof obj === 'object') {
-    return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => [key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()), toCamelCase(value)]),
-    )
+type TokenKey = 'accessToken' | 'refreshToken'
+
+export const saveToken = async (key: TokenKey, value: string) => {
+  console.log(value, 'saveToken')
+  if (typeof key !== 'string' || typeof value !== 'string') {
+    throw new Error('Invalid value provided to SecureStore')
   }
-  return obj
+  await SecureStore.setItemAsync(key, value)
+  console.log(key, 'save token')
 }
 
-const toSnakeCase = (obj: any): any => {
-  if (Array.isArray(obj)) {
-    return obj.map((v) => toSnakeCase(v))
-  } else if (obj && typeof obj === 'object') {
-    return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => [key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`), toSnakeCase(value)]),
-    )
-  }
-  return obj
+const getToken = async (key: TokenKey) => {
+  const value = await SecureStore.getItemAsync(key)
+  return value
+}
+
+const deleteToken = async (key: TokenKey) => {
+  await SecureStore.deleteItemAsync(key)
 }
 
 const api = axios.create({
   baseURL: 'http://192.168.8.189:3000',
 })
 
-api.interceptors.request.use(async (config) => {
-  const token = await AsyncStorage.getItem('token')
-  if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`
-  }
-  if (config.data) {
-    config.data = toSnakeCase(config.data)
-  }
-  return config
-})
+api.interceptors.request.use(
+  async (config) => {
+    const token = await getToken('accessToken')
+    console.log(token, 'api config')
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
+    if (config.data) {
+      config.data = toSnakeCase(config.data)
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  },
+)
 
 api.interceptors.response.use(
-  (response) => {
+  async (response) => {
     if (response.data) {
       response.data = toCamelCase(response.data)
     }
@@ -48,24 +52,42 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-      const refreshToken = await AsyncStorage.getItem('refreshToken')
-
+    console.log(error.response.status)
+    if (error.response && [401, 403].includes(error.response.status)) {
+      console.log('Token expired')
       try {
-        const res = await api.post('/auth/refresh-token', {
-          token: refreshToken,
-        })
-        const newToken = res.data.accessToken
-        await AsyncStorage.setItem('token', newToken)
+        const refreshToken = await getToken('refreshToken')
+        if (!refreshToken) {
+          console.error('Brak refresh tokena')
+          return Promise.reject(error)
+        }
+
+        const { data } = await axios.post('http://192.168.8.189:3000/auth/refresh-token', { refresh_token: refreshToken })
+        console.log(data)
+        const newToken = data.accessToken
+        // Zapisujemy nowy access token
+        await saveToken('accessToken', data.accessToken)
+        console.log(newToken, 'MEEEEE')
+
         originalRequest.headers['Authorization'] = `Bearer ${newToken}`
-        return api(originalRequest)
+
+        return api.request(originalRequest)
       } catch (e) {
-        console.error('Failed to refresh token', e)
+        console.error('Nie udało się odświeżyć tokena:', e)
+
+        // Usuwamy tokeny, gdy odświeżenie nie powiedzie się
+        await deleteToken('accessToken')
+        await deleteToken('refreshToken')
         return Promise.reject(error)
       }
     }
-    return Promise.reject(error.response.data)
+
+    // Obsługa innych błędów
+    if (error.response) {
+      return Promise.reject(error.response.data)
+    } else {
+      return Promise.reject(error)
+    }
   },
 )
 

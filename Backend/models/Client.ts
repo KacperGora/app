@@ -1,4 +1,5 @@
 import db from '../db'
+import { buildSelectQueryForTable } from '../utils/helpers'
 
 export type Client = {
   name: string
@@ -29,13 +30,19 @@ export const createClient = async (client: Client) => {
   }
 }
 
-export const getAllClients = async (userId: string) => {
-  console.log(userId)
-  const query = `
-    SELECT * FROM clients
-    WHERE user_id = $1
-  `
-  const clients = await db.manyOrNone(query, [userId])
+export const fetchDatabaseClients = async (userId: string, query: { search?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }) => {
+  let dbQuery = buildSelectQueryForTable('clients')
 
-  return clients
+  const values: any[] = [userId]
+
+  if (query.search) {
+    dbQuery += ` AND (name ILIKE $2 OR last_name ILIKE $2 OR phone_number ILIKE $2)`
+    values.push(`%${query.search}%`)
+  }
+
+  if (query.sortBy && query.sortOrder) {
+    dbQuery += ` ORDER BY ${query.sortBy} ${query.sortOrder}`
+  }
+
+  return await db.manyOrNone(dbQuery, values)
 }

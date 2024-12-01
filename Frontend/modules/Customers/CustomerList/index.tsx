@@ -33,7 +33,7 @@ const CustomerList = () => {
     queryKey: ['clientList'],
     queryFn: fetchClientList,
   })
-  console.log(clients, 'line 28')
+
   const searchHandler = (value: string) => {
     setSearchQuery(value)
   }

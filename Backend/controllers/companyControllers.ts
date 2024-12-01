@@ -1,13 +1,14 @@
 import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import { findUserById } from '../models/User'
-import { dbCreateService, dbGetServices, Service } from '../models/Service'
+import { findUserByKey } from '../models/User'
+import { dbCreateService, fetchDatabaseServices, Service } from '../models/Service'
 import { handleError } from '../utils/authUtils'
 import { errors } from '../config/errors'
+import { getDatabaseServices } from '../services/serviceServices'
 
 export const addService = async (req: Request, res: Response): Promise<void> => {
   const userId = req.user.id
-  const foundUser = await findUserById(userId)
+  const foundUser = await findUserByKey('id', userId)
   if (!foundUser) {
     res.status(400).send('User not found')
     return
@@ -21,7 +22,7 @@ export const addService = async (req: Request, res: Response): Promise<void> => 
       service_price: Number(Number(service_price).toFixed(2)),
       service_duration: Number(service_duration),
     }
-    const serviceAlreadyExists = await dbGetServices(userId, { search: service_name })
+    const serviceAlreadyExists = await fetchDatabaseServices(userId, { search: service_name })
     if (Boolean(serviceAlreadyExists.length)) {
       return handleError(res, errors.SERVICE_EXISTS)
     }
@@ -32,20 +33,20 @@ export const addService = async (req: Request, res: Response): Promise<void> => 
     return handleError(res, errors.SERVICE_EXISTS)
   }
 }
+
 export const getServices = async (req: Request, res: Response): Promise<void> => {
-  const userId = req.user.id
-  const { query } = req
-  const sortBy = query.sortBy as keyof Service
-  const sortOrder = query.sortOrder as 'ASC' | 'DESC'
   try {
-    const services = await dbGetServices(userId, { ...query, sortBy, sortOrder, search: query.search as string })
-    const servicesWithNoUserIds = services.map((service) => {
-      delete service.user_id
-      return service
-    })
-    console.log(servicesWithNoUserIds)
-    res.status(200).json(servicesWithNoUserIds)
+    const userId = req.user.id
+    const query = {
+      search: req.query.search as string,
+      sortBy: req.query.sortBy as string,
+      sortOrder: req.query.sortOrder as 'ASC' | 'DESC',
+    }
+
+    const services = await getDatabaseServices(userId, query)
+    res.status(200).json(services)
   } catch (error) {
-    res.status(500).send('Error getting services')
+    console.error('Error fetching services:', error)
+    res.status(500).json({ error: 'Internal Server Error' })
   }
 }

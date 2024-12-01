@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as Keychain from 'react-native-keychain'
 
 export type AuthContextType = {
   isLoggedIn: boolean | null
@@ -18,8 +18,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useState<string>('')
 
   const checkToken = async () => {
-    const token = await AsyncStorage.getItem('token')
-    setIsLoggedIn(!!token)
+    // const token = await Keychain.getGenericPassword({ service: 'token' })
+    // console.log('Token', token);
+    // setIsLoggedIn(!!token)
   }
 
   useEffect(() => {

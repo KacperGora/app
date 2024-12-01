@@ -1,19 +1,18 @@
 import { Request, Response } from 'express'
-import { findUserById } from '../models/User'
-import { createClient, getAllClients } from '../models/Client'
+import { createClient, fetchDatabaseClients } from '../models/Client'
+import { findUserByKey } from '../models/User'
 
 export const getClients = async (req: Request, res: Response): Promise<void> => {
   const userId = req.user.id
-  const foundUser = await findUserById(userId)
+  const foundUser = await findUserByKey('id', userId)
   if (!foundUser) {
     res.status(400).send('User not found')
     return
   }
   try {
-    const clients = await getAllClients(userId)
+    const clients = await fetchDatabaseClients(userId, {})
     res.status(200).json(clients)
   } catch (error) {
-    console.log(error)
     res.status(500).send('Error getting clients')
   }
 }

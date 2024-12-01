@@ -1,11 +1,10 @@
 import express from 'express'
 import { PORT } from './config/env'
-import apiRouter from './routes/apiRouter'
 import router from './routes/authRoutes'
 import eventRouter from './routes/eventRoutes'
 import clientRouter from './routes/clientRoutes'
 import companyRouter from './routes/companyRouter'
-import db from './db'
+
 const app = express()
 
 app.use(express.json())

@@ -1,4 +1,5 @@
 import db from '../db'
+import { buildSelectQueryForTable } from '../utils/helpers'
 
 export type Service = {
   user_id: string
@@ -23,11 +24,8 @@ export const dbCreateService = async (service: Service) => {
   }
 }
 
-export const dbGetServices = async (userId: string, query: { search?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }) => {
-  let dbQuery = `
-    SELECT * FROM services
-    WHERE user_id = $1
-  `
+export const fetchDatabaseServices = async (userId: string, query: { search?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }) => {
+  let dbQuery = buildSelectQueryForTable('services')
   const values: any[] = [userId]
 
   if (query.search) {

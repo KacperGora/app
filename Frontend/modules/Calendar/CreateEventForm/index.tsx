@@ -40,29 +40,25 @@ type EventForm = {
 }
 
 type CreateEventFormProps = {
-  onEventCreateRequest: () => void
+  onEventCreateRequest: () => Promise<void>
   initialState?: EventForm
-}
-const fetchUserList = async () => {
-  const { data } = await api.get('/client/getClient')
-  return data
-}
-
-const fetchServiceList = async () => {
-  const { data } = await api.get('/company/getServices')
-  return data
 }
 
 const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest, initialState }) => {
   const { t } = useTranslation()
-  const { data: clientList = [], isLoading = false } = useQuery<Customer[]>({
-    queryKey: ['clientList'],
-    queryFn: fetchUserList,
+
+  const { data, isLoading = false } = useQuery<{
+    services: Service[]
+    clients: Customer[]
+  }>({
+    queryKey: ['getEventsFormOptions'],
+    queryFn: async () => {
+      const { data } = await api.get('/event/fetchEventOptions')
+      console.log(data)
+      return data
+    },
   })
-  const { data: serviceList = [] } = useQuery<Service[]>({
-    queryKey: ['serviceList'],
-    queryFn: fetchServiceList,
-  })
+
   const [form, setForm] = useState<EventForm>({
     start: initialState?.start || '',
     end: initialState?.end || '',
@@ -81,14 +77,14 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
 
   const handleClientSearch = (text: string) => {
     setClientSearch(text)
-    const filtered: Customer[] = clientList.filter((client: Customer) => client.name.toLowerCase().includes(text.toLowerCase()))
-    setFilteredClients(filtered)
+    // const filtered: Customer[] = clientList.filter((client: Customer) => client.name.toLowerCase().includes(text.toLowerCase()))
+    // setFilteredClients(filtered)
   }
 
   const handleServiceSearch = (text: string) => {
     setServiceSearch(text)
-    const filtered: any[] = serviceList.filter((service: Service) => service.name.toLowerCase().includes(text.toLowerCase()))
-    setFilteredServices(filtered)
+    // const filtered: any[] = serviceList.filter((service: Service) => service.name.toLowerCase().includes(text.toLowerCase()))
+    // setFilteredServices(filtered)
   }
 
   const handleClientSelect = (client: Customer) => {
@@ -115,18 +111,19 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
     console.log('form', form)
     try {
       await api.post('/event/create', form)
-      // const foundClientPhoneNumber = clientList.find((client) => client.id === form.clientId)?.phoneNumber
-      // if (foundClientPhoneNumber) {
-      //   Linking.openURL(
-      //     `sms:${foundClientPhoneNumber}?body=${encodeURIComponent(
-      //       `Przypomnienie o wizycie ${form.service} w salonie dnia: ` + dayjs(form.start).format(DEFAULT_DATE_FORMAT_WITH_TIME),
-      //     )}`,
-      //   )
-      // }
     } catch (error) {
       console.error('Error creating event:', error)
     }
-    onEventCreateRequest()
+    await onEventCreateRequest()
+  }
+
+  const handleUpdate = async () => {
+    try {
+      await api.patch('/event/update', form)
+    } catch (error) {
+      console.error('Error updating event:', error)
+    }
+    await onEventCreateRequest()
   }
 
   useEffect(() => {
@@ -140,11 +137,22 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
     )
   }, [initialState])
 
+  useEffect(() => {
+    if (form.clientId && !clientSearch) {
+      // const { name, lastName } = clientList.find((client) => client.id === form.clientId) || { name: '', lastName: '' }
+      // setClientSearch(`${name} ${lastName}`)
+    }
+    if (form.service && !serviceSearch) {
+      // const { name } = serviceList.find((service) => service.name === form.service) || { name: '' }
+      // setServiceSearch(name)
+    }
+  }, [form.clientId, form.service])
+
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView contentContainerStyle={styles.container}>
         <Title style={styles.formTitle}>{t('calendar.addNewVisit')}</Title>
-        {isLoading ? (
+        {isLoading || !data ? (
           <Loader />
         ) : (
           <>
@@ -212,7 +220,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
               style={[styles.input, styles.textArea]}
             />
 
-            <Button mode='contained' onPress={handleSubmit} style={styles.submitButton}>
+            <Button mode='contained' onPress={handleUpdate} style={styles.submitButton}>
               {t('form.save')}
             </Button>
           </>

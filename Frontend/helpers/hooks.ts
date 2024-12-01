@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react'
 import * as SplashScreen from 'expo-splash-screen'
 import { AuthContext, AuthContextType } from 'context/AuthContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
+import * as SecureStore from 'expo-secure-store'
 export const useModal = () => {
   const [isVisible, setIsVisible] = useState(false)
 
@@ -39,9 +39,9 @@ export const useAuth = () => {
   useEffect(() => {
     const checkToken = async () => {
       try {
-        const token = await AsyncStorage.getItem('token')
+        const token = await SecureStore.getItemAsync('accessToken')
         console.log(token)
-        setIsLoggedIn(!!token)
+        setIsLoggedIn(Boolean(token))
       } catch (error) {
         console.error('Error getting token', error)
       } finally {
