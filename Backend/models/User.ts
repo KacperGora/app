@@ -22,7 +22,8 @@ export const findUserByKey = async (key: string, value: string): Promise<UserRec
     SELECT * FROM users
     WHERE ${key} = $1
   `
-  return await db.oneOrNone<UserRecord>(query, [value])
+  const user = await db.oneOrNone<UserRecord>(query, [value])
+  return user
 }
 
 export const updateUserPassword = async (username: string, password: string): Promise<void> => {

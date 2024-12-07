@@ -1,10 +1,12 @@
 import { Router } from 'express'
-import { addService, getServices } from '../controllers/companyControllers'
+import { addService, getEventsIncome, getServices } from '../controllers/companyControllers'
 import { authenticateToken } from '../middleware/authMiddleWare'
 
 const companyRouter = Router()
+
 companyRouter.use(authenticateToken)
-companyRouter.post('/addService', addService)
+companyRouter.get('/calculateIncome', getEventsIncome)
 companyRouter.get('/getServices', getServices)
+companyRouter.post('/addService', addService)
 
 export default companyRouter

@@ -1,15 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native'
 import { ToggleButton, Card, Title, Button } from 'react-native-paper'
 import { colors } from '../../../theme/theme'
 import api from '@helpers/api'
 
 const FinanceView = () => {
-  const [selectedRange, setSelectedRange] = useState('miesięczny')
+  const [selectedRange, setSelectedRange] = useState({ start: null, end: null })
 
-  const fetchEventsIncome = () => {
-    api.get('/events/income')
-  }
   const finances = {
     dailyRevenue: 400,
     weeklyRevenue: 2800,
@@ -23,23 +20,18 @@ const FinanceView = () => {
     profitabilityIndex: 1.5,
   }
 
-  const getRevenue = () => {
-    switch (selectedRange) {
-      case 'dzienny':
-        return finances.dailyRevenue
-      case 'tygodniowy':
-        return finances.weeklyRevenue
-      case 'miesięczny':
-        return finances.monthlyRevenue
-      default:
-        return finances.monthlyRevenue
-    }
+  const fetchIncome = async () => {
+    const { data } = await api.get('/company/calculateIncome', { params: selectedRange })
   }
+
+  useEffect(() => {
+    fetchIncome()
+  }, [])
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
-        <Card style={styles.card}>
+        {/* <Card style={styles.card}>
           <Card.Content>
             <Title style={styles.cardTitle}>Przychody ({selectedRange})</Title>
             <Text style={styles.cardText}>{getRevenue()} PLN</Text>
@@ -67,7 +59,7 @@ const FinanceView = () => {
             <Text style={styles.cardText}>Trend: {finances.financialTrend}</Text>
             <Text style={styles.cardText}>Wskaźnik rentowności: {finances.profitabilityIndex * 100}%</Text>
           </Card.Content>
-        </Card>
+        </Card> */}
 
         <Button mode='contained' style={styles.button} onPress={() => console.log('Więcej analiz')}>
           Więcej analiz

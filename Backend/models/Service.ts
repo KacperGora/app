@@ -9,7 +9,7 @@ export type Service = {
   service_duration: number
 }
 
-export const dbCreateService = async (service: Service) => {
+export const saveDatabaseService = async (service: Service) => {
   const { user_id, service_name, service_description, service_price, service_duration } = service
 
   let query = `
@@ -24,7 +24,7 @@ export const dbCreateService = async (service: Service) => {
   }
 }
 
-export const fetchDatabaseServices = async (userId: string, query: { search?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }) => {
+export const getDataBaseServices = async (userId: string, query: { search?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }) => {
   let dbQuery = buildSelectQueryForTable('services')
   const values: any[] = [userId]
 
@@ -39,3 +39,4 @@ export const fetchDatabaseServices = async (userId: string, query: { search?: st
 
   return await db.manyOrNone(dbQuery, values)
 }
+

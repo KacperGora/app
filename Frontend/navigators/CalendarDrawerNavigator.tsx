@@ -8,13 +8,10 @@ import { CALENDAR_ENUM, today } from '@views/Calendar/utils'
 import Topbar from '@modules/Calendar/Topbar'
 import dayjs from 'dayjs'
 import { CalendarKitHandle } from '@howljs/calendar-kit'
-import { DATE_FORMAT_FULL_MONTH_WITH_YEAR, DATE_FORMAT_YYYY_MM_DD } from '@helpers/constants'
+import { DATE_FORMAT_FULL_MONTH_WITH_YEAR, DATE_FORMAT_YYYY_MM_DD, HOUR_CELL_WIDTH, LOCALE_PL } from '@helpers/constants'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { debounce } from 'lodash'
 
 const Drawer = createDrawerNavigator()
-const HOUR_CELL_WIDTH = 60
-const LOCALE_PL = 'pl'
 const width = Dimensions.get('window').width - HOUR_CELL_WIDTH
 const currentMonth = dayjs().locale(LOCALE_PL).format(DATE_FORMAT_FULL_MONTH_WITH_YEAR)
 const { day, fullWeek, withoutWeekends } = CALENDAR_ENUM

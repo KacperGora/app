@@ -1,29 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput as RNTextInput,
-  Linking,
-} from 'react-native'
-import { TextInput, Text, Button, Title } from 'react-native-paper'
+import { Dimensions, ScrollView, StyleSheet, View, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
+import { Text, Button, Title } from 'react-native-paper'
 import api from '@helpers/api'
 import { useQuery } from '@tanstack/react-query'
-import { fromDateString } from '@helpers/toString'
-import { DEFAULT_DATE_FORMAT_WITH_TIME } from '@helpers/constants'
 import TextInputWithCounter from '@components/TextInputWithCounter'
 import DatePicker from '@components/DatePicker'
 import Loader from '@components/Loader'
 import { colors } from '../../../theme/theme'
 import dayjs from 'dayjs'
 import Input from '@components/TextInputWithCounter'
-import { Link } from '@react-navigation/native'
-import { set } from 'lodash'
 import { fromIntervalToMinutes } from '@helpers/transformers'
 import { Service } from '@modules/Company/CompanyServices'
 import { Customer } from '@modules/Customers/CustomerList'
@@ -58,7 +44,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
       return data
     },
   })
-
+console.log(initialState)
   const [form, setForm] = useState<EventForm>({
     start: initialState?.start || '',
     end: initialState?.end || '',
@@ -77,14 +63,15 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
 
   const handleClientSearch = (text: string) => {
     setClientSearch(text)
+    const filtered: Customer[] = (data?.clients || []).filter((client: Customer) => client.name.toLowerCase().includes(text.toLowerCase()))
     // const filtered: Customer[] = clientList.filter((client: Customer) => client.name.toLowerCase().includes(text.toLowerCase()))
-    // setFilteredClients(filtered)
+    setFilteredClients(filtered)
   }
 
   const handleServiceSearch = (text: string) => {
     setServiceSearch(text)
-    // const filtered: any[] = serviceList.filter((service: Service) => service.name.toLowerCase().includes(text.toLowerCase()))
-    // setFilteredServices(filtered)
+    const filtered: Service[] = (data?.services || []).filter((service: Service) => service.name.toLowerCase().includes(text.toLowerCase()))
+    setFilteredServices(filtered)
   }
 
   const handleClientSelect = (client: Customer) => {
@@ -137,16 +124,11 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
     )
   }, [initialState])
 
-  useEffect(() => {
-    if (form.clientId && !clientSearch) {
-      // const { name, lastName } = clientList.find((client) => client.id === form.clientId) || { name: '', lastName: '' }
-      // setClientSearch(`${name} ${lastName}`)
+  useEffect(() => { 
+    if (initialState) {
+     console.log(initialState);
     }
-    if (form.service && !serviceSearch) {
-      // const { name } = serviceList.find((service) => service.name === form.service) || { name: '' }
-      // setServiceSearch(name)
-    }
-  }, [form.clientId, form.service])
+  }, [initialState])
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -220,7 +202,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
               style={[styles.input, styles.textArea]}
             />
 
-            <Button mode='contained' onPress={handleUpdate} style={styles.submitButton}>
+            <Button mode='contained' onPress={handleSubmit} style={styles.submitButton}>
               {t('form.save')}
             </Button>
           </>

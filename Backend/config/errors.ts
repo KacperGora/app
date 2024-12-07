@@ -44,4 +44,9 @@ export const errors: Errors = {
     message: 'Service already exists',
     code: 'SERVICE_EXISTS',
   },
+  FORBIDDEN: {
+    status: 403,
+    message: 'Forbidden',
+    code: 'FORBIDDEN',
+  },
 }

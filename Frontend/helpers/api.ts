@@ -15,6 +15,8 @@ export const saveToken = async (key: TokenKey, value: string) => {
 
 const getToken = async (key: TokenKey) => {
   const value = await SecureStore.getItemAsync(key)
+  console.log(value, 'get token')
+  console.log(key)
   return value
 }
 
@@ -75,14 +77,12 @@ api.interceptors.response.use(
       } catch (e) {
         console.error('Nie udało się odświeżyć tokena:', e)
 
-        // Usuwamy tokeny, gdy odświeżenie nie powiedzie się
         await deleteToken('accessToken')
         await deleteToken('refreshToken')
         return Promise.reject(error)
       }
     }
 
-    // Obsługa innych błędów
     if (error.response) {
       return Promise.reject(error.response.data)
     } else {

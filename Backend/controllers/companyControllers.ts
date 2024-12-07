@@ -1,10 +1,17 @@
 import { Request, Response } from 'express'
-import { v4 as uuidv4 } from 'uuid'
 import { findUserByKey } from '../models/User'
-import { dbCreateService, fetchDatabaseServices, Service } from '../models/Service'
+import { getDataBaseServices, Service } from '../models/Service'
 import { handleError } from '../utils/authUtils'
 import { errors } from '../config/errors'
-import { getDatabaseServices } from '../services/serviceServices'
+import { companyService } from '../services/companyService'
+import { getDatabaseEventsInPeriod } from '../models/Event'
+
+type CustomRequest = Request & {
+  query: {
+    start: string
+    end: string
+  }
+}
 
 export const addService = async (req: Request, res: Response): Promise<void> => {
   const userId = req.user.id
@@ -14,23 +21,17 @@ export const addService = async (req: Request, res: Response): Promise<void> => 
     return
   }
   try {
-    const { service_name, service_description, service_duration, service_price } = req.body
-    const service: Service = {
-      user_id: userId,
-      service_name: service_name,
-      service_description: service_description,
-      service_price: Number(Number(service_price).toFixed(2)),
-      service_duration: Number(service_duration),
-    }
-    const serviceAlreadyExists = await fetchDatabaseServices(userId, { search: service_name })
+    const service = { ...req.body, user_id: userId } as Service
+    const serviceAlreadyExists = await getDataBaseServices(userId, { search: req.body.service_name })
     if (Boolean(serviceAlreadyExists.length)) {
       return handleError(res, errors.SERVICE_EXISTS)
     }
 
-    await dbCreateService(service)
+    await companyService.createService(service)
     res.status(201).json({ message: 'Service created successfully', service })
   } catch (error) {
-    return handleError(res, errors.SERVICE_EXISTS)
+    console.error('Error creating service:', error)
+    res.status(500).json({ error: 'Internal Server Error' })
   }
 }
 
@@ -43,8 +44,32 @@ export const getServices = async (req: Request, res: Response): Promise<void> =>
       sortOrder: req.query.sortOrder as 'ASC' | 'DESC',
     }
 
-    const services = await getDatabaseServices(userId, query)
+    const services = await companyService.getDatabaseServices(userId, query)
     res.status(200).json(services)
+  } catch (error) {
+    console.error('Error fetching services:', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
+
+export const getEventsIncome = async (req: CustomRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user.id
+    const { start, end } = req.query
+    const events = await getDatabaseEventsInPeriod(userId, start, end)
+    const income = events.reduce((acc, { price }) => {
+      return acc + parseInt(price)
+    }, 0)
+
+    const totalIncomeByEvents = events.reduce((acc, { service, price }) => {
+      return {
+        ...acc,
+        [service]: acc[service] ? acc[service] + parseInt(price) : parseInt(price),
+      }
+    }, {})
+
+    console.log('Most income event:', totalIncomeByEvents)
+    res.status(200).json({ income })
   } catch (error) {
     console.error('Error fetching services:', error)
     res.status(500).json({ error: 'Internal Server Error' })

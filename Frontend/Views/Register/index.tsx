@@ -1,104 +1,104 @@
 import React, { useState } from 'react'
-import { View, StyleSheet } from 'react-native'
-import { TextInput, Button, Title } from 'react-native-paper'
+import { View, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, SafeAreaView } from 'react-native'
+import { TextInput, Button, Title, Text } from 'react-native-paper'
 import { useTranslation } from 'react-i18next'
-import api from '../../helpers/api'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { useMutation } from '@tanstack/react-query'
 
-type RegisterForm = {
-  username: string
-  password: string
-  confirmPassword: string
-}
-
-type handleChange = (key: keyof RegisterForm) => (value: string) => void
+import api from '@helpers/api'
+import { API_PATHS } from '@helpers/apiPathsConfig'
+import PasswordStrength from '@components/PasswordStrength'
+import Loader from '@components/Loader'
+import Notification from '@components/Notification'
+import { styles } from './styles'
+import { InputChangeHandler, RegisterForm } from './types'
 
 const Register = () => {
   const { t } = useTranslation()
   const [form, setForm] = useState<RegisterForm>({ username: '', password: '', confirmPassword: '' })
+  const [errorMessage, setErrorMessage] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+
   const { username, password, confirmPassword } = form
 
-  const handleFormChange: handleChange = (key) => (value) => {
-    setForm({ ...form, [key]: value })
+  const isReadOnlySubmitButton = Boolean(password !== confirmPassword || !password || !confirmPassword || errorMessage || !username)
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev)
   }
 
-  const handleRegister = async () => {
-    try {
-      const response = await api.post('auth/register', { username, password })
+  const handleFormChange: InputChangeHandler = (key) => (value) => {
+    setForm({ ...form, [key]: value })
+    setErrorMessage('')
+  }
+
+  const { mutateAsync, status } = useMutation({
+    mutationFn: async () => await api.post(API_PATHS.REGISTER, { username, password }),
+    onSuccess: ({ data }) => {
       alert('Registered successfully')
-    } catch (error: any) {
-      alert(error.response.data.error)
-    }
+    },
+    onError: (error) => {
+      setErrorMessage(error.message)
+    },
+  })
+
+  const handleRegister = async () => {
+    await mutateAsync()
+  }
+
+  if (status === 'pending') {
+    return <Loader />
   }
 
   return (
-    <View style={styles.container}>
-      <Title style={styles.title}>{t('global.signUp')}</Title>
-      <TextInput
-        label={t('global.username')}
-        value={username}
-        onChangeText={handleFormChange('username')}
-        style={styles.input}
-        mode='outlined'
-      />
-      <TextInput
-        label={t('global.password')}
-        value={password}
-        onChangeText={handleFormChange('password')}
-        secureTextEntry
-        style={styles.input}
-        mode='outlined'
-      />
-      <TextInput
-        label={t('global.confirmPassword')}
-        value={confirmPassword}
-        onChangeText={handleFormChange('confirmPassword')}
-        secureTextEntry
-        style={styles.input}
-        mode='outlined'
-      />
-      <Button
-        mode='contained'
-        onPress={handleRegister}
-        style={styles.button}
-        contentStyle={styles.buttonContent}
-        labelStyle={styles.buttonLabel}
-      >
-        {t('global.signUp')}
-      </Button>
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Title style={styles.title}>{t('global.signUp')}</Title>
+          <TextInput
+            label={t('form.username')}
+            value={username}
+            onChangeText={handleFormChange('username')}
+            style={styles.input}
+            mode='outlined'
+          />
+          <View>
+            <TextInput
+              label={t('form.password')}
+              value={password}
+              onChangeText={handleFormChange('password')}
+              secureTextEntry={!showPassword}
+              style={styles.input}
+              mode='outlined'
+            />
+            <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility}>
+              <Icon size={16} name='eye' />
+            </TouchableOpacity>
+          </View>
+          <TextInput
+            label={t('form.confirmPassword')}
+            value={confirmPassword}
+            onChangeText={handleFormChange('confirmPassword')}
+            secureTextEntry
+            style={styles.input}
+            mode='outlined'
+          />
+          {errorMessage ? <Text>{errorMessage}</Text> : <PasswordStrength password={password} passwordConfirmation={confirmPassword} />}
+          <Button
+            mode='contained'
+            onPress={handleRegister}
+            style={styles.button}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.buttonLabel}
+            disabled={isReadOnlySubmitButton}
+            theme={{ roundness: 8, mode: 'adaptive' }}
+          >
+            {t('global.signUp')}
+          </Button>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 24,
-    textAlign: 'center',
-    color: '#333',
-    fontFamily: 'Lato-Bold',
-  },
-  input: {
-    marginBottom: 16,
-    backgroundColor: '#fff',
-  },
-  button: {
-    marginTop: 24,
-    borderRadius: 8,
-  },
-  buttonContent: {
-    height: 48,
-  },
-  buttonLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-})
 
 export default Register

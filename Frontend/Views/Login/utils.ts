@@ -21,5 +21,6 @@ export const loginSuccessHandler = async (data: LoginSuccess, setIsLoggedIn: (va
   await SecureStore.setItemAsync('refreshToken', data.refreshToken).catch((error) => {
     console.error('Error saving refresh token:', error)
   })
+  console.log(data);
   setIsLoggedIn(true)
 }

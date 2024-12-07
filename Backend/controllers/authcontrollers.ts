@@ -1,15 +1,17 @@
 import { Request, Response } from 'express'
 import { errors } from '../config/errors'
 import { handleError } from '../utils/authUtils'
-import { userService } from '../services/authServices'
+import { userService } from '../services/userService'
 
 export const register = async (req: Request, res: Response) => {
   const { username, password } = req.body
   try {
     const response = await userService.registerUser(username, password)
-    res.status(201).json(response)
-  } catch (error) {
-    // handleError(res, error)
+    res.status(201).json({ data: response })
+  } catch (error: any) {
+    const [text, errorCode] = String(error).split(': ')
+    return handleError(res, errors[errorCode])
+    // return handleError(res, errors.USERNAME_AND_PASSWORD_REQUIRED)
   }
 }
 
@@ -29,7 +31,6 @@ export const refreshToken = async (req: Request, res: Response) => {
     const newAccessToken = await userService.refreshUserToken(refresh_token)
     res.json({ accessToken: newAccessToken })
   } catch (error) {
-    console.error(error)
-    res.sendStatus(403)
+    handleError(res, errors.TOKEN_REQUIRED)
   }
 }

@@ -1,4 +1,5 @@
 import db from '../db'
+import { calculateCurrentWeek } from '../utils/helpers'
 
 export const createDataBaseEvent = async (event: any) => {
   const { service, start, end, client_id, notes, price, userId } = event
@@ -35,4 +36,15 @@ export const updateDatabaseEvent = async (event: any) => {
   } catch (error) {
     throw error
   }
+}
+
+export const getDatabaseEventsInPeriod = async (userId: string, start: string, end: string) => {
+  const startDate = start ? start : calculateCurrentWeek().start
+  const endDate = end ? end : calculateCurrentWeek().end
+ 
+  const query = `
+    SELECT * FROM events
+    WHERE user_id = $1 AND start_time >= $2 AND end_time <= $3
+  `
+  return db.manyOrNone(query, [userId, startDate, endDate])
 }

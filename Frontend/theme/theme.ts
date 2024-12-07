@@ -73,7 +73,7 @@ export const beautyTheme = {
     },
 
     surfaceDisabled: 'rgba(51, 43, 47, 0.12)',
-    onSurfaceDisabled: 'rgba(51, 43, 47, 0.38)',
+    onSurfaceDisabled: 'white',
     backdrop: 'rgba(51, 47, 55, 0.2)',
   },
 }

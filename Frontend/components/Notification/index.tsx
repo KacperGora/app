@@ -15,7 +15,7 @@ const Notification: React.FC<ToastProps> = ({ visible, message, type = 'info', d
   const [fadeAnim] = useState(new Animated.Value(0))
   const [slideAnim] = useState(new Animated.Value(Dimensions.get('window').width))
 
-  const positionStyle = position === 'top' ? { top: 40 } : { bottom: 50 }
+  const positionStyle = position === 'top' ? { top: 160 } : { bottom: 50 }
 
   useEffect(() => {
     if (visible) {
@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     maxWidth: '50%',
+    elevation: 5,
   },
   snackbar: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
