@@ -7,13 +7,26 @@ import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable'
 import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated'
 import { colors } from 'theme/theme'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import api from '@helpers/api'
+import { QueryObserverResult, useQueryClient } from '@tanstack/react-query'
 
-const RightAction: React.FC<{ prog: SharedValue<number>; drag: SharedValue<number>; close: () => void }> = ({ prog, drag, close }) => {
+const RightAction: React.FC<{
+  prog: SharedValue<number>
+  drag: SharedValue<number>
+  close: () => void
+  serviceId: string
+  refetchFn: () => Promise<QueryObserverResult<Service[], Error>>
+}> = ({ prog, drag, close, serviceId, refetchFn }) => {
   const styleAnimation = useAnimatedStyle(() => {
     return {
       transform: [{ translateX: drag.value + 50 }],
     }
   })
+
+  const deleteSerivceHandler = async () => {
+    await api.post('/company/deleteService', { id: serviceId })
+    await refetchFn()
+  }
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -25,19 +38,21 @@ const RightAction: React.FC<{ prog: SharedValue<number>; drag: SharedValue<numbe
 
   return (
     <Reanimated.View style={styleAnimation}>
-      <TouchableOpacity onPress={() => console.log('ress')} style={styles.rightAction}>
+      <TouchableOpacity onPress={deleteSerivceHandler} style={styles.rightAction}>
         <MaterialCommunityIcons name='delete' size={32} />
       </TouchableOpacity>
     </Reanimated.View>
   )
 }
 
-const ServiceItem: React.FC<Service> = ({ duration, name, price, description }) => {
+type ServiceItemProps = Service & { refetchFn: () => Promise<QueryObserverResult<Service[], Error>> }
+
+const ServiceItem: React.FC<ServiceItemProps> = ({ duration, name, price, description, id, refetchFn }) => {
   const swipeableRef = useRef<any>(null)
+
   const closeSwipeable = () => {
     swipeableRef.current?.close()
   }
-
   const memoizedPrice = useMemo(() => formatPrice(price), [price])
   const memoizedDuration = useMemo(() => formatDuration(duration), [duration])
 
@@ -46,7 +61,9 @@ const ServiceItem: React.FC<Service> = ({ duration, name, price, description }) 
       containerStyle={styles.swipeable}
       friction={2}
       enableTrackpadTwoFingerGesture
-      renderRightActions={(prog, drag) => <RightAction prog={prog} drag={drag} close={closeSwipeable} />}
+      renderRightActions={(prog, drag) => (
+        <RightAction prog={prog} drag={drag} close={closeSwipeable} serviceId={id} refetchFn={refetchFn} />
+      )}
     >
       <View style={styles.container}>
         <Text style={styles.nameText}>{name}</Text>

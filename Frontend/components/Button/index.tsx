@@ -1,16 +1,35 @@
 import React from 'react'
-import { StyleSheet } from 'react-native'
-import { Button } from 'react-native-paper'
+import { StyleSheet, Text, TextStyle } from 'react-native'
+import { Button as ButtonComponent } from 'react-native-paper'
 
-const ButtonC = ({ label, onPress }: { label: string; onPress: () => void }) => {
-  return <Button onPress={onPress}>{label}</Button>
+import { StyleProp, ViewStyle } from 'react-native'
+
+const Button = ({
+  label,
+  onPress,
+  style,
+  labelStyle,
+}: {
+  label: string
+  onPress: () => void
+  style?: StyleProp<ViewStyle>
+  labelStyle?: StyleProp<TextStyle>
+}) => {
+  return (
+    <ButtonComponent mode='contained' style={[styles.button, style]} onPress={onPress}>
+      <Text style={[styles.label, labelStyle]}>{label}</Text>
+    </ButtonComponent>
+  )
 }
 
 const styles = StyleSheet.create({
   button: {
     padding: 10,
-    backgroundColor: 'blue',
+    backgroundColor: 'transparent',
+  },
+  label: {
+    color: '#000',
   },
 })
 
-export default ButtonC
+export default Button

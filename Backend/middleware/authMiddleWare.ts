@@ -17,6 +17,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
   const token = authHeader && authHeader.split(' ')[1]
   if (!token) return res.sendStatus(401)
   jwt.verify(token, process.env.SECRET_KEY as string, (err, user) => {
+    console.log(err);
     if (err) {
       return res.sendStatus(403)
     }

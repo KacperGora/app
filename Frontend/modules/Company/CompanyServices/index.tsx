@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { FlatList } from 'react-native'
-import { useQuery } from '@tanstack/react-query'
+import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query'
 import { debounce } from 'lodash'
 import api from '@helpers/api'
 import ServiceItem from '../ServicesItem'
@@ -39,13 +39,13 @@ type PayloadType = {
 const CompanyServices = () => {
   const { t } = useTranslation()
 
-  const [searchText, setSearchText] = useState<string>('') // Lokalny stan dla pola wyszukiwania
+  const [searchText, setSearchText] = useState('')
   const [payload, setPayload] = useState<PayloadType>({
-    sortOrder: 'ASC',
+    sortOrder: 'DESC',
     sortBy: 'name',
   })
 
-  const { data, isLoading } = useQuery<Service[]>({
+  const { data, isLoading, refetch } = useQuery<Service[]>({
     queryKey: ['services', payload],
     queryFn: () => fetchServices(payload),
     enabled: true,
@@ -63,8 +63,14 @@ const CompanyServices = () => {
     debouncedHandleFiltersChange(text)
   }
 
-  const RenderServiceItem = ({ item }: { item: Service }) => {
-    return <ServiceItem {...item} />
+  const RenderServiceItem = ({
+    item,
+    refetchFn,
+  }: {
+    item: Service
+    refetchFn: (options?: RefetchOptions) => Promise<QueryObserverResult<Service[], Error>>
+  }) => {
+    return <ServiceItem {...item} refetchFn={refetchFn} />
   }
 
   return (
@@ -82,7 +88,7 @@ const CompanyServices = () => {
           style={styles.list}
           data={data}
           keyExtractor={({ id }) => id}
-          renderItem={({ item }) => <RenderServiceItem item={item} />}
+          renderItem={({ item }) => <RenderServiceItem item={item} refetchFn={refetch} />}
         />
       )}
     </View>

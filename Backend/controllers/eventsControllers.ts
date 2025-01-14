@@ -1,11 +1,9 @@
 import { Request, Response } from 'express'
 import { createDataBaseEvent, getDatabaseEvents, updateDatabaseEvent } from '../models/Event'
-import { getServices } from './companyControllers'
-import { getClients } from './clientControllers'
-import { getDatabaseClients } from '../services/clientServices'
 import { handleError } from '../utils/authUtils'
 import { errors } from '../config/errors'
 import { companyService } from '../services/companyService'
+import { clientService } from '../services/clientServices'
 interface CustomRequest extends Request {
   user: {
     userId: string
@@ -45,7 +43,7 @@ export const getEventsFormOptions = async (req: Request, res: Response) => {
   try {
     const userId = req.user.id
     const services = await companyService.getDatabaseServices(userId, {})
-    const clients = await getDatabaseClients(userId, {})
+    const clients = await clientService.getClients(userId, {})
     res.status(200).json({ services, clients })
   } catch (error) {
     handleError(res, errors.INTERNAL_SERVER_ERROR)

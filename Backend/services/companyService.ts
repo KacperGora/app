@@ -1,4 +1,4 @@
-import { getDataBaseServices, saveDatabaseService, Service } from '../models/Service'
+import { getDataBaseServices, saveDatabaseService, Service, deleteDatabaseService } from '../models/Service'
 import { ORDER_DIRECTION } from '../types/queryTypes'
 import { SORT_ORDER_ENUM } from '../utils/enums'
 
@@ -21,5 +21,9 @@ export const companyService = {
       service_duration: Number(newService.service_duration),
     }
     return await saveDatabaseService(service)
+  },
+
+  async deleteService(userId: string, serviceId: string) {
+    return await deleteDatabaseService(userId, serviceId)
   },
 }

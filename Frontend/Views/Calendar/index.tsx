@@ -27,34 +27,10 @@ import { EventForm } from '../../types/calendarTypes'
 
 import CreateEventForm from '@modules/Calendar/CreateEventForm'
 import BottomSheetFormWrapper from '@components/BottomSheetFormWrapper'
+import Toast from '@components/Toast'
 
 const { withoutWeekends } = CALENDAR_ENUM
 
-const resources: ResourceItem[] = [
-  { id: 'room1', title: 'Justyna Góra' },
-  { id: 'room2', title: 'Kacper Góra' },
-  { id: 'room3', title: 'Blanka Góra' },
-]
-
-const events = [
-  {
-    id: '1',
-    title: 'Team Meeting',
-    start: { dateTime: '2024-10-31T14:00:00Z' },
-    end: { dateTime: '2024-10-31T15:30:00Z' },
-    color: colors.primary,
-    resourceId: 'room1',
-  },
-  {
-    id: '2',
-    title: 'Client Presentation',
-    start: { dateTime: '2024-10-31T14:00:00Z' },
-    end: { dateTime: '2024-10-31T15:30:00Z' },
-    resourceId: 'room2',
-    color: colors.primary,
-  },
-  // ... more events
-]
 export type CalendarRouteProp = {
   params: {
     mode: number
@@ -120,11 +96,6 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(({ params }, r
     onMonthChange(dayjs(date).locale('pl').format(DATE_FORMAT_FULL_MONTH_WITH_YEAR))
   }
 
-  const refetchOnDemand = async () => {
-    await refetch()
-    bottomSheetRef.current?.close()
-  }
-
   return (
     <GestureHandlerRootView>
       <View style={styles.wrapper}>
@@ -157,7 +128,7 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(({ params }, r
       </View>
 
       <BottomSheetFormWrapper ref={bottomSheetRef}>
-        <CreateEventForm onEventCreateRequest={refetchOnDemand} initialState={eventForm} />
+        <CreateEventForm onEventCreateRequest={fetchList} initialState={eventForm} />
       </BottomSheetFormWrapper>
     </GestureHandlerRootView>
   )

@@ -1,25 +1,19 @@
 import dayjs from 'dayjs'
-import { Linking, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { DEFAULT_DATE_FORMAT, DEFAULT_DATE_FORMAT_WITH_TIME } from '../../../helpers/constants'
-import { Swipeable } from 'react-native-gesture-handler'
+import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { DEFAULT_DATE_FORMAT } from '../../../helpers/constants'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { EventForm } from '../../../Views/Calendar'
 import { useNavigation } from '@react-navigation/native'
 
 type PhoneMethod = 'tel' | 'sms'
 
-interface Props {
-  customer: Customer
-}
-
 import { NavigationProp } from '@react-navigation/native'
-import { RootStackParamList } from '../../../Views/Login'
 import { Customer } from '../CustomerList'
+import { RootStackParamList } from '@views/Login/types'
 
-const CustomerDetailListRow: React.FC<Props> = ({ customer }) => {
+const CustomerDetailListRow: React.FC<{ customer: Customer }> = ({ customer }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const { lastName, name, phoneNumber } = customer
-  console.log(name, phoneNumber)
+
   const isContactDisplayed = Boolean(phoneNumber)
   const handlePhonePress = (type: PhoneMethod) => () => {
     let url = `${type}:${phoneNumber}`
@@ -28,20 +22,6 @@ const CustomerDetailListRow: React.FC<Props> = ({ customer }) => {
     }
     Linking.openURL(url)
   }
-  const handleSwipeableOpen = (direction: 'left' | 'right') => {
-    if (direction === 'right') {
-    }
-  }
-  const handleDeleteCustomer = () => {}
-
-  const renderLeftAction = () => {
-    return (
-      <TouchableOpacity onPress={handleDeleteCustomer} style={styles.leftAction}>
-        <Icon name='delete-outline' size={24} color='red' style={styles.leftActionIcon} />
-      </TouchableOpacity>
-    )
-  }
-
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate('CustomerDetail', { customer })}

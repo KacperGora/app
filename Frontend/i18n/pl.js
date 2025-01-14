@@ -1,5 +1,3 @@
-import { en } from './en'
-
 export const pl = {
   translation: {
     global: {
@@ -10,6 +8,9 @@ export const pl = {
       welcome: 'Witaj',
       logout: 'Wyloguj',
       search: 'Szukaj',
+      success: 'Sukces',
+      error: 'Błąd',
+      confirmation: 'Potwierdzenie',
     },
     login: {
       password: 'Hasło',
@@ -22,6 +23,9 @@ export const pl = {
       appointments: 'Wizyty',
       clients: 'Klienci',
       company: 'Firma',
+      clientDetails: 'Szczegóły klienta',
+      clientsBase: 'Baza klientów',
+      statistics: 'Statystyki',
     },
     form: {
       username: 'Nazwa użytkownika',
@@ -62,6 +66,7 @@ export const pl = {
       passwordNumberError: 'Hasło musi zawierać co najmniej jedną cyfrę',
       passwordMatchError: 'Hasła nie pasują do siebie',
       passwordMetRequirements: 'Hasło spełnia wymagania',
+      addClient: 'Nie widzisz swojego klienta? Dodaj go',
     },
     validation: {
       fieldRequired: 'Pole jest wymagane',
@@ -79,6 +84,10 @@ export const pl = {
     client: {
       clientBase: 'Baza klientów',
       addCustomer: 'Dodaj klienta',
+      deleteCustomer: 'Usuń klienta',
+      deletetionSuccess: 'Klient został usunięty',
+      deletionError: 'Wystąpił błąd podczas usuwania klienta',
+      deletionConfirmation: 'Czy na pewno chcesz usunąć klienta',
     },
     company: {
       dashboard: 'Pulpit',

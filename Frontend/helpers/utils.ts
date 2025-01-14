@@ -1,17 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-
-export const checkTokenExpiration = async () => {
-  // if (!token) return
-  // const decodedToken = jwtDecode(token)
-  // const currentTime = Date.now() / 1000
-  // if (decodedToken.exp && decodedToken.exp < currentTime) {
-  //   try {
-  //     const response = await api.post('/auth/refresh-token')
-  //     await saveToken('token', response.data.token)
-  //   } catch (error) {}
-  // }
-}
-
 export const toCamelCase = (obj: any): any => {
   if (Array.isArray(obj)) {
     return obj.map((v) => toCamelCase(v))
@@ -33,3 +19,5 @@ export const toSnakeCase = (obj: any): any => {
   }
   return obj
 }
+
+export const getFullName = (name: string, lastName: string): string => `${name} ${lastName}`

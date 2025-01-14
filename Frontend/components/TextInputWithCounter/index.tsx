@@ -28,7 +28,7 @@ const Input: React.FC<TextInputWithCounterProps> = ({
         value={value}
         onChangeText={onChangeText}
         maxLength={maxLength}
-        label={placeholder}
+        label={label}
         placeholder={placeholder}
         textAlignVertical='top'
         multiline={multiline}
@@ -47,7 +47,6 @@ const Input: React.FC<TextInputWithCounterProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 15,
     position: 'relative',
   },
   input: {

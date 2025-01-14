@@ -5,7 +5,8 @@ export type LoginForm = {
 
 export type RootStackParamList = {
   Register: string
-  CustomerDetail: { customer: any }
+  CustomerDetail: { customer: any },
+  CustomerList: string,
 }
 
 export type LoginSuccess = {

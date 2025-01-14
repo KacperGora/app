@@ -49,4 +49,14 @@ export const errors: Errors = {
     message: 'Forbidden',
     code: 'FORBIDDEN',
   },
+  CLIENT_EXISTS: {
+    status: 400,
+    message: 'Client already exists',
+    code: 'CLIENT_EXISTS',
+  },
+  INVALID_CLIENT_ADD_REQUEST: {
+    status: 400,
+    message: 'Invalid client add request',
+    code: 'INVALID_CLIENT_ADD_REQUEST',
+  },
 }

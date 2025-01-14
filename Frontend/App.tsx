@@ -10,7 +10,6 @@ import { AuthProvider } from './context/AuthContext'
 import { beautyTheme, colors } from './theme/theme'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useAuth, useLoadFonts } from '@helpers/hooks'
-import { checkTokenExpiration } from '@helpers/utils'
 import { AppNavigator } from 'navigators/HomeStackNavigator'
 import * as SecureStore from 'expo-secure-store'
 
@@ -23,10 +22,6 @@ AppRegistry.registerComponent(appName, () => App)
 
 const App: React.FC<{ queryClient: QueryClient; fontsLoaded: boolean }> = ({ queryClient, fontsLoaded }) => {
   const { isLoggedIn, loading } = useAuth()
-
-  useEffect(() => {
-    checkTokenExpiration()
-  }, [])
 
   if (!fontsLoaded || loading) {
     return <ActivityIndicator size='large' color={colors.primary} />
@@ -41,8 +36,8 @@ const App: React.FC<{ queryClient: QueryClient; fontsLoaded: boolean }> = ({ que
   )
 }
 
+export const queryClient = new QueryClient()
 const Root = () => {
-  const queryClient = new QueryClient()
   const fontsLoaded = useLoadFonts()
 
   return (

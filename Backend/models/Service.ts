@@ -27,8 +27,7 @@ export const saveDatabaseService = async (service: Service) => {
 export const getDataBaseServices = async (userId: string, query: { search?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }) => {
   let dbQuery = buildSelectQueryForTable('services')
   const values: any[] = [userId]
-
-  if (query.search) {
+  if (Boolean(query.search)) {
     dbQuery += ` AND (name ILIKE $2 OR description ILIKE $2)`
     values.push(`%${query.search}%`)
   }
@@ -36,7 +35,14 @@ export const getDataBaseServices = async (userId: string, query: { search?: stri
   if (query.sortBy && query.sortOrder) {
     dbQuery += ` ORDER BY ${query.sortBy} ${query.sortOrder}`
   }
-
   return await db.manyOrNone(dbQuery, values)
 }
 
+export const deleteDatabaseService = async (userId: string, serviceId: string) => {
+  const query = `
+    DELETE FROM services
+    WHERE user_id = $1 AND id = $2
+    RETURNING id, user_id, name, description, price, duration`
+
+  return await db.one(query, [userId, serviceId])
+}

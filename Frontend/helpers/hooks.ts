@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import { AuthContext, AuthContextType } from 'context/AuthContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as SecureStore from 'expo-secure-store'
+import api from './api'
 export const useModal = () => {
   const [isVisible, setIsVisible] = useState(false)
 

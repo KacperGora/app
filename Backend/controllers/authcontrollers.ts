@@ -11,7 +11,6 @@ export const register = async (req: Request, res: Response) => {
   } catch (error: any) {
     const [text, errorCode] = String(error).split(': ')
     return handleError(res, errors[errorCode])
-    // return handleError(res, errors.USERNAME_AND_PASSWORD_REQUIRED)
   }
 }
 
