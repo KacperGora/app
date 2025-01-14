@@ -49,8 +49,6 @@ const EmployeeForm = () => {
   }
 
   const handleSubmit = () => {
-    // Handle form submission
-    // console.log('Employee Data:', { name, phoneNumber, position, image })
   }
 
   return (

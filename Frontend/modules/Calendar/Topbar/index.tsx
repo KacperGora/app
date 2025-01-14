@@ -15,8 +15,7 @@ type TopbarProps = {
 }
 
 const Topbar: React.FC<TopbarProps> = ({ onPress, date, displayedCalendarMonth }) => {
-  const { setIsLoggedIn } = useContext(AuthContext) as AuthContextType
-
+  const { setIsLoggedIn, userId } = useContext(AuthContext) as AuthContextType
   return (
     <View style={styles.topBar}>
       <TouchableOpacity>

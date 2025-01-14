@@ -1,6 +1,7 @@
 {
-  "extends": "expo/tsconfig.base",
+  "extends": "./node_modules/expo/tsconfig.base",
   "compilerOptions": {
+    "esModuleInterop": true,
     "strict": true,
     "baseUrl": "./",
     "paths": {
@@ -10,8 +11,8 @@
       "navigation/*": ["navigation/*"],
       "utils/*": ["utils/*"],
       "assets/*": ["assets/*"],
-      "types/*": ["types/*"],
-      "@helpers/*": ["helpers/*"]
+      "@helpers/*": ["helpers/*"],
+      "@types/*" : ["types/*"]
     }
   }
 }

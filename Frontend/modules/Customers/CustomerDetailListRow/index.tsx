@@ -1,28 +1,20 @@
 import dayjs from 'dayjs'
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { DEFAULT_DATE_FORMAT, DEFAULT_DATE_FORMAT_WITH_TIME } from '../../../helpers/constants'
-import { Swipeable } from 'react-native-gesture-handler'
+import { DEFAULT_DATE_FORMAT } from '../../../helpers/constants'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { EventForm } from '../../../Views/Calendar'
-
-export interface Customer {
-  name: string
-  lastName: string
-  phoneNumber: string
-  lastVisit: string
-  id: string
-  events: EventForm[]
-}
+import { useNavigation } from '@react-navigation/native'
 
 type PhoneMethod = 'tel' | 'sms'
 
-interface Props {
-  customer: Customer
-}
+import { NavigationProp } from '@react-navigation/native'
+import { Customer } from '../CustomerList'
+import { RootStackParamList } from '@views/Login/types'
 
-const CustomerDetailListRow: React.FC<Props> = ({ customer }) => {
-  const { lastName, name, lastVisit, phoneNumber, events } = customer
-  console.log(customer)
+const CustomerDetailListRow: React.FC<{ customer: Customer }> = ({ customer }) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+  const { lastName, name, phoneNumber } = customer
+
+  const isContactDisplayed = Boolean(phoneNumber)
   const handlePhonePress = (type: PhoneMethod) => () => {
     let url = `${type}:${phoneNumber}`
     if (type === 'sms') {
@@ -30,40 +22,23 @@ const CustomerDetailListRow: React.FC<Props> = ({ customer }) => {
     }
     Linking.openURL(url)
   }
-
-  const handleSwipeableOpen = (direction: 'left' | 'right') => {
-    if (direction === 'right') {
-      console.log('Swiped right')
-    }
-  }
-  const handleDeleteCustomer = () => {
-    console.log('Delete customer')
-  }
-
-  const renderLeftAction = () => {
-    return (
-      <TouchableOpacity onPress={handleDeleteCustomer} style={styles.leftAction}>
-        <Icon name='delete-outline' size={24} color='red' style={styles.leftActionIcon} />
-      </TouchableOpacity>
-    )
-  }
-
   return (
-    <TouchableOpacity>
-      <Swipeable renderLeftActions={renderLeftAction} onSwipeableOpen={handleSwipeableOpen}>
-        <TouchableOpacity style={styles.item} accessibilityLabel={`Customer ${name} ${lastName}`}>
-          <Text style={styles.name}>{`${name} ${lastName}`}</Text>
-          <View style={styles.phoneWrapper}>
-            <TouchableOpacity onPress={handlePhonePress('tel')} accessibilityLabel={`Call ${name}`}>
-              <Text style={styles.phone}>{phoneNumber}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handlePhonePress('sms')} accessibilityLabel={`Send SMS to ${name}`}>
-              <Icon name='message-outline' size={24} color='#666' />
-            </TouchableOpacity>
-          </View>
-          {/* <Text style={styles.lastVisit}>{`Ostatnia wizyta: ${dayjs(events[0].start).format(DEFAULT_DATE_FORMAT_WITH_TIME)}`}</Text> */}
-        </TouchableOpacity>
-      </Swipeable>
+    <TouchableOpacity
+      onPress={() => navigation.navigate('CustomerDetail', { customer })}
+      style={styles.item}
+      accessibilityLabel={`Customer ${name} ${lastName}`}
+    >
+      <Text style={styles.name}>{`${name} ${lastName}`}</Text>
+      {isContactDisplayed && (
+        <View style={styles.phoneWrapper}>
+          <TouchableOpacity onPress={handlePhonePress('tel')} accessibilityLabel={`Call ${name}`}>
+            <Text style={styles.phone}>{}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handlePhonePress('sms')} accessibilityLabel={`Send SMS to ${name}`}>
+            <Icon name='message-outline' size={24} color='#666' />
+          </TouchableOpacity>
+        </View>
+      )}
     </TouchableOpacity>
   )
 }

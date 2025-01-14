@@ -1,58 +1,81 @@
 import axios from 'axios'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { jwtDecode } from 'jwt-decode'
+import * as SecureStore from 'expo-secure-store'
+import { toCamelCase, toSnakeCase } from './utils'
+
+type TokenKey = 'accessToken' | 'refreshToken'
+
+export const saveToken = async (key: TokenKey, value: string) => {
+  if (typeof key !== 'string' || typeof value !== 'string') {
+    throw new Error('Invalid value provided to SecureStore')
+  }
+  await SecureStore.setItemAsync(key, value)
+}
+
+const getToken = async (key: TokenKey) => {
+  const value = await SecureStore.getItemAsync(key)
+  return value
+}
+
+const deleteToken = async (key: TokenKey) => {
+  await SecureStore.deleteItemAsync(key)
+}
 
 const api = axios.create({
   baseURL: 'http://192.168.8.189:3000',
 })
 
-const refreshToken = async () => {
-  const token = await AsyncStorage.getItem('token')
-  if (!token) return null
-  try {
-    const response = await api.post('/auth/refresh-token')
-    const newToken = response.data.token
-    await AsyncStorage.setItem('token', newToken)
-    return newToken
-  } catch (error) {
-    console.error('Error refreshing token', error)
-    return null
-  }
-}
+api.interceptors.request.use(
+  async (config) => {
+    const token = await getToken('accessToken')
+    console.log(token, 'storedTOKEN');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
+    if (config.data) {
+      config.data = toSnakeCase(config.data)
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  },
+)
 
-api.interceptors.request.use(async (config) => {
-  // const token = await AsyncStorage.getItem('token')
-  // if (token) {
-  //   const decodedToken = jwtDecode(token)
-  //   const currentTime = Date.now() / 1000
-  //   if (decodedToken.exp && decodedToken.exp < currentTime) {
-  //     const newToken = await refreshToken()
-  //     if (newToken) {
-  //       config.headers['Authorization'] = `Bearer ${newToken}`
-  //     }
-  //   } else {
-  //     config.headers['Authorization'] = `Bearer ${token}`
-  //   }
-  // }
-  return config
-})
+api.interceptors.response.use(
+  async (response) => {
+    if (response.data) {
+      response.data = toCamelCase(response.data)
+    }
+    return response
+  },
+  async (error) => {
+    const originalRequest = error.config
+    if (error.response && [401, 403].includes(error.response.status)) {
+      try {
+        const refreshToken = await getToken('refreshToken')
+        if (!refreshToken) {
+          return Promise.reject(error)
+        }
 
-// api.interceptors.response.use(
-//   (response) => {
-//     return response
-//   },
-//   async (error) => {
-//     const originalRequest = error.config
-//     if (error.response.status === 401 && !originalRequest._retry) {
-//       originalRequest._retry = true
-//       const newToken = await refreshToken()
-//       if (newToken) {
-//         originalRequest.headers['Authorization'] = `Bearer ${newToken}`
-//         return api(originalRequest)
-//       }
-//     }
-//     return Promise.reject(error)
-//   },
-// )
+        const { data } = await axios.post('http://192.168.8.189:3000/auth/refresh-token', { refresh_token: refreshToken })
+        const newToken = data.accessToken
+        await saveToken('accessToken', data.accessToken)
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`
+
+        return api.request(originalRequest)
+      } catch (e) {
+        await deleteToken('accessToken')
+        await deleteToken('refreshToken')
+        return Promise.reject(error)
+      }
+    }
+
+    if (error.response) {
+      return Promise.reject(error.response.data)
+    } else {
+      return Promise.reject(error)
+    }
+  },
+)
 
 export default api

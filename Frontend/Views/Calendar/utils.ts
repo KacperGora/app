@@ -4,6 +4,7 @@ import { DATE_FORMAT_FULL_MONTH_WITH_YEAR, DATE_FORMAT_MMM_YYYY } from '../../he
 import { colors } from 'theme/theme'
 import { HeaderItemProps, parseDateTime, ResourceHeaderItem, ResourceItem } from '@howljs/calendar-kit'
 import { View, Text, StyleSheet } from 'react-native'
+import { EventForm } from 'types/calendarTypes'
 
 export const handleChange = (date: string, setCurrentDisplayedDate: React.Dispatch<React.SetStateAction<string>>) => {
   setCurrentDisplayedDate(dayjs(date).locale('pl').format('MMMM YY'))
@@ -59,11 +60,10 @@ export const calendarContainerConfig = {
   allowDragToCreate: true,
 }
 
-const styles = StyleSheet.create({
-  resourceContainer: {
-    padding: 10,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-})
+export const eventEmptyState: EventForm = {
+  start: '',
+  end: '',
+  service: '',
+  clientId: '',
+  notes: '',
+}

@@ -1,25 +1,49 @@
-import mongoose, { Schema } from 'mongoose'
+import db from '../db'
 
-export interface IUser extends Document {
-  eventsID: any
+type UserRecord = {
   id: string
   username: string
-  password: string
-  clientsID: mongoose.Types.ObjectId[]
-  employeesID: string[]
-  servicesID: string[]
+  password?: string
+  refresh_token?: string
 }
 
-const UserSchema: Schema = new Schema({
-  id: { type: String },
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  eventsID: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
-  clientsID: [{ type: String }],
-  employeesID: [{ type: String }],
-  servicesID: [{ type: String }],
-})
+export const createUser = async (user: { username: string; password: string }) => {
+  const { username, password } = user
+  const query = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username'
+  return db.one<UserRecord>(query, [username, password])
+}
 
-const User = mongoose.model<IUser>('User', UserSchema)
+export const findUserByKey = async (key: string, value: string): Promise<UserRecord | null> => {
+  if (!['id', 'username'].includes(key)) {
+    throw new Error('Invalid key')
+  }
 
-export default User
+  const query = `
+    SELECT * FROM users
+    WHERE ${key} = $1
+  `
+  const user = await db.oneOrNone<UserRecord>(query, [value])
+  return user
+}
+
+export const updateUserPassword = async (username: string, password: string): Promise<void> => {
+  const query = `
+    UPDATE users
+    SET password = $1
+    WHERE username = $2
+  `
+  await db.none(query, [password, username])
+}
+
+export const saveRefreshToken = async (userId: string, token: string): Promise<void> => {
+  try {
+    const query = `
+     UPDATE users
+     SET refresh_token = $1
+     WHERE id = $2
+   `
+    await db.none(query, [token, userId])
+  } catch (error) {
+    throw error
+  }
+}

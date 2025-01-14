@@ -1,20 +1,23 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { jwtDecode } from 'jwt-decode'
-import api from './api'
-
-export const checkTokenExpiration = async () => {
-  const token = await AsyncStorage.getItem('token')
-  if (!token) return
-  const decodedToken = jwtDecode(token)
-  const currentTime = Date.now() / 1000
-  if (decodedToken.exp && decodedToken.exp < currentTime) {
-    try {
-      console.log('need to refresh token');
-      const response = await api.post('/auth/refresh-token')
-      console.log(response.data.token);
-      await AsyncStorage.setItem('token', response.data.token)
-    } catch (error) {
-      console.error('Error refreshing token', error)
-    }
+export const toCamelCase = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map((v) => toCamelCase(v))
+  } else if (obj && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()), toCamelCase(value)]),
+    )
   }
+  return obj
 }
+
+export const toSnakeCase = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map((v) => toSnakeCase(v))
+  } else if (obj && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`), toSnakeCase(value)]),
+    )
+  }
+  return obj
+}
+
+export const getFullName = (name: string, lastName: string): string => `${name} ${lastName}`

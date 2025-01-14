@@ -3,9 +3,11 @@
     "name": "Frontend",
     "slug": "Frontend",
     "version": "1.0.0",
+    "entryPoint": "./App.tsx",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -28,6 +30,9 @@
       "eas": {
         "projectId": "3502ff5b-5773-4b14-b7ac-46a8d0e5b47e"
       }
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

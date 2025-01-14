@@ -39,6 +39,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ label, value, onChange, minDate
   useEffect(() => {
     setDate(value)
   }, [value])
+  
   return (
     <View style={styles.dateTimeContainer}>
       {showDatePicker ? (
@@ -60,7 +61,6 @@ const DatePicker: React.FC<DatePickerProps> = ({ label, value, onChange, minDate
             mode='outlined'
             value={fromDateString({ string: date.toString(), format: DEFAULT_DATE_FORMAT_WITH_TIME })}
             theme={customTheme}
-            style={{ pointerEvents: 'none' }}
           />
         </TouchableOpacity>
       )}

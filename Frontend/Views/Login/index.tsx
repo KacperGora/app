@@ -1,123 +1,84 @@
-import React, { useState, useContext } from 'react'
-import { View, StyleSheet } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { AuthContext, AuthContextType } from '../../context/AuthContext'
-import api from '../../helpers/api'
-import { Text, TextInput, Button } from 'react-native-paper'
-import { useQuery } from 'react-query'
-import Loader from '../../components/Loader'
+import React, { useContext, useState } from 'react'
+import { View, Text, KeyboardAvoidingView, Platform } from 'react-native'
+import { TextInput } from 'react-native-paper'
+import { useNavigation, NavigationProp } from '@react-navigation/native'
+import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-
-interface LoginForm {
-  username: string
-  password: string
-}
+import { AuthContext, AuthContextType } from 'context/AuthContext'
+import { loginApiHandler, loginSuccessHandler, validateLoginForm } from './utils'
+import { styles } from './styles'
+import { LoginForm, LoginSuccess, RootStackParamList } from './types'
+import { name as appName } from '../../package.json'
+import ButtonC from '@components/Button'
 
 const LoginScreen = () => {
+  const { setIsLoggedIn } = useContext(AuthContext) as AuthContextType
+
+  const { navigate } = useNavigation<NavigationProp<RootStackParamList>>()
   const { t } = useTranslation()
-  const { setIsLoggedIn, setLogin, setUserId } = useContext(AuthContext) as AuthContextType
-  const [remindChecked, setRemindChecked] = useState(false)
-  const [loginForm, setLoginForm] = useState<LoginForm>({
-    username: '',
-    password: '',
-  })
 
-  const { username, password } = loginForm
+  const [form, setForm] = useState<LoginForm>({ username: '', password: '' })
+  const [passwordVisible, setPasswordVisible] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const login = async () => {
-    const response = await api.post('auth/login', { username, password })
-    return response.data
+  const togglePasswordVisibility = () => {
+    setPasswordVisible((prev) => !prev)
   }
 
-  const storeToken = async (token: string) => {
-    try {
-      await AsyncStorage.setItem('token', token)
-    } catch (error) {
-      console.error('Error storing token', error)
+  const handleFormChange = (name: keyof LoginForm) => (value: string) => {
+    setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleLogin = async () => {
+    const validationError = validateLoginForm(form)
+    if (validationError) {
+      setError(validationError)
+      return
     }
+    await mutateAsync(form)
   }
 
-  const { data, error, isLoading, refetch } = useQuery('login', login, {
-    enabled: false,
-    onSuccess: async (data) => {
-      const {
-        token,
-        user: { login, id },
-      } = data
-      setLogin(login)
-      setIsLoggedIn(true)
-      setUserId(id)
-      storeToken(token)
-      await AsyncStorage.setItem('login', login)
-    },
+  const { mutateAsync } = useMutation({
+    mutationFn: loginApiHandler,
+    onSuccess: async ({ data }: { data: LoginSuccess }) => await loginSuccessHandler(data, setIsLoggedIn),
     onError: (error) => {
-      console.log(error)
-      console.error('Login failed:', error)
+      setError('Nieprawidłowe dane logowania')
     },
   })
 
-  const handleInputChange = (key: keyof LoginForm) => (value: string) => {
-    setLoginForm({ ...loginForm, [key]: value })
-  }
-
-  const handleLogin = () => {
-    refetch()
-  }
-
-  const handleForgotPassword = async () => {
-    try {
-      await api.post('auth/change-password', { username: 'Gorinek', password: 'Gazeta93.' })
-      alert('Password changed successfully')
-    } catch (error: any) {
-      console.log(error.response.data.error)
-      alert(error.response.data.error)
-    }
-  }
-
-  if (isLoading) {
-    return <Loader />
-  }
   return (
     <View style={styles.container}>
-      <Text variant='headlineMedium'>{t('global.signIn')}</Text>
-      <TextInput
-        mode='outlined'
-        label={t('global.login')}
-        value={username}
-        onChangeText={handleInputChange('username')}
-        style={styles.input}
-      />
-      <TextInput
-        mode='outlined'
-        label={t('global.password')}
-        value={password}
-        onChangeText={handleInputChange('password')}
-        secureTextEntry
-        style={styles.input}
-      />
-      <Button mode='contained' onPress={handleLogin} disabled={isLoading}>
-        {isLoading ? 'Logging in...' : 'Login'}
-      </Button>
-      <Button mode='text' onPress={handleForgotPassword}>
-        {t('form.forgotPassword')}
-      </Button>
+      <View style={styles.header}>
+        <View style={styles.gradient}>
+          <Text style={styles.appName}>{appName}</Text>
+          <Text style={styles.tagline}>Zarządzaj biznesem w prosty sposób</Text>
+        </View>
+      </View>
+      <View style={styles.wave}></View>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <View style={styles.form}>
+          {error && <Text style={styles.errorText}>{error}</Text>}
+          <TextInput
+            label={t('login.username')}
+            mode='outlined'
+            style={styles.input}
+            keyboardType='email-address'
+            onChangeText={handleFormChange('username')}
+          />
+          <TextInput
+            label={t('login.password')}
+            mode='outlined'
+            style={styles.input}
+            onChangeText={handleFormChange('password')}
+            secureTextEntry={!passwordVisible}
+          />
+          <ButtonC label={'Zaloguj'} onPress={handleLogin} />
+          <ButtonC label='Pokaż hasło' onPress={togglePasswordVisibility} />
+          <ButtonC label={t('login.dontHaveAccount')} onPress={() => navigate({ name: 'Register', params: '' })} />
+        </View>
+      </KeyboardAvoidingView>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-  },
-  input: {
-    marginBottom: 12,
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 10,
-  },
-})
 
 export default LoginScreen

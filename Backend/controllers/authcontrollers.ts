@@ -1,104 +1,35 @@
 import { Request, Response } from 'express'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import User from '../models/User'
-import db from '../db'
-const SECRET_KEY = process.env.SECRET_KEY as string
-if (!SECRET_KEY) {
-  throw new Error('SECRET_KEY is not defined in environment variables')
-}
-
-const hashPassword = async (password: string): Promise<string> => {
-  return await bcrypt.hash(password, 10)
-}
-
-const generateToken = (id: number, username: string): string => {
-  return jwt.sign({ id, username }, SECRET_KEY, { expiresIn: '1h' })
-}
+import { errors } from '../config/errors'
+import { handleError } from '../utils/authUtils'
+import { userService } from '../services/userService'
 
 export const register = async (req: Request, res: Response) => {
   const { username, password } = req.body
-
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password are required' })
-  }
-
   try {
-    const existingUser = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username])
-
-    if (existingUser) {
-      return res.status(409).json({ error: 'Username already exists' })
-    }
-
-    const hashedPassword = await hashPassword(password)
-    const newUser = await db.one('INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username', [
-      username,
-      hashedPassword,
-    ])
-
-    res.status(201).json({
-      message: 'User created successfully',
-      user: { login: newUser.username, id: newUser.id },
-    })
-  } catch (error) {
-    console.error('Error registering user:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    const response = await userService.registerUser(username, password)
+    res.status(201).json({ data: response })
+  } catch (error: any) {
+    const [text, errorCode] = String(error).split(': ')
+    return handleError(res, errors[errorCode])
   }
 }
 
 export const login = async (req: Request, res: Response) => {
   const { username, password } = req.body
-
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password are required' })
-  }
-
   try {
-    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username])
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password)
-
-    if (!passwordMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' })
-    }
-
-    const token = generateToken(user.id, user.username)
-
-    res.status(200).json({
-      message: 'Login successful',
-      token,
-      user: { id: user.id, username: user.username },
-    })
+    const response = await userService.loginUser(username, password)
+    res.status(200).json({ data: response })
   } catch (error) {
-    console.error('Error logging in user:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    handleError(res, errors.INVALID_CREDENTIALS)
   }
 }
-export const changePassword = async (req: Request, res: Response) => {
-  const { username, password } = req.body
 
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password are required' })
-  }
-
+export const refreshToken = async (req: Request, res: Response) => {
+  const { refresh_token } = req.body
   try {
-    const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username])
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
-    const hashedPassword = await hashPassword(password)
-
-    await db.none('UPDATE users SET password = $1 WHERE username = $2', [hashedPassword, username])
-
-    res.status(200).json({ message: 'Password changed successfully' })
+    const newAccessToken = await userService.refreshUserToken(refresh_token)
+    res.json({ accessToken: newAccessToken })
   } catch (error) {
-    console.error('Error changing password:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    handleError(res, errors.TOKEN_REQUIRED)
   }
 }

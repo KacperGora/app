@@ -1,29 +1,50 @@
-import mongoose, { Schema } from 'mongoose'
+import db from '../db'
+import { calculateCurrentWeek } from '../utils/helpers'
 
-interface EventDocument extends Document {
-  clientId: string
-  userId: string
+export const createDataBaseEvent = async (event: any) => {
+  const { service, start, end, client_id, notes, price, userId } = event
+  let query = `
+    INSERT INTO events (service, start_time, end_time, client_id, notes, price, user_id)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+  `
+  const values = [service, start, end, client_id, notes, Number(price), userId]
+  try {
+    return await db.none(query, values)
+  } catch (error) {
+    throw error
+  }
 }
-interface Event extends Document {
-  service: string
-  notes: string
-  start: Date
-  end: Date
-  userId: string
-  clientId: string
-  price: number
+
+export const getDatabaseEvents = async (userId: string) => {
+  const query = `
+    SELECT * FROM events
+    WHERE user_id = $1
+  `
+  return db.manyOrNone(query, [userId])
 }
 
-const EventSchema: Schema = new Schema({
-  service: { type: String, required: true },
-  notes: { type: String, required: false },
-  start: { type: Date, required: true },
-  end: { type: Date, required: true },
-  price: { type: Number, required: true },
-  clientId: { type: String, required: true },
-  userId: { type: String, required: true },
-})
+export const updateDatabaseEvent = async (event: any) => {
+  const { service, start, end, client_id, notes, price, userId, id } = event
+  let query = `
+    UPDATE events
+    SET service = $1, start_time = $2, end_time = $3, client_id = $4, notes = $5, price = $6
+    WHERE id = $7 AND user_id = $8
+  `
+  const values = [service, start, end, client_id, notes, Number(price), id, userId]
+  try {
+    return await db.none(query, values)
+  } catch (error) {
+    throw error
+  }
+}
 
-const Event = mongoose.model<EventDocument>('Event', EventSchema)
-
-export default Event
+export const getDatabaseEventsInPeriod = async (userId: string, start: string, end: string) => {
+  const startDate = start ? start : calculateCurrentWeek().start
+  const endDate = end ? end : calculateCurrentWeek().end
+ 
+  const query = `
+    SELECT * FROM events
+    WHERE user_id = $1 AND start_time >= $2 AND end_time <= $3
+  `
+  return db.manyOrNone(query, [userId, startDate, endDate])
+}

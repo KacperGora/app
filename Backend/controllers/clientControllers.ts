@@ -1,87 +1,42 @@
 import { Request, Response } from 'express'
-import Client from '../models/Client'
-import User from '../models/User'
-import mongoose, { Document } from 'mongoose'
-import Event from '../models/Event'
-import { v4 as uuidv4 } from 'uuid'
+import { findUserByKey } from '../models/User'
+import { handleError } from '../utils/authUtils'
+import { errors } from '../config/errors'
+import { clientService } from '../services/clientServices'
 
-interface CustomRequest extends Request {
-  user: {
-    userId: string
-    exp: number
-    iat: number
-  }
-}
-
-export const getClients = async (req: CustomRequest, res: Response): Promise<void> => {
-  console.log('getClients')
-  const userId = req.user?.userId
-  const foundUser = await User.findById(userId).populate('clientsID')
-  console.log(foundUser)
+export const getClients = async (req: Request, res: Response): Promise<void> => {
+  const userId = req.user.id
+  const foundUser = await findUserByKey('id', userId)
   if (!foundUser) {
     res.status(400).send('User not found')
     return
   }
-
-  const userClientsId = foundUser.clientsID
-  const clients = await Client.find({ id: { $in: userClientsId } })
-  const eventsForClients = await Event.find({ clientId: { $in: userClientsId } })
-  console.log(clients)
-  const clientsWithEvents = clients.map((client) => {
-    const clientEvents = eventsForClients.filter((event) => event.clientId === client.id)
-    return {
-      ...client.toObject(),
-      events: clientEvents,
-    }
-  })
-  res.status(200).json(clientsWithEvents)
-}
-
-export const addClient = async (req: CustomRequest, res: Response<any, Record<string, any>>): Promise<void> => {
-  const { name, lastName, phoneNumber } = req.body
-  const userId = req.user.userId
-
-  const foundUser = await User.findById(userId)
-  if (!foundUser) {
-    res.status(400).send('User not found')
-    return
-  }
-
   try {
-    const newClient = new Client({
-      name,
-      lastName,
-      phoneNumber,
-      connectedUser: foundUser.id,
-      id: uuidv4(),
-    })
-    await newClient.save()
-    foundUser.clientsID.push(newClient.id)
-    await foundUser.save()
-
-    res.status(201).send('Client added successfully')
+    const clients = await clientService.getClients(userId, req.query)
+    res.status(200).json(clients)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Error adding client')
+    res.status(500).send('Error getting clients')
   }
 }
 
-export const deleteClient = async (req: CustomRequest, res: Response<any, Record<string, any>>): Promise<void> => {
-  const { clientId } = req.body
-  const userId = req.user.userId
-
-  const foundUser = await User.findById(userId)
-  if (!foundUser) {
-    res.status(400).send('User not found')
-    return
-  }
+export const addClient = async (req: Request, res: Response): Promise<void> => {
+  const { name, last_name, phone_number, notes } = req.body
+  const userId = req.user.id
 
   try {
-    await Client.findByIdAndDelete(clientId)
-    foundUser.clientsID = foundUser.clientsID.filter((client: mongoose.Types.ObjectId) => client.toString() !== clientId)
-    await foundUser.save()
-    console.log('success')
-    res.status(200).send('Client deleted successfully')
+    await clientService.addClient({ name, last_name, phone_number, userId, notes })
+    res.status(200).send('Client added')
+  } catch (error) {
+    const [text, errorCode] = String(error).split(': ')
+    return handleError(res, errors[errorCode])
+  }
+}
+
+export const deleteClient = async (req: Request, res: Response): Promise<void> => {
+  const { client_id } = req.body
+  try {
+    await clientService.deleteClient(client_id)
+    res.status(200).send('Client deleted')
   } catch (error) {
     res.status(500).send('Error deleting client')
   }
