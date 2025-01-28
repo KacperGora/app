@@ -1,56 +1,80 @@
-import { useFonts } from 'expo-font'
-import { useContext, useEffect, useState } from 'react'
-import * as SplashScreen from 'expo-splash-screen'
-import { AuthContext, AuthContextType } from 'context/AuthContext'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import * as SecureStore from 'expo-secure-store'
-import api from './api'
+import { useFonts } from 'expo-font';
+import { useContext, useEffect, useState } from 'react';
+import { AuthContext, AuthContextType } from 'context/AuthContext';
+import * as SplashScreen from 'expo-splash-screen';
+import * as SecureStore from 'expo-secure-store';
+import { Keyboard } from 'react-native';
+
 export const useModal = () => {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
 
   const toggleModal = () => {
-    setIsVisible((prev) => !prev)
-  }
-  return [isVisible, toggleModal] as const
-}
+    setIsVisible((prev) => !prev);
+  };
+  return [isVisible, toggleModal] as const;
+};
 
 export const useLoadFonts = () => {
   const [fontsLoaded] = useFonts({
     'Lato-Regular': require('assets/fonts/Lato-Regular.ttf'),
     'Lato-Bold': require('assets/fonts/Lato-Bold.ttf'),
-  })
+  });
 
   useEffect(() => {
     const hideSplashScreen = async () => {
       if (fontsLoaded) {
-        await SplashScreen.preventAutoHideAsync()
-        await SplashScreen.hideAsync()
+        await SplashScreen.preventAutoHideAsync();
+        await SplashScreen.hideAsync();
       }
-    }
-    hideSplashScreen()
-  }, [fontsLoaded])
+    };
+    hideSplashScreen();
+  }, [fontsLoaded]);
 
-  return fontsLoaded
-}
+  return fontsLoaded;
+};
 
 export const useAuth = () => {
-  const { isLoggedIn, setIsLoggedIn, setLogin } = useContext(AuthContext) as AuthContextType
-  const [loading, setLoading] = useState(true)
+  const { isLoggedIn, setIsLoggedIn, setLogin, setUserId, userId } = useContext(AuthContext) as AuthContextType;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkToken = async () => {
       try {
-        const token = await SecureStore.getItemAsync('accessToken')
-        console.log(token)
-        setIsLoggedIn(Boolean(token))
+        const token = await SecureStore.getItemAsync('accessToken');
+        console.log(token);
+        setIsLoggedIn(Boolean(token));
       } catch (error) {
-        console.error('Error getting token', error)
+        console.error('Error getting token', error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    checkToken()
-  }, [setIsLoggedIn, setLogin])
+    };
+    checkToken();
+  }, [setIsLoggedIn, setLogin]);
 
-  return { isLoggedIn, loading }
-}
+  return { isLoggedIn, loading, setLogin, setUserId, userId };
+};
+
+export const useKeyboardStatus = () => {
+  const [keyboardStatus, setKeyboardStatus] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShow = () => {
+      setKeyboardStatus(true);
+    };
+
+    const keyboardDidHide = () => {
+      setKeyboardStatus(false);
+    };
+
+    Keyboard.addListener('keyboardDidShow', keyboardDidShow);
+    Keyboard.addListener('keyboardDidHide', keyboardDidHide);
+
+    return () => {
+      Keyboard.removeAllListeners('keyboardDidShow');
+      Keyboard.removeAllListeners('keyboardDidHide');
+    };
+  }, []);
+
+  return keyboardStatus;
+};

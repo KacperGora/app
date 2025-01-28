@@ -1,30 +1,26 @@
-import React, { useRef, useState } from 'react'
-import { createDrawerNavigator } from '@react-navigation/drawer'
-import { Keyboard, StyleSheet } from 'react-native'
-import i18next from 'i18next'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import FinanceView from '@modules/Company/Finance'
-import { TouchableOpacity } from 'react-native-gesture-handler'
-import Employees from '@modules/Company/Employees'
-import BottomSheetFormWrapper from '@components/BottomSheetFormWrapper'
-import BottomSheet from '@gorhom/bottom-sheet'
-import CustomerForm from '@modules/Customers/CustomerForm'
-import EmployeeForm from '@modules/Company/EmployeeForm'
-import CompanyServices from '@modules/Company/CompanyServices'
-import CompanyServicesForm from '@modules/Company/CompanyServiesForm'
+import React, { useRef, useState } from 'react';
+import { Keyboard, StyleSheet } from 'react-native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import i18next from 'i18next';
+import BottomSheet from '@gorhom/bottom-sheet';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { BottomSheetFormWrapper } from '@components';
+import { CompanyServicesForm, CompanyServices, EmployeeForm, Employees, FinanceView } from '@modules/Company';
 
-const Drawer = createDrawerNavigator()
-type FormType = 'customer' | 'employee' | 'service'
+const Drawer = createDrawerNavigator();
+type FormType = 'customer' | 'employee' | 'service';
 
 export const CompanyDrawerNavigator = () => {
-  const bottomSheetRef = useRef<BottomSheet>(null)
-  const [formType, setFormType] = useState<FormType>('customer')
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [formType, setFormType] = useState<FormType>('customer');
 
   const onFormToggle = (formType: FormType) => {
-    setFormType(formType)
-    bottomSheetRef.current?.expand()
-    Keyboard.dismiss()
-  }
+    setFormType(formType);
+    bottomSheetRef.current?.expand();
+    Keyboard.dismiss();
+  };
+  
   return (
     <>
       <Drawer.Navigator
@@ -76,8 +72,8 @@ export const CompanyDrawerNavigator = () => {
         {formType === 'service' && <CompanyServicesForm />}
       </BottomSheetFormWrapper>
     </>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   headerRightContainer: {},
@@ -85,6 +81,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-})
+});
 
-export default CompanyDrawerNavigator
+export default CompanyDrawerNavigator;

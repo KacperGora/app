@@ -1,58 +1,58 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { TouchableOpacity, View, Keyboard } from 'react-native'
-import { createStackNavigator } from '@react-navigation/stack'
-import { createDrawerNavigator } from '@react-navigation/drawer'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { ToggleButton } from 'react-native-paper'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { useQuery } from '@tanstack/react-query'
-import { useTranslation } from 'react-i18next'
+import React, { useState, useRef, useEffect } from 'react';
+import { TouchableOpacity, View, Keyboard } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import BottomSheet from '@gorhom/bottom-sheet';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { ToggleButton } from 'react-native-paper';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
-import CustomerList, { Customer } from '@modules/Customers/CustomerList'
-import CustomerDetail from '@modules/Customers/CustomerDetail'
-import Statistics from '@modules/Customers/Statistics'
-import CustomerForm from '@modules/Customers/CustomerForm'
-import BottomSheetFormWrapper from '@components/BottomSheetFormWrapper'
-import { colors } from '../../theme/theme'
-import api from '../../helpers/api'
-import { drawerScreenOptions } from './utils'
-import { apiRoutes } from '@helpers/apiRoutes'
+import { CustomerList, CustomerDetail, Statistics, CustomerForm } from '@modules/Customers';
+import { BottomSheetFormWrapper } from '@components';
+import { colors } from '../../theme/theme';
+import { drawerScreenOptions } from './utils';
+import { apiRoutes, api, useAuth } from '@helpers';
+import { CustomerType } from '@types';
 
-type ToggleEnum = 'day' | 'week' | 'month'
+const {
+  client: { getList },
+} = apiRoutes;
+type ToggleEnum = 'day' | 'week' | 'month';
 
-const Stack = createStackNavigator()
-const Drawer = createDrawerNavigator()
+const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
 
 const HeaderRight = ({ onPress }: { onPress: () => void }) => (
   <TouchableOpacity onPress={onPress}>
     <Icon name='plus' size={24} color={colors.textPrimary} style={{ marginRight: 15 }} />
   </TouchableOpacity>
-)
+);
 
 const CustomerListWithDrawer = () => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
+  const { userId } = useAuth();
+  const [toggle, setToggle] = useState<ToggleEnum>('day');
+  const bottomSheetRef = useRef<BottomSheet | null>(null);
 
-  const [toggle, setToggle] = useState<ToggleEnum>('day')
-  const bottomSheetRef = useRef<BottomSheet | null>(null)
-
-  const { data: clients = [], refetch } = useQuery<Customer[]>({
-    queryKey: ['clientList'],
+  const { data: clients = [], refetch } = useQuery<CustomerType[]>({
+    queryKey: [getList.queryKey],
     queryFn: async () => {
-      const { data } = await api.get(apiRoutes.getClientList)
-      return data
+      const { data } = await api.get(getList.path);
+      return data;
     },
-  })
+  });
 
   const handleFormToggle = () => {
-    Keyboard.dismiss()
-    bottomSheetRef.current?.expand()
-  }
+    Keyboard.dismiss();
+    bottomSheetRef.current?.expand();
+  };
 
   const handleFormClose = async () => {
-    Keyboard.dismiss()
-    bottomSheetRef.current?.close()
-    await refetch()
-  }
+    Keyboard.dismiss();
+    bottomSheetRef.current?.close();
+    await refetch();
+  };
 
   return (
     <>
@@ -95,11 +95,11 @@ const CustomerListWithDrawer = () => {
         <CustomerForm onSubmit={handleFormClose} />
       </BottomSheetFormWrapper>
     </>
-  )
-}
+  );
+};
 
 const Customers = () => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <Stack.Navigator>
@@ -114,7 +114,7 @@ const Customers = () => {
         }}
       />
     </Stack.Navigator>
-  )
-}
+  );
+};
 
-export default Customers
+export default Customers;

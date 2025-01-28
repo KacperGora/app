@@ -9,3 +9,5 @@ export const LOCALE_PL = 'pl'
 
 //OTHERS
 export const HOUR_CELL_WIDTH = 60
+
+export const DEFAULT_CURRENCY = 'PLN'

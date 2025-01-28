@@ -1,43 +1,41 @@
-import React from 'react'
-import { View, Text, StyleSheet, Alert } from 'react-native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import api from '../../../helpers/api'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Customer } from '../CustomerList'
-import { useNavigation } from '@react-navigation/native'
-import { apiRoutes } from '@helpers/apiRoutes'
-import { useTranslation } from 'react-i18next'
-import { getFullName } from '@helpers/utils'
-import { Card } from 'react-native-paper'
-import { colors } from 'theme/theme'
+import React from 'react';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { CustomerType } from '@types';
+import { useNavigation } from '@react-navigation/native';
+import { apiRoutes, getFullName, api } from '@helpers';
+import { useTranslation } from 'react-i18next';
+import { Card } from 'react-native-paper';
+import { colors } from 'theme/theme';
 
 type CustomerDetailProps = {
   route?: {
     params: {
-      customer: Customer
-    }
-  }
-}
-const CustomerDetail: React.FC<CustomerDetailProps> = ({ route = { params: { customer: {} as Customer } } }) => {
-  const { t } = useTranslation()
-  const navigation = useNavigation()
-  const queryClient = useQueryClient()
+      customer: CustomerType;
+    };
+  };
+};
+const CustomerDetail: React.FC<CustomerDetailProps> = ({ route = { params: { customer: {} as CustomerType } } }) => {
+  const { t } = useTranslation();
+  const navigation = useNavigation();
+  const queryClient = useQueryClient();
 
-  const { customer } = route.params || {}
-  const { id: clientId, lastName, name, phoneNumber, notes } = customer
+  const { customer } = route.params || {};
+  const { id: clientId, lastName, name, phoneNumber, notes } = customer;
 
   const deleteCustomer = useMutation({
     mutationFn: async () => {
-      await api.post(apiRoutes.deleteClient, { clientId })
+      await api.post(apiRoutes.client.delete.path, { clientId });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clientList'] })
-      Alert.alert(t('global.success'), t('client.deletetionSuccess'), [{ text: 'OK', onPress: () => navigation.goBack() }])
+      queryClient.invalidateQueries({ queryKey: ['clientList'] });
+      Alert.alert(t('global.success'), t('client.deletetionSuccess'), [{ text: 'OK', onPress: () => navigation.goBack() }]);
     },
     onError: (error: any) => {
-      Alert.alert(t('global.error'), `${t('client.deletionError')} ${error.message}`)
+      Alert.alert(t('global.error'), `${t('client.deletionError')} ${error.message}`);
     },
-  })
+  });
 
   // const getCustomerData = useQuery({
   //   queryKey: ['client', { clientId }],
@@ -56,13 +54,13 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ route = { params: { cus
         { text: 'Usuń', onPress: () => deleteCustomer.mutate() },
       ],
       { cancelable: true },
-    )
-  }
+    );
+  };
 
   return (
     <Card style={styles.container}>
       <View style={styles.header}>
-        <Card.Title title={getFullName(name, lastName)} style={{flex: 1}} />
+        <Card.Title title={getFullName(name, lastName)} style={{ flex: 1 }} />
         <Card.Actions>
           <Icon.Button name='delete' backgroundColor={'transparent'} iconStyle={{ color: 'red' }} onPress={handleDelete}></Icon.Button>
         </Card.Actions>
@@ -72,8 +70,8 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ route = { params: { cus
         <Text>{`Notatki: ${notes}`}</Text>
       </Card.Content>
     </Card>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -110,6 +108,6 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     color: '#fff',
   },
-})
+});
 
-export default CustomerDetail
+export default CustomerDetail;

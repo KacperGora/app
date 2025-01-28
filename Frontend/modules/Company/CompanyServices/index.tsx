@@ -1,77 +1,70 @@
-import React, { useCallback, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
-import { FlatList } from 'react-native'
-import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query'
-import { debounce } from 'lodash'
-import api from '@helpers/api'
-import ServiceItem from '../ServicesItem'
-import { Searchbar } from 'react-native-paper'
-import { colors } from 'theme/theme'
-import { useTranslation } from 'react-i18next'
-import Loader from '@components/Loader'
-
-export type Service = {
-  id: string
-  name: string
-  description?: string
-  price: number
-  duration: { hours?: number; minutes: number }
-}
+import React, { useCallback, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { FlatList } from 'react-native';
+import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query';
+import { debounce } from 'lodash';
+import { api } from '@helpers';
+import { Loader } from '@components';
+import ServiceItem from '../ServicesItem';
+import { Searchbar } from 'react-native-paper';
+import { colors } from 'theme/theme';
+import { useTranslation } from 'react-i18next';
+import { ServiceType } from '@types';
 
 const fetchServices = async (payload: { sortOrder: string; sortBy: string; search?: string }) => {
   try {
     const { data } = await api.get('/company/getServices', {
       params: payload,
-    })
-    return data
+    });
+    return data;
   } catch (error) {
-    console.error('Error fetching services:', error)
-    throw new Error('Failed to fetch services')
+    console.error('Error fetching services:', error);
+    throw new Error('Failed to fetch services');
   }
-}
+};
 
 type PayloadType = {
-  sortOrder: 'ASC' | 'DESC'
-  sortBy: keyof Service
-  search?: string
-}
+  sortOrder: 'ASC' | 'DESC';
+  sortBy: keyof ServiceType;
+  search?: string;
+};
 
 const CompanyServices = () => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
-  const [searchText, setSearchText] = useState('')
+  const [searchText, setSearchText] = useState('');
   const [payload, setPayload] = useState<PayloadType>({
     sortOrder: 'DESC',
     sortBy: 'name',
-  })
+  });
 
-  const { data, isLoading, refetch } = useQuery<Service[]>({
+  const { data, isLoading, refetch } = useQuery<ServiceType[]>({
     queryKey: ['services', payload],
     queryFn: () => fetchServices(payload),
     enabled: true,
-  })
+  });
 
   const debouncedHandleFiltersChange = useCallback(
     debounce((search: string) => {
-      setPayload((prev) => ({ ...prev, search }))
+      setPayload((prev) => ({ ...prev, search }));
     }, 300),
     [],
-  )
+  );
 
   const handleSearchChange = (text: string) => {
-    setSearchText(text)
-    debouncedHandleFiltersChange(text)
-  }
+    setSearchText(text);
+    debouncedHandleFiltersChange(text);
+  };
 
   const RenderServiceItem = ({
     item,
     refetchFn,
   }: {
-    item: Service
-    refetchFn: (options?: RefetchOptions) => Promise<QueryObserverResult<Service[], Error>>
+    item: ServiceType;
+    refetchFn: (options?: RefetchOptions) => Promise<QueryObserverResult<ServiceType[], Error>>;
   }) => {
-    return <ServiceItem {...item} refetchFn={refetchFn} />
-  }
+    return <ServiceItem {...item} refetchFn={refetchFn} />;
+  };
 
   return (
     <View style={styles.container}>
@@ -92,10 +85,10 @@ const CompanyServices = () => {
         />
       )}
     </View>
-  )
-}
+  );
+};
 
-export default CompanyServices
+export default CompanyServices;
 
 const styles = StyleSheet.create({
   searchbar: {
@@ -113,4 +106,4 @@ const styles = StyleSheet.create({
   list: {
     flex: 1,
   },
-})
+});

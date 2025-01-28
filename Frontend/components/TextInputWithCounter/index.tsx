@@ -1,15 +1,16 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, KeyboardTypeOptions } from 'react-native'
-import { TextInput } from 'react-native-paper'
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, KeyboardTypeOptions } from 'react-native';
+import { TextInput } from 'react-native-paper';
 interface TextInputWithCounterProps {
-  placeholder: string
-  value: string | undefined
-  onChangeText: (text: string) => void
-  label?: string
-  maxLength?: number
-  multiline?: boolean
-  style?: object
-  keyboardType?: KeyboardTypeOptions
+  placeholder: string;
+  value: string | undefined;
+  onChangeText: (text: string) => void;
+  label?: string;
+  maxLength?: number;
+  multiline?: boolean;
+  style?: object;
+  onBlur?: (value: string) => void;
+  keyboardType?: KeyboardTypeOptions;
 }
 
 const Input: React.FC<TextInputWithCounterProps> = ({
@@ -17,6 +18,7 @@ const Input: React.FC<TextInputWithCounterProps> = ({
   placeholder,
   value,
   onChangeText,
+  onBlur = () => {},
   maxLength,
   multiline = false,
   style = {},
@@ -27,10 +29,12 @@ const Input: React.FC<TextInputWithCounterProps> = ({
       <TextInput
         value={value}
         onChangeText={onChangeText}
+        onBlur={(v) => onBlur(v.nativeEvent.text)}
         maxLength={maxLength}
         label={label}
         placeholder={placeholder}
         textAlignVertical='top'
+        textContentType='addressCity'
         multiline={multiline}
         mode='outlined'
         style={[styles.input, style]}
@@ -42,8 +46,8 @@ const Input: React.FC<TextInputWithCounterProps> = ({
         </Text>
       )}
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -61,6 +65,6 @@ const styles = StyleSheet.create({
     right: 12,
     bottom: 24,
   },
-})
+});
 
-export default Input
+export default Input;

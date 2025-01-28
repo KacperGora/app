@@ -1,81 +1,81 @@
-import axios from 'axios'
-import * as SecureStore from 'expo-secure-store'
-import { toCamelCase, toSnakeCase } from './utils'
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+import { toCamelCase, toSnakeCase } from './utils';
 
-type TokenKey = 'accessToken' | 'refreshToken'
+type TokenKey = 'accessToken' | 'refreshToken';
 
 export const saveToken = async (key: TokenKey, value: string) => {
   if (typeof key !== 'string' || typeof value !== 'string') {
-    throw new Error('Invalid value provided to SecureStore')
+    throw new Error('Invalid value provided to SecureStore');
   }
-  await SecureStore.setItemAsync(key, value)
-}
+  await SecureStore.setItemAsync(key, value);
+};
 
-const getToken = async (key: TokenKey) => {
-  const value = await SecureStore.getItemAsync(key)
-  return value
-}
+export const getToken = async (key: TokenKey) => {
+  const value = await SecureStore.getItemAsync(key);
+  return value;
+};
 
 const deleteToken = async (key: TokenKey) => {
-  await SecureStore.deleteItemAsync(key)
-}
+  await SecureStore.deleteItemAsync(key);
+};
 
 const api = axios.create({
   baseURL: 'http://192.168.8.189:3000',
-})
+});
 
 api.interceptors.request.use(
   async (config) => {
-    const token = await getToken('accessToken')
-    console.log(token, 'storedTOKEN');
+    const token = await getToken('accessToken');
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     if (config.data) {
-      config.data = toSnakeCase(config.data)
+      config.data = toSnakeCase(config.data);
     }
-    return config
+    return config;
   },
   (error) => {
-    return Promise.reject(error)
+    return Promise.reject(error);
   },
-)
+);
 
 api.interceptors.response.use(
   async (response) => {
     if (response.data) {
-      response.data = toCamelCase(response.data)
+      response.data = toCamelCase(response.data);
     }
-    return response
+    return response;
   },
   async (error) => {
-    const originalRequest = error.config
+    const originalRequest = error.config;
     if (error.response && [401, 403].includes(error.response.status)) {
       try {
-        const refreshToken = await getToken('refreshToken')
+        const refreshToken = await getToken('refreshToken');
         if (!refreshToken) {
-          return Promise.reject(error)
+          return Promise.reject(error);
         }
 
-        const { data } = await axios.post('http://192.168.8.189:3000/auth/refresh-token', { refresh_token: refreshToken })
-        const newToken = data.accessToken
-        await saveToken('accessToken', data.accessToken)
-        originalRequest.headers['Authorization'] = `Bearer ${newToken}`
+        const { data } = await axios.post('http://192.168.8.189:3000/auth/refresh-token', { refresh_token: refreshToken });
+        console.log('New token:', data);
+        const newToken = data.accessToken;
+        await saveToken('accessToken', data.accessToken);
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
 
-        return api.request(originalRequest)
+        return api.request(originalRequest);
       } catch (e) {
-        await deleteToken('accessToken')
-        await deleteToken('refreshToken')
-        return Promise.reject(error)
+        await deleteToken('accessToken');
+        await deleteToken('refreshToken');
+        return Promise.reject(error);
       }
     }
 
     if (error.response) {
-      return Promise.reject(error.response.data)
+      return Promise.reject(error.response.data);
     } else {
-      return Promise.reject(error)
+      return Promise.reject(error);
     }
   },
-)
+);
 
-export default api
+export default api;

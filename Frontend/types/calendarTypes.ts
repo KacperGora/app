@@ -1,7 +1,10 @@
-export interface EventForm {
-  start: string
-  end: string
-  service: string
-  notes: string
-  clientId: string
-}
+export type EventForm = {
+  start: string;
+  end: string;
+  clientId: string;
+  service: string;
+  notes?: string;
+  price?: any;
+};
+
+export type EventFormOptionType = 'service' | 'customer';

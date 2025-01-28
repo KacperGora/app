@@ -1,11 +1,11 @@
-import React, { useRef, useState, forwardRef, useMemo } from 'react'
-import { View, StyleSheet } from 'react-native'
-import { Text } from 'react-native-paper'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import BottomSheet from '@gorhom/bottom-sheet'
-import dayjs from 'dayjs'
-import { useQuery } from '@tanstack/react-query'
-import 'intl-pluralrules'
+import React, { useRef, useState, forwardRef, useMemo } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Text } from 'react-native-paper';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet from '@gorhom/bottom-sheet';
+import dayjs from 'dayjs';
+import { useQuery } from '@tanstack/react-query';
+import 'intl-pluralrules';
 
 import {
   CalendarContainer,
@@ -13,72 +13,70 @@ import {
   CalendarBody,
   CalendarKitHandle,
   OnCreateEventResponse,
-  ResourceItem,
   OnEventResponse,
   EventItem,
   PackedEvent,
-} from '@howljs/calendar-kit'
+} from '@howljs/calendar-kit';
 
-import api from '@helpers/api'
-import { DATE_FORMAT_FULL_MONTH_WITH_YEAR } from '@helpers/constants'
-import { colors } from 'theme/theme'
-import { CALENDAR_ENUM, calendarContainerConfig, eventEmptyState } from './utils'
-import { EventForm } from '../../types/calendarTypes'
+import { BottomSheetFormWrapper } from '@components';
+import { EventForm } from '@types';
+import { api, DATE_FORMAT_FULL_MONTH_WITH_YEAR, useAuth } from '@helpers';
+import { CALENDAR_ENUM, calendarContainerConfig, eventEmptyState } from './utils';
 
-import CreateEventForm from '@modules/Calendar/CreateEventForm'
-import BottomSheetFormWrapper from '@components/BottomSheetFormWrapper'
-import Toast from '@components/Toast'
+import CreateEventForm from '@modules/Calendar/CreateEventForm';
 
-const { withoutWeekends } = CALENDAR_ENUM
+const { withoutWeekends } = CALENDAR_ENUM;
 
 export type CalendarRouteProp = {
   params: {
-    mode: number
-    onMonthChange: (date: string) => void
-  }
-}
+    mode: number;
+    onMonthChange: (date: string) => void;
+  };
+};
+
 const fetchList = async () => {
-  const { data } = await api.get('event/getEvents')
+  const { data } = await api.get('event/getEvents');
   const parseEvents = data.map((event: any) => ({
     ...event,
     title: `${event.service}`,
     start: { dateTime: event.startTime },
     end: { dateTime: event.endTime },
     color: '#4285F4',
-  }))
+  }));
 
-  return parseEvents
-}
-
+  return parseEvents;
+};
 const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(({ params }, ref) => {
-  const { mode } = useMemo(() => params, [params])
+  const { mode } = useMemo(() => params, [params]);
+  const { userId } = useAuth();
+
   const { data, isLoading, refetch, dataUpdatedAt } = useQuery<EventItem[]>({
     queryKey: ['events'],
     queryFn: fetchList,
     enabled: true,
-  })
+  });
 
-  const bottomSheetRef = useRef<BottomSheet>(null)
-  const [eventForm, setEventForm] = useState<EventForm>(eventEmptyState)
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [eventForm, setEventForm] = useState<EventForm>(eventEmptyState);
 
   const handleEventChange = (event: OnCreateEventResponse) => {
     const {
       start: { dateTime: start },
       end: { dateTime: end },
-    } = event
+    } = event;
     setEventForm((prev) => ({
       ...prev,
       start,
       end,
-    }))
-    bottomSheetRef.current?.expand()
-  }
+    }));
+    bottomSheetRef.current?.expand();
+  };
 
   const onDragEventEnd = (event: OnEventResponse) => {
-    const { start, end, id } = event
-    const eventToUpdate = data?.find(({ id: eventId }) => eventId === id) as EventItem
+    const { start, end, id } = event;
+    const eventToUpdate = data?.find(({ id: eventId }) => eventId === id) as EventItem;
 
-    if (!eventToUpdate) return
+    if (!eventToUpdate) return;
     setEventForm((prev) => ({
       ...prev,
       ...eventToUpdate,
@@ -87,14 +85,14 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(({ params }, r
       start: start.dateTime || '',
       end: end.dateTime || '',
       notes: eventToUpdate.notes,
-    }))
+    }));
+    bottomSheetRef.current?.expand();
+  };
 
-    bottomSheetRef.current?.expand()
-  }
   const handleDateChange = (date: string) => {
-    const { onMonthChange } = params
-    onMonthChange(dayjs(date).locale('pl').format(DATE_FORMAT_FULL_MONTH_WITH_YEAR))
-  }
+    const { onMonthChange } = params;
+    onMonthChange(dayjs(date).locale('pl').format(DATE_FORMAT_FULL_MONTH_WITH_YEAR));
+  };
 
   return (
     <GestureHandlerRootView>
@@ -106,7 +104,6 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(({ params }, r
           firstDay={0}
           hideWeekDays={mode === withoutWeekends ? [5, 6] : []}
           numberOfDays={mode}
-          // isLoading={isLoading}
           onDateChanged={handleDateChange}
           onDragEventEnd={onDragEventEnd}
           onDragCreateEventEnd={handleEventChange}
@@ -126,13 +123,12 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(({ params }, r
           />
         </CalendarContainer>
       </View>
-
       <BottomSheetFormWrapper ref={bottomSheetRef}>
         <CreateEventForm onEventCreateRequest={fetchList} initialState={eventForm} />
       </BottomSheetFormWrapper>
     </GestureHandlerRootView>
-  )
-})
+  );
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -153,6 +149,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     paddingVertical: 8,
   },
-})
+});
 
-export default Calendar
+export default Calendar;

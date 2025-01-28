@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native'
-import { ToggleButton, Card, Title, Button } from 'react-native-paper'
-import { colors } from '../../../theme/theme'
-import api from '@helpers/api'
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { ToggleButton, Card, Title, Button } from 'react-native-paper';
+import { colors } from '../../../theme/theme';
+import { api } from '../../../helpers';
 
 const FinanceView = () => {
-  const [selectedRange, setSelectedRange] = useState({ start: null, end: null })
+  const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
 
   const finances = {
     dailyRevenue: 400,
@@ -18,15 +18,15 @@ const FinanceView = () => {
     debt: 2000,
     financialTrend: 'wzrost',
     profitabilityIndex: 1.5,
-  }
+  };
 
   const fetchIncome = async () => {
-    const { data } = await api.get('/company/calculateIncome', { params: selectedRange })
-  }
+    const { data } = await api.get('/company/calculateIncome', { params: selectedRange });
+  };
 
   useEffect(() => {
-    fetchIncome()
-  }, [])
+    fetchIncome();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -66,8 +66,8 @@ const FinanceView = () => {
         </Button>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -104,6 +104,6 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
   },
-})
+});
 
-export default FinanceView
+export default FinanceView;

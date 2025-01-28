@@ -67,6 +67,10 @@ export const pl = {
       passwordMatchError: 'Hasła nie pasują do siebie',
       passwordMetRequirements: 'Hasło spełnia wymagania',
       addClient: 'Nie widzisz swojego klienta? Dodaj go',
+      price: 'Cena',
+      notes: 'Notatki',
+      addService: 'Dodaj nową usługę',
+      goBack: 'Wróć',
     },
     validation: {
       fieldRequired: 'Pole jest wymagane',
@@ -109,4 +113,4 @@ export const pl = {
       withoutWeekends: 'Bez weekendów',
     },
   },
-}
+};

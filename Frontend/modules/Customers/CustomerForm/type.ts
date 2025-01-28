@@ -1,10 +1,11 @@
 export interface Client {
-  name: string
-  lastName: string
-  phoneNumber?: string
-  notes?: string
+  name: string;
+  lastName: string;
+  phoneNumber?: string;
+  notes?: string;
 }
 
 export type CustomerComponentProps = {
-  onSubmit: () => Promise<void>
-}
+  onSubmit: () => Promise<void>;
+  onClose?: () => void;
+};

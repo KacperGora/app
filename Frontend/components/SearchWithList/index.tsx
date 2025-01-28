@@ -1,18 +1,17 @@
-import { StyleSheet, View } from 'react-native'
-import i18next from 'i18next'
+import { StyleSheet, View } from 'react-native';
+import i18next from 'i18next';
 
-import Input from '@components/TextInputWithCounter'
-import { Customer } from '@modules/Customers/CustomerList'
-import { Service } from '@modules/Company/CompanyServices'
+import { Input } from '@components';
+import { CustomerType, ServiceType } from '@types';
 
 type SearchWithListProps = {
-  label: string
-  placeholder: string
-  searchValue: string
-  list: Service[] | Customer[]
-  handleInputChange: (value: string) => void
-  renderItem: (item: Service | Customer) => JSX.Element
-}
+  label: string;
+  placeholder: string;
+  searchValue: string;
+  list: ServiceType[] | CustomerType[];
+  handleInputChange: (value: string) => void;
+  renderItem: (item: ServiceType | CustomerType) => JSX.Element;
+};
 
 const SearchWithList: React.FC<SearchWithListProps> = ({
   label,
@@ -27,10 +26,10 @@ const SearchWithList: React.FC<SearchWithListProps> = ({
       <Input style={styles.input} value={searchValue} onChangeText={handleInputChange} label={label} placeholder={placeholder} />
       {Boolean(searchValue.length && list.length) && <View style={styles.suggestionsContainer}>{list.map(renderItem)}</View>}
     </View>
-  )
-}
+  );
+};
 
-export default SearchWithList
+export default SearchWithList;
 
 const styles = StyleSheet.create({
   input: {
@@ -56,4 +55,4 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
   },
-})
+});

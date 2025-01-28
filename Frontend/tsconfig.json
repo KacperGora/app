@@ -5,14 +5,14 @@
     "strict": true,
     "baseUrl": "./",
     "paths": {
-      "@components/*": ["components/*"],
+      "@components": ["components/"],
       "@views/*": ["Views/*"],
       "@modules/*": ["modules/*"],
       "navigation/*": ["navigation/*"],
       "utils/*": ["utils/*"],
       "assets/*": ["assets/*"],
-      "@helpers/*": ["helpers/*"],
-      "@types/*" : ["types/*"]
+      "@helpers": ["helpers/"],
+      "@types" : ["types/"]
     }
   }
 }

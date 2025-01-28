@@ -1,7 +1,5 @@
-import { Dimensions, StyleSheet } from 'react-native'
-import { colors } from 'theme/theme'
-
-const width = Dimensions.get('window').width
+import { StyleSheet } from 'react-native';
+import { colors } from 'theme/theme';
 
 export const styles = StyleSheet.create({
   formTitle: {
@@ -9,15 +7,12 @@ export const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontWeight: 'bold',
   },
-  container: {
-    padding: 16,
-    width: width,
-    backgroundColor: colors.background,
-  },
   suggestion: {
-    paddingVertical: 0,
+    paddingVertical: 8,
     width: 'auto',
     borderRadius: 4,
+    borderBottomColor: colors.textSecondary,
+    borderBottomWidth: 1,
   },
   element: {
     color: colors.textPrimary,
@@ -31,15 +26,22 @@ export const styles = StyleSheet.create({
     marginBottom: 8,
   },
   submitButton: {
-    paddingVertical: 2,
+    paddingVertical: 8,
     backgroundColor: 'black',
-    color: 'white',
+    borderRadius: 8,
+    width: '100%',
   },
   textArea: {
     height: 100,
     borderColor: 'black',
   },
   btnLabel: {
-    color: 'white',
-  }
-})
+    color: colors.black,
+    width: '100%',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  addBtn: {
+    paddingVertical: 8,
+  },
+});

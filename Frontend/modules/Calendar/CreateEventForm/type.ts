@@ -1,10 +1,6 @@
-export type EventForm = {
-  start: string
-  end: string
-  clientId: string
-  service: string
-  notes?: string
-  price?: number
-}
+import { EventForm } from "@types";
 
-export type EventFormOptionType = 'service' | 'customer'
+export type CreateEventFormProps = {
+  onEventCreateRequest: () => Promise<void>;
+  initialState?: EventForm;
+};

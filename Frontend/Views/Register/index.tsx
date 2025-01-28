@@ -1,53 +1,53 @@
-import React, { useState } from 'react'
-import { View, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, SafeAreaView } from 'react-native'
-import { TextInput, Button, Title, Text } from 'react-native-paper'
-import { useTranslation } from 'react-i18next'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { useMutation } from '@tanstack/react-query'
+import React, { useState } from 'react';
+import { View, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, SafeAreaView } from 'react-native';
+import { TextInput, Button, Title, Text } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useMutation } from '@tanstack/react-query';
+import { styles } from './styles';
+import { Loader, PasswordStrength } from '@components';
+import { api, apiRoutes } from '@helpers';
+import { InputChangeHandler, RegisterForm } from './types';
 
-import api from '@helpers/api'
-import { API_PATHS } from '@helpers/apiPathsConfig'
-import PasswordStrength from '@components/PasswordStrength'
-import Loader from '@components/Loader'
-import Notification from '@components/Notification'
-import { styles } from './styles'
-import { InputChangeHandler, RegisterForm } from './types'
+const {
+  auth: { register },
+} = apiRoutes;
 
 const Register = () => {
-  const { t } = useTranslation()
-  const [form, setForm] = useState<RegisterForm>({ username: '', password: '', confirmPassword: '' })
-  const [errorMessage, setErrorMessage] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const { t } = useTranslation();
+  const [form, setForm] = useState<RegisterForm>({ username: '', password: '', confirmPassword: '' });
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const { username, password, confirmPassword } = form
+  const { username, password, confirmPassword } = form;
 
-  const isReadOnlySubmitButton = Boolean(password !== confirmPassword || !password || !confirmPassword || errorMessage || !username)
+  const isReadOnlySubmitButton = Boolean(password !== confirmPassword || !password || !confirmPassword || errorMessage || !username);
 
   const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev)
-  }
+    setShowPassword((prev) => !prev);
+  };
 
   const handleFormChange: InputChangeHandler = (key) => (value) => {
-    setForm({ ...form, [key]: value })
-    setErrorMessage('')
-  }
+    setForm({ ...form, [key]: value });
+    setErrorMessage('');
+  };
 
   const { mutateAsync, status } = useMutation({
-    mutationFn: async () => await api.post(API_PATHS.REGISTER, { username, password }),
+    mutationFn: async () => await api.post(register, { username, password }),
     onSuccess: ({ data }) => {
-      alert('Registered successfully')
+      alert('Registered successfully');
     },
     onError: (error) => {
-      setErrorMessage(error.message)
+      setErrorMessage(error.message);
     },
-  })
+  });
 
   const handleRegister = async () => {
-    await mutateAsync()
-  }
+    await mutateAsync();
+  };
 
   if (status === 'pending') {
-    return <Loader />
+    return <Loader />;
   }
 
   return (
@@ -98,7 +98,7 @@ const Register = () => {
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

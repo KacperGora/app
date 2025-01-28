@@ -1,23 +1,20 @@
-import dayjs from 'dayjs'
-import React from 'react'
-import { DATE_FORMAT_FULL_MONTH_WITH_YEAR, DATE_FORMAT_MMM_YYYY } from '../../helpers/constants'
-import { colors } from 'theme/theme'
-import { HeaderItemProps, parseDateTime, ResourceHeaderItem, ResourceItem } from '@howljs/calendar-kit'
-import { View, Text, StyleSheet } from 'react-native'
-import { EventForm } from 'types/calendarTypes'
+import dayjs from 'dayjs';
+import React from 'react';
+import { DATE_FORMAT_FULL_MONTH_WITH_YEAR } from '@helpers';
+import { EventForm } from '@types';
 
 export const handleChange = (date: string, setCurrentDisplayedDate: React.Dispatch<React.SetStateAction<string>>) => {
-  setCurrentDisplayedDate(dayjs(date).locale('pl').format('MMMM YY'))
-}
+  setCurrentDisplayedDate(dayjs(date).locale('pl').format('MMMM YY'));
+};
 
-export const currentMonth = dayjs().locale('pl').format(DATE_FORMAT_FULL_MONTH_WITH_YEAR)
-export const today = dayjs().format('DD')
+export const currentMonth = dayjs().locale('pl').format(DATE_FORMAT_FULL_MONTH_WITH_YEAR);
+export const today = dayjs().format('DD');
 
 export const CALENDAR_ENUM = {
   day: 1,
   fullWeek: 7,
   withoutWeekends: 5,
-}
+};
 
 export const plConfig = {
   pl: {
@@ -25,7 +22,7 @@ export const plConfig = {
     more: 'więcej',
     meridiem: { ante: 'przed południem', post: 'po południu' },
   },
-}
+};
 
 export const calendarContainerConfig = {
   allowPinchToZoom: true,
@@ -58,7 +55,7 @@ export const calendarContainerConfig = {
     },
   },
   allowDragToCreate: true,
-}
+};
 
 export const eventEmptyState: EventForm = {
   start: '',
@@ -66,4 +63,4 @@ export const eventEmptyState: EventForm = {
   service: '',
   clientId: '',
   notes: '',
-}
+};

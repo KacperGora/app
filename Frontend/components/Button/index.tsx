@@ -1,35 +1,30 @@
-import React from 'react'
-import { StyleSheet, Text, TextStyle } from 'react-native'
-import { Button as ButtonComponent } from 'react-native-paper'
+import React from 'react';
+import { StyleSheet, TextStyle, TouchableOpacity } from 'react-native';
+import { Button as ButtonComponent, Text } from 'react-native-paper';
 
-import { StyleProp, ViewStyle } from 'react-native'
+import { StyleProp, ViewStyle } from 'react-native';
+type ButtonProps = {
+  label: string;
+  onPress: () => void;
+  style?: StyleProp<ViewStyle>;
+  labelStyle?: StyleProp<TextStyle>;
+};
 
-const Button = ({
-  label,
-  onPress,
-  style,
-  labelStyle,
-}: {
-  label: string
-  onPress: () => void
-  style?: StyleProp<ViewStyle>
-  labelStyle?: StyleProp<TextStyle>
-}) => {
+const Button: React.FC<ButtonProps> = ({ label, onPress, style, labelStyle }) => {
   return (
-    <ButtonComponent mode='contained' style={[styles.button, style]} onPress={onPress}>
-      <Text style={[styles.label, labelStyle]}>{label}</Text>
-    </ButtonComponent>
-  )
-}
+    <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
+      <Text style={labelStyle}>{label}</Text>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   button: {
-    padding: 10,
-    backgroundColor: 'transparent',
+    alignSelf: 'flex-start',
   },
-  label: {
-    color: '#000',
+  content: {
+    justifyContent: 'flex-start',
   },
-})
+});
 
-export default Button
+export default Button;
