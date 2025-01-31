@@ -32,10 +32,6 @@ export const HomeTabs = () => (
       tabBarActiveTintColor: colors.textPrimary,
       tabBarInactiveTintColor: colors.textSecondary,
       tabBarStyle: {
-        // position: 'absolute',
-        // bottom: 25,
-        // left: 20,
-        // right: 20,
         backgroundColor: colors.white,
         borderRadius: 15,
         height: 90,
@@ -55,7 +51,7 @@ export const HomeTabs = () => (
       component={CalendarDrawerNavigator}
       options={{
         tabBarButton: (props) => <CustomTabBarButton {...props} />,
-        tabBarIcon: ({ color, size }) => <Icon name='calendar' color={color} size={size} />,
+        tabBarIcon: ({ color, size, focused }) => <Icon name='calendar' color={focused ? colors.white : colors.darkBlue} size={size} />,
       }}
     />
     <Tab.Screen

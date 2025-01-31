@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, Platform, Keyboard } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import TextInputWithCounter from '../../../components/TextInputWithCounter';
 import { colors } from '../../../theme/theme';
 import { customerFieldsConfig, initialCustomerFormValues } from './utils';
 import { Client, CustomerComponentProps } from './type';
-import { apiRoutes, api, useKeyboardStatus } from '@helpers';
+import { apiRoutes, api } from '@helpers';
 import { Button, Input } from '@components';
 import FormTitle from 'components/FormTitle';
 
@@ -13,17 +13,16 @@ const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) =
   const { t } = useTranslation();
 
   const [clientForm, setClientForm] = useState<Client>(initialCustomerFormValues);
-  const [error, setError] = useState('');
-  const [containerHeight, setContainerHeight] = useState(0);
 
   const handleChange = (key: keyof Client) => (value: string) => {
     setClientForm((prev) => ({ ...prev, [key]: value }));
   };
+
   const onClientSave = async (client: Client) => {
     try {
       await api.post(apiRoutes.client.addClient.path, client);
     } catch (error: any) {
-      setError(error.message);
+      // setError(error.message);
     } finally {
       setClientForm(initialCustomerFormValues);
     }

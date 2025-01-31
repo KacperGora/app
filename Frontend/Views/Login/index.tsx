@@ -1,83 +1,91 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, KeyboardAvoidingView, Platform } from 'react-native';
-import { TextInput } from 'react-native-paper';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { useMutation } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { AuthContext, AuthContextType } from 'context/AuthContext';
-import { loginApiHandler, loginSuccessHandler, validateLoginForm } from './utils';
-import { styles } from './styles';
 import { LoginForm, LoginSuccess, RootStackParamList } from './types';
-import { name as appName } from '../../package.json';
-import { Button } from '@components';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { useMutation } from '@tanstack/react-query';
+import { api, apiRoutes, useAuth } from '@helpers';
+import { loginSuccessHandler } from './utils';
+import { styles } from './styles';
 
 const LoginScreen = () => {
-  const { setIsLoggedIn, setUserId } = useContext(AuthContext) as AuthContextType;
-
-  const { navigate } = useNavigation<NavigationProp<RootStackParamList>>();
   const { t } = useTranslation();
+  const { setIsLoggedIn } = useAuth();
+  const { navigate } = useNavigation<NavigationProp<RootStackParamList>>();
 
   const [form, setForm] = useState<LoginForm>({ username: '', password: '' });
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [passwordIsVisible, setPasswordIsVisible] = useState(false);
 
-  const togglePasswordVisibility = () => {
-    setPasswordVisible((prev) => !prev);
+  const { mutateAsync: handleLogin } = useMutation({
+    mutationFn: async () => await api.post(apiRoutes.auth.login, form),
+    onSuccess: async ({ data }: { data: LoginSuccess }) => {
+      await loginSuccessHandler(data);
+      setIsLoggedIn(true);
+    },
+    onError: (error) => {},
+  });
+
+  const handlePasswordVisibility = () => {
+    setPasswordIsVisible((prevState) => !prevState);
   };
 
   const handleFormChange = (name: keyof LoginForm) => (value: string) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLogin = async () => {
-    const validationError = validateLoginForm(form);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-    await mutateAsync(form);
-  };
-
-  const { mutateAsync } = useMutation({
-    mutationFn: loginApiHandler,
-    onSuccess: async ({ data }: { data: LoginSuccess }) => await loginSuccessHandler(data, setIsLoggedIn, setUserId),
-    onError: (error) => {
-      setError('Nieprawidłowe dane logowania');
-    },
-  });
-
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.gradient}>
-          <Text style={styles.appName}>{appName}</Text>
-          <Text style={styles.tagline}>Zarządzaj biznesem w prosty sposób</Text>
-        </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <ScrollView>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} contentContainerStyle={styles.formContainer}>
+            <View style={styles.logoContainer}>
+              <Text style={styles.logo}>Appoitment</Text>
+            </View>
+            <Text style={styles.header}>{t('global.welcomeBack')}</Text>
+            <TextInput
+              style={styles.input}
+              placeholder={t('global.login')}
+              placeholderTextColor='#B0A8B9'
+              value={form.username}
+              onChangeText={handleFormChange('username')}
+            />
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder={t('login.password')}
+                placeholderTextColor='#B0A8B9'
+                secureTextEntry={!passwordIsVisible}
+                value={form.password}
+                onChangeText={handleFormChange('password')}
+              />
+              <TouchableOpacity onPress={handlePasswordVisibility} style={styles.eyeIcon}>
+                <Ionicons name={passwordIsVisible ? 'eye-off' : 'eye'} size={20} color='#B0A8B9' />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity onPress={() => handleLogin()} style={styles.loginButton}>
+              <Text style={styles.loginButtonText}>{t('global.signIn')}</Text>
+            </TouchableOpacity>
+            <View style={styles.linksContainer}>
+              <TouchableOpacity>
+                <Text style={styles.linkText}>{t('login.forgetPassword')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => navigate({ name: 'Register', params: '' })}>
+                <Text style={styles.linkText}>{t('login.dontHaveAccount')}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.socialLoginContainer}>
+              <TouchableOpacity style={styles.socialButton}>
+                <Ionicons name='logo-google' size={24} color='white' />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <Ionicons name='logo-facebook' size={24} color='white' />
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        </ScrollView>
       </View>
-      <View style={styles.wave}></View>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <View style={styles.form}>
-          {error && <Text style={styles.errorText}>{error}</Text>}
-          <TextInput
-            label={t('login.username')}
-            mode='outlined'
-            style={styles.input}
-            keyboardType='email-address'
-            onChangeText={handleFormChange('username')}
-          />
-          <TextInput
-            label={t('login.password')}
-            mode='outlined'
-            style={styles.input}
-            onChangeText={handleFormChange('password')}
-            secureTextEntry={!passwordVisible}
-          />
-          <Button label={'Zaloguj'} onPress={handleLogin} />
-          <Button label='Pokaż hasło' onPress={togglePasswordVisibility} />
-          <Button label={t('login.dontHaveAccount')} onPress={() => navigate({ name: 'Register', params: '' })} />
-        </View>
-      </KeyboardAvoidingView>
-    </View>
+    </SafeAreaView>
   );
 };
 

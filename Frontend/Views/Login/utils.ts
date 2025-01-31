@@ -1,24 +1,11 @@
-import { api } from '@helpers';
-import { LoginForm, LoginSuccess } from './types';
+import { LoginSuccess } from './types';
 import * as SecureStore from 'expo-secure-store';
+import { AuthContext, AuthContextType } from 'context/AuthContext';
+import { useContext } from 'react';
 
-export const validateLoginForm = (form: LoginForm) => {
-  if (!form.username || !form.password) {
-    return 'Proszę wypełnić wszystkie pola';
-  }
-  return null;
-};
-
-export const loginApiHandler = async (form: LoginForm) => {
-  const { data } = await api.post('/auth/login', form);
-  return data;
-};
-
-export const loginSuccessHandler = async (
-  data: LoginSuccess,
-  setIsLoggedIn: (value: boolean) => void,
-  setUserId: (value: string) => void,
-) => {
+export const loginSuccessHandler = async (data: LoginSuccess) => {
+  const { setIsLoggedIn, setUserId, isLoggedIn } = useContext(AuthContext) as AuthContextType;
+  console.log('it should be logged');
   await SecureStore.setItemAsync('accessToken', data.accessToken).catch((error) => {
     console.error('Error saving access token:', error);
   });
@@ -27,4 +14,5 @@ export const loginSuccessHandler = async (
   });
   setUserId(data.user.id);
   setIsLoggedIn(true);
+  console.log(isLoggedIn);
 };

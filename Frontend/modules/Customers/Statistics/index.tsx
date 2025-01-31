@@ -1,19 +1,13 @@
-import React from 'react'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import { Card, Title } from 'react-native-paper'
-import { ToggleType } from '../../../Views/Customers'
+import React from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Card, Title } from 'react-native-paper';
 
-
-const Statistics: React.FC<ToggleType> = ({ toggle }) => {
+const Statistics: React.FC = ({}) => {
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.toggleContainer}>
-        <View>
-          <Text>xd</Text>
-        </View>
-      </View>
+      <View style={styles.toggleContainer}></View>
       <Card style={styles.card}>
-        <Text style={styles.statText}>Nowych klientów w {toggle}: 10</Text>
+        <Text style={styles.statText}>Nowych klientów w 10</Text>
         <Text style={styles.statText}>Ostatnio dodany klient: Joanna Dobosz</Text>
         <Text style={styles.statText}>Najczęściej odwiedzający klient: Jan Kowalski</Text>
         <Text style={styles.statText}>Ostatni raz widziany klient: Renata Mlyczyńska</Text>
@@ -25,10 +19,10 @@ const Statistics: React.FC<ToggleType> = ({ toggle }) => {
         <Text style={styles.statText}>Ostatni raz widziany klient: Renata Mlyczyńska</Text>
       </Card>
     </ScrollView>
-  )
-}
+  );
+};
 
-export default Statistics
+export default Statistics;
 
 const styles = StyleSheet.create({
   container: {
@@ -52,4 +46,4 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontFamily: 'Lato-Bold',
   },
-})
+});

@@ -13,6 +13,7 @@ export const saveToken = async (key: TokenKey, value: string) => {
 
 export const getToken = async (key: TokenKey) => {
   const value = await SecureStore.getItemAsync(key);
+  console.log(value);
   return value;
 };
 

@@ -1,104 +1,151 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, SafeAreaView } from 'react-native';
-import { TextInput, Button, Title, Text } from 'react-native-paper';
-import { useTranslation } from 'react-i18next';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useMutation } from '@tanstack/react-query';
-import { styles } from './styles';
-import { Loader, PasswordStrength } from '@components';
-import { api, apiRoutes } from '@helpers';
-import { InputChangeHandler, RegisterForm } from './types';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-const {
-  auth: { register },
-} = apiRoutes;
+const RegisterScreen = () => {
+  const [firstName, setFirstName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-const Register = () => {
-  const { t } = useTranslation();
-  const [form, setForm] = useState<RegisterForm>({ username: '', password: '', confirmPassword: '' });
-  const [errorMessage, setErrorMessage] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-
-  const { username, password, confirmPassword } = form;
-
-  const isReadOnlySubmitButton = Boolean(password !== confirmPassword || !password || !confirmPassword || errorMessage || !username);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
+  const handleRegister = () => {
+    if (!firstName || !email || !password || !confirmPassword) {
+      Alert.alert('Błąd', 'Proszę wypełnić wszystkie pola.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Błąd', 'Hasła muszą się zgadzać.');
+      return;
+    }
+    // Tu należy dodać logikę rejestracji (np. API).
+    Alert.alert('Rejestracja', `Witaj, ${firstName}!`);
   };
 
-  const handleFormChange: InputChangeHandler = (key) => (value) => {
-    setForm({ ...form, [key]: value });
-    setErrorMessage('');
+  const handlePasswordVisibility = () => {
+    setIsPasswordVisible((prevState) => !prevState);
   };
-
-  const { mutateAsync, status } = useMutation({
-    mutationFn: async () => await api.post(register, { username, password }),
-    onSuccess: ({ data }) => {
-      alert('Registered successfully');
-    },
-    onError: (error) => {
-      setErrorMessage(error.message);
-    },
-  });
-
-  const handleRegister = async () => {
-    await mutateAsync();
-  };
-
-  if (status === 'pending') {
-    return <Loader />;
-  }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Title style={styles.title}>{t('global.signUp')}</Title>
-          <TextInput
-            label={t('form.username')}
-            value={username}
-            onChangeText={handleFormChange('username')}
-            style={styles.input}
-            mode='outlined'
-          />
-          <View>
-            <TextInput
-              label={t('form.password')}
-              value={password}
-              onChangeText={handleFormChange('password')}
-              secureTextEntry={!showPassword}
-              style={styles.input}
-              mode='outlined'
-            />
-            <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility}>
-              <Icon size={16} name='eye' />
-            </TouchableOpacity>
-          </View>
-          <TextInput
-            label={t('form.confirmPassword')}
-            value={confirmPassword}
-            onChangeText={handleFormChange('confirmPassword')}
-            secureTextEntry
-            style={styles.input}
-            mode='outlined'
-          />
-          {errorMessage ? <Text>{errorMessage}</Text> : <PasswordStrength password={password} passwordConfirmation={confirmPassword} />}
-          <Button
-            mode='contained'
-            onPress={handleRegister}
-            style={styles.button}
-            contentStyle={styles.buttonContent}
-            labelStyle={styles.buttonLabel}
-            disabled={isReadOnlySubmitButton}
-            theme={{ roundness: 8, mode: 'adaptive' }}
-          >
-            {t('global.signUp')}
-          </Button>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+    <View style={styles.container}>
+      {/* Nagłówek */}
+      <Text style={styles.header}>Zarejestruj się</Text>
+
+      {/* Imię */}
+      <TextInput style={styles.input} placeholder='Imię' placeholderTextColor='#B0A8B9' value={firstName} onChangeText={setFirstName} />
+
+      {/* E-mail */}
+      <TextInput
+        style={styles.input}
+        placeholder='E-mail'
+        placeholderTextColor='#B0A8B9'
+        value={email}
+        onChangeText={setEmail}
+        keyboardType='email-address'
+      />
+
+      {/* Hasło */}
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder='Hasło'
+          placeholderTextColor='#B0A8B9'
+          secureTextEntry={!isPasswordVisible}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity onPress={handlePasswordVisibility} style={styles.eyeIcon}>
+          <Ionicons name={isPasswordVisible ? 'eye-off' : 'eye'} size={20} color='#B0A8B9' />
+        </TouchableOpacity>
+      </View>
+
+      {/* Potwierdzenie hasła */}
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder='Potwierdź hasło'
+          placeholderTextColor='#B0A8B9'
+          secureTextEntry={!isPasswordVisible}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+        />
+      </View>
+
+      {/* Przycisk rejestracji */}
+      <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
+        <Text style={styles.registerButtonText}>Zarejestruj się</Text>
+      </TouchableOpacity>
+
+      {/* Link do logowania */}
+      <View style={styles.linksContainer}>
+        <Text style={styles.linkText}>Masz już konto? </Text>
+        <TouchableOpacity>
+          <Text style={[styles.linkText, styles.boldLinkText]}>Zaloguj się</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
-export default Register;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9F1F6',
+    padding: 20,
+    justifyContent: 'center',
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: '600',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#6C4A5B',
+  },
+  input: {
+    height: 50,
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    fontSize: 16,
+    color: '#6C4A5B',
+    borderWidth: 1,
+    borderColor: '#E0D1D6',
+  },
+  passwordContainer: {
+    position: 'relative',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 15,
+    top: 15,
+  },
+  registerButton: {
+    backgroundColor: '#D18E9D',
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  registerButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  linksContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  linkText: {
+    color: '#6C4A5B',
+    fontSize: 14,
+  },
+  boldLinkText: {
+    fontWeight: 'bold',
+    color: '#D18E9D',
+  },
+});
+
+export default RegisterScreen;

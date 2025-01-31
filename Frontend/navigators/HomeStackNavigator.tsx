@@ -1,10 +1,11 @@
-import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack'
-import LoginScreen from '@views/Login'
-import Register from '@views/Register'
-import { HomeTabs } from './HomeTabsNavigator'
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import LoginScreen from '@views/Login';
+import Register from '@views/Register';
+import { HomeTabs } from './HomeTabsNavigator';
 
-const Stack = createStackNavigator()
+const Stack = createStackNavigator();
 
 export const AppNavigator = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => (
   <NavigationContainer>
@@ -19,4 +20,4 @@ export const AppNavigator = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => 
       )}
     </Stack.Navigator>
   </NavigationContainer>
-)
+);

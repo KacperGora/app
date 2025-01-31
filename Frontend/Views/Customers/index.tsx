@@ -88,7 +88,7 @@ const CustomerListWithDrawer = () => {
             ),
           }}
         >
-          {() => <Statistics toggle={toggle} />}
+          {() => <Statistics />}
         </Drawer.Screen>
       </Drawer.Navigator>
       <BottomSheetFormWrapper ref={bottomSheetRef}>

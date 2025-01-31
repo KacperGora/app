@@ -11,13 +11,15 @@ export const pl = {
       success: 'Sukces',
       error: 'Błąd',
       confirmation: 'Potwierdzenie',
+      welcomeBack: 'Witaj ponownie',
     },
     login: {
       password: 'Hasło',
       showPassword: 'Pokaż hasło',
       dontHaveAccount: 'Nie masz konta?',
       password: 'Hasło',
-      sing: 'Zaloguj',
+      sign: 'Zaloguj',
+      forgetPassword: 'Zapomniałeś hasła?',
     },
     navigation: {
       appointments: 'Wizyty',

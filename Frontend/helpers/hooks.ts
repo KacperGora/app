@@ -41,10 +41,8 @@ export const useAuth = () => {
     const checkToken = async () => {
       try {
         const token = await SecureStore.getItemAsync('accessToken');
-        console.log(token);
         setIsLoggedIn(Boolean(token));
       } catch (error) {
-        console.error('Error getting token', error);
       } finally {
         setLoading(false);
       }
@@ -52,7 +50,7 @@ export const useAuth = () => {
     checkToken();
   }, [setIsLoggedIn, setLogin]);
 
-  return { isLoggedIn, loading, setLogin, setUserId, userId };
+  return { isLoggedIn, loading, setLogin, setUserId, userId, setIsLoggedIn };
 };
 
 export const useKeyboardStatus = () => {
