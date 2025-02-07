@@ -1,6 +1,8 @@
-import React from 'react'
-import { View, FlatList, StyleSheet } from 'react-native'
-import EmployeeItem from '../EmployeeItem'
+import React from 'react';
+
+import { FlatList, StyleSheet, View } from 'react-native';
+
+import EmployeeItem from '../EmployeeItem';
 
 const employees = [
   {
@@ -24,7 +26,7 @@ const employees = [
     contact: '123123123',
     imageSrc: require('../../../assets/images/avatar3.jpg'),
   },
-]
+];
 
 const Employees = () => {
   return (
@@ -33,12 +35,18 @@ const Employees = () => {
         data={employees}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <EmployeeItem imageSrc={item.imageSrc} id={item.id} name={item.name} position={item.position} contact={item.contact} />
+          <EmployeeItem
+            imageSrc={item.imageSrc}
+            id={item.id}
+            name={item.name}
+            position={item.position}
+            contact={item.contact}
+          />
         )}
       />
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -51,6 +59,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-})
+});
 
-export default Employees
+export default Employees;

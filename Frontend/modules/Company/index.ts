@@ -7,4 +7,13 @@ import Employees from './Employees';
 import FinanceView from './Finance';
 import ServicesItem from './ServicesItem';
 
-export { EmployeeItem, Employees, EmployeeForm, CompanyServices, CompanyServicesForm, ServicesItem, FinanceView, CompanyStatistic };
+export {
+  EmployeeItem,
+  Employees,
+  EmployeeForm,
+  CompanyServices,
+  CompanyServicesForm,
+  ServicesItem,
+  FinanceView,
+  CompanyStatistic,
+};

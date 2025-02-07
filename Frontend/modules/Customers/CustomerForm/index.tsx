@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+
+import { StyleSheet, View } from 'react-native';
+
+import { Button, Input } from '@components';
+import { api, apiRoutes } from '@helpers';
+import FormTitle from 'components/FormTitle';
 import { useTranslation } from 'react-i18next';
+
 import TextInputWithCounter from '../../../components/TextInputWithCounter';
 import { colors } from '../../../theme/theme';
-import { customerFieldsConfig, initialCustomerFormValues } from './utils';
 import { Client, CustomerComponentProps } from './type';
-import { apiRoutes, api } from '@helpers';
-import { Button, Input } from '@components';
-import FormTitle from 'components/FormTitle';
+import { customerFieldsConfig, initialCustomerFormValues } from './utils';
 
 const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) => {
   const { t } = useTranslation();
@@ -56,8 +59,18 @@ const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) =
           multiline
           style={styles.textArea}
         />
-        <Button label={t('form.save')} onPress={handleSubmit} style={styles.button} labelStyle={styles.buttonLabel} />
-        <Button label={t('form.goBack')} onPress={handleSubmit} style={styles.goBackButton} labelStyle={styles.goBackBtnLabel} />
+        <Button
+          label={t('form.save')}
+          onPress={handleSubmit}
+          style={styles.button}
+          labelStyle={styles.buttonLabel}
+        />
+        <Button
+          label={t('form.goBack')}
+          onPress={handleSubmit}
+          style={styles.goBackButton}
+          labelStyle={styles.goBackBtnLabel}
+        />
       </View>
     </>
   );

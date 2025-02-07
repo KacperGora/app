@@ -1,25 +1,34 @@
-import React, { useState, useEffect } from 'react'
-import { StyleSheet, Animated, Dimensions, View, Text } from 'react-native'
-import { Snackbar } from 'react-native-paper'
+import { borderRadius } from '@theme';
+import React, { useEffect, useState } from 'react';
+
+import { Animated, Dimensions, StyleSheet, Text, View } from 'react-native';
+
+import { Snackbar } from 'react-native-paper';
 
 interface ToastProps {
-  visible: boolean
-  message: string
-  type?: 'success' | 'error' | 'warning' | 'info'
-  duration?: number
-  position?: 'top' | 'bottom'
+  visible: boolean;
+  message: string;
+  type?: 'success' | 'error' | 'warning' | 'info';
+  duration?: number;
+  position?: 'top' | 'bottom';
 }
 
-const Notification: React.FC<ToastProps> = ({ visible, message, type = 'info', duration = 3000, position = 'top' }) => {
-  const [show, setShow] = useState(visible)
-  const [fadeAnim] = useState(new Animated.Value(0))
-  const [slideAnim] = useState(new Animated.Value(Dimensions.get('window').width))
+const Notification: React.FC<ToastProps> = ({
+  visible,
+  message,
+  type = 'info',
+  duration = 3000,
+  position = 'top',
+}) => {
+  const [show, setShow] = useState(visible);
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [slideAnim] = useState(new Animated.Value(Dimensions.get('window').width));
 
-  const positionStyle = position === 'top' ? { top: 160 } : { bottom: 50 }
+  const positionStyle = position === 'top' ? { top: 160 } : { bottom: 50 };
 
   useEffect(() => {
     if (visible) {
-      setShow(true)
+      setShow(true);
 
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -32,7 +41,7 @@ const Notification: React.FC<ToastProps> = ({ visible, message, type = 'info', d
           duration: 500,
           useNativeDriver: true,
         }),
-      ]).start()
+      ]).start();
 
       const timer = setTimeout(() => {
         Animated.parallel([
@@ -46,15 +55,21 @@ const Notification: React.FC<ToastProps> = ({ visible, message, type = 'info', d
             duration: 500,
             useNativeDriver: true,
           }),
-        ]).start(() => setShow(false))
-      }, duration)
+        ]).start(() => setShow(false));
+      }, duration);
 
-      return () => clearTimeout(timer)
+      return () => clearTimeout(timer);
     }
-  }, [visible, duration, fadeAnim, slideAnim])
+  }, [visible, duration, fadeAnim, slideAnim]);
 
   return (
-    <Animated.View style={[styles.toast, positionStyle, { opacity: fadeAnim, transform: [{ translateX: slideAnim }] }]}>
+    <Animated.View
+      style={[
+        styles.toast,
+        positionStyle,
+        { opacity: fadeAnim, transform: [{ translateX: slideAnim }] },
+      ]}
+    >
       {show && (
         <Snackbar
           visible={visible}
@@ -66,8 +81,8 @@ const Notification: React.FC<ToastProps> = ({ visible, message, type = 'info', d
         </Snackbar>
       )}
     </Animated.View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   toast: {
@@ -75,7 +90,7 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     padding: 10,
-    borderRadius: 5,
+    borderRadius: borderRadius.small,
     alignItems: 'center',
     justifyContent: 'center',
     maxWidth: '50%',
@@ -101,6 +116,6 @@ const styles = StyleSheet.create({
   info: {
     backgroundColor: 'black',
   },
-})
+});
 
-export default Notification
+export default Notification;

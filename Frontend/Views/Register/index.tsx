@@ -1,25 +1,46 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
+import { Alert, Text, View } from 'react-native';
+
+import { Button, Input, KeyboardAvoidingContainer, ScreenWrapper } from '@components';
+import { api, apiRoutes } from '@helpers';
+import { useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+
+import { styles } from './styles';
+import { InputChangeHandler, RegisterForm } from './types';
 
 const RegisterScreen = () => {
-  const [firstName, setFirstName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const { t } = useTranslation();
 
-  const handleRegister = () => {
-    if (!firstName || !email || !password || !confirmPassword) {
-      Alert.alert('Błąd', 'Proszę wypełnić wszystkie pola.');
-      return;
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [form, setForm] = useState<RegisterForm>({
+    username: '',
+    password: '',
+    confirmPassword: '',
+  });
+
+  const { mutateAsync } = useMutation({
+    mutationFn: async () => {
+      await api.post(apiRoutes.auth.register, form);
+    },
+    onError: (error) => {
+      Alert.alert('Error', error.message);
+    },
+  });
+
+  const handleRegister = async () => {
+    const { username, password, confirmPassword } = form;
+    const formIsValid = username && password && confirmPassword && confirmPassword === password;
+    if (formIsValid) {
+      await mutateAsync();
+    } else {
+      Alert.alert('Error', t('register.formError'));
     }
-    if (password !== confirmPassword) {
-      Alert.alert('Błąd', 'Hasła muszą się zgadzać.');
-      return;
-    }
-    // Tu należy dodać logikę rejestracji (np. API).
-    Alert.alert('Rejestracja', `Witaj, ${firstName}!`);
+  };
+
+  const handleInputChange: InputChangeHandler = (key) => (value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handlePasswordVisibility = () => {
@@ -27,125 +48,38 @@ const RegisterScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Nagłówek */}
-      <Text style={styles.header}>Zarejestruj się</Text>
-
-      {/* Imię */}
-      <TextInput style={styles.input} placeholder='Imię' placeholderTextColor='#B0A8B9' value={firstName} onChangeText={setFirstName} />
-
-      {/* E-mail */}
-      <TextInput
-        style={styles.input}
-        placeholder='E-mail'
-        placeholderTextColor='#B0A8B9'
-        value={email}
-        onChangeText={setEmail}
-        keyboardType='email-address'
-      />
-
-      {/* Hasło */}
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder='Hasło'
-          placeholderTextColor='#B0A8B9'
-          secureTextEntry={!isPasswordVisible}
-          value={password}
-          onChangeText={setPassword}
+    <KeyboardAvoidingContainer>
+      <ScreenWrapper style={styles.formContainer}>
+        <Text style={styles.header}>{t('global.signUp')}</Text>
+        <Input
+          value={form.username}
+          placeholder={t('form.username')}
+          onChangeText={handleInputChange('username')}
         />
-        <TouchableOpacity onPress={handlePasswordVisibility} style={styles.eyeIcon}>
-          <Ionicons name={isPasswordVisible ? 'eye-off' : 'eye'} size={20} color='#B0A8B9' />
-        </TouchableOpacity>
-      </View>
-
-      {/* Potwierdzenie hasła */}
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder='Potwierdź hasło'
-          placeholderTextColor='#B0A8B9'
-          secureTextEntry={!isPasswordVisible}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
+        <Input
+          isPassword
+          placeholder={t('form.password')}
+          value={form.password}
+          onChangeText={handleInputChange('password')}
         />
-      </View>
-
-      {/* Przycisk rejestracji */}
-      <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
-        <Text style={styles.registerButtonText}>Zarejestruj się</Text>
-      </TouchableOpacity>
-
-      {/* Link do logowania */}
-      <View style={styles.linksContainer}>
-        <Text style={styles.linkText}>Masz już konto? </Text>
-        <TouchableOpacity>
-          <Text style={[styles.linkText, styles.boldLinkText]}>Zaloguj się</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+        <Input
+          placeholder={t('form.confirmPassword')}
+          value={form.confirmPassword}
+          onChangeText={handleInputChange('confirmPassword')}
+        />
+        <Button
+          label={t('global.signUp')}
+          onPress={handleRegister}
+          style={styles.registerButton}
+          labelStyle={styles.registerButtonText}
+        />
+        <View style={styles.linksContainer}>
+          <Text style={styles.linkText}>{t('register.haveAnAccount')}</Text>
+          <Button label={t('global.signIn')} onPress={() => {}} labelStyle={styles.boldLinkText} />
+        </View>
+      </ScreenWrapper>
+    </KeyboardAvoidingContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9F1F6',
-    padding: 20,
-    justifyContent: 'center',
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#6C4A5B',
-  },
-  input: {
-    height: 50,
-    backgroundColor: '#FFF',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    fontSize: 16,
-    color: '#6C4A5B',
-    borderWidth: 1,
-    borderColor: '#E0D1D6',
-  },
-  passwordContainer: {
-    position: 'relative',
-  },
-  eyeIcon: {
-    position: 'absolute',
-    right: 15,
-    top: 15,
-  },
-  registerButton: {
-    backgroundColor: '#D18E9D',
-    paddingVertical: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  registerButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  linksContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  linkText: {
-    color: '#6C4A5B',
-    fontSize: 14,
-  },
-  boldLinkText: {
-    fontWeight: 'bold',
-    color: '#D18E9D',
-  },
-});
 
 export default RegisterScreen;

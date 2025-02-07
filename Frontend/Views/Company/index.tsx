@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react'
-import { SafeAreaView, View, Text, StyleSheet, Dimensions } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler'
-import { Title } from 'react-native-paper'
-import { colors } from '../../theme/theme'
+import React from 'react';
 
-const width = Dimensions.get('window').width
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+
+import { ScrollView } from 'react-native-gesture-handler';
+import { Title } from 'react-native-paper';
+
+import { colors } from '@theme';
+
 
 const Company = () => {
   return (
@@ -17,10 +19,10 @@ const Company = () => {
         {/* <FinanceView /> */}
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default Company
+export default Company;
 
 const styles = StyleSheet.create({
   container: {
@@ -32,4 +34,4 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontWeight: '600',
   },
-})
+});

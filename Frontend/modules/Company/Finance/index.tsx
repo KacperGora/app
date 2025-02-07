@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
-import { ToggleButton, Card, Title, Button } from 'react-native-paper';
-import { colors } from '../../../theme/theme';
+
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+
+import { Button, Card, Title, ToggleButton } from 'react-native-paper';
+
 import { api } from '../../../helpers';
+import { colors } from '../../../theme/theme';
 
 const FinanceView = () => {
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
@@ -61,7 +64,7 @@ const FinanceView = () => {
           </Card.Content>
         </Card> */}
 
-        <Button mode='contained' style={styles.button} onPress={() => console.log('Więcej analiz')}>
+        <Button mode="contained" style={styles.button} onPress={() => console.log('Więcej analiz')}>
           Więcej analiz
         </Button>
       </ScrollView>

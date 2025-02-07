@@ -1,56 +1,57 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+
 import { Dimensions, Keyboard, StyleSheet, View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { useNavigation } from '@react-navigation/native';
+import KeyboardAvoidingContainer from 'components/KeyboardAvoidingContainer';
+import { use } from 'i18next';
 import { ScrollView } from 'react-native-gesture-handler';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 type BottomSheetFormWrapperProps = {
   children: React.ReactNode;
 };
 
-const BottomSheetFormWrapper = forwardRef<BottomSheet, BottomSheetFormWrapperProps>(({ children }, ref) => {
-  const [toggleForm, setToggleForm] = useState(false);
-  const bottomSheetRef = useRef<BottomSheet>(null);
+const BottomSheetFormWrapper = forwardRef<BottomSheet, BottomSheetFormWrapperProps>(
+  ({ children }, ref) => {
+    const [toggleForm, setToggleForm] = useState(false);
+    const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const handleChange = (index: number) => {
-    console.log('index', index);
-    Keyboard.dismiss();
-    setToggleForm(index !== -1);
-  };
+    const handleChange = (index: number) => {
+      Keyboard.dismiss();
+      setToggleForm(index !== -1);
+    };
 
-  useImperativeHandle(ref, () => ({
-    expand: () => bottomSheetRef.current?.expand(),
-    close: () => bottomSheetRef.current?.close(),
-    collapse: () => bottomSheetRef.current?.collapse(),
-    snapToIndex: (index: number) => bottomSheetRef.current?.snapToIndex(index),
-    snapToPosition: (position: number | string) => bottomSheetRef.current?.snapToPosition(position),
-    forceClose: () => bottomSheetRef.current?.forceClose(),
-  }));
+    useImperativeHandle(ref, () => ({
+      expand: () => bottomSheetRef.current?.expand(),
+      close: () => bottomSheetRef.current?.close(),
+      collapse: () => bottomSheetRef.current?.collapse(),
+      snapToIndex: (index: number) => bottomSheetRef.current?.snapToIndex(index),
+      snapToPosition: (position: number | string) =>
+        bottomSheetRef.current?.snapToPosition(position),
+      forceClose: () => bottomSheetRef.current?.forceClose(),
+    }));
 
-  return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      index={2}
-      snapPoints={['12%', '50%', '90%']}
-      onChange={handleChange}
-      enablePanDownToClose
-      enableHandlePanningGesture
-      enableOverDrag
-      backdropComponent={({ animatedIndex, style }) => toggleForm && <View style={[style, backdropStyle.backdrop]} />}
-    >
-      <BottomSheetView style={styles.sheetContent}>
-        <KeyboardAwareScrollView
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps='handled'
-          canCancelContentTouches
-          keyboardDismissMode='interactive'
-        >
-          <ScrollView style={{ flex: 1, height: 'auto' }}>{children}</ScrollView>
-        </KeyboardAwareScrollView>
-      </BottomSheetView>
-    </BottomSheet>
-  );
-});
+    return (
+      <BottomSheet
+        ref={bottomSheetRef}
+        snapPoints={['12%', '50%', '85%']}
+        onChange={handleChange}
+        enablePanDownToClose
+        enableHandlePanningGesture
+        index={-1}
+        backdropComponent={({ animatedIndex, style }) =>
+          toggleForm && <View style={[style, backdropStyle.backdrop]} />
+        }
+      >
+        <BottomSheetView style={styles.sheetContent}>
+          <KeyboardAvoidingContainer>{children}</KeyboardAvoidingContainer>
+        </BottomSheetView>
+      </BottomSheet>
+    );
+  },
+);
 
 export default BottomSheetFormWrapper;
 

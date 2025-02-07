@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+
 import { toCamelCase, toSnakeCase } from './utils';
 
 type TokenKey = 'accessToken' | 'refreshToken';
@@ -57,7 +58,9 @@ api.interceptors.response.use(
           return Promise.reject(error);
         }
 
-        const { data } = await axios.post('http://192.168.8.189:3000/auth/refresh-token', { refresh_token: refreshToken });
+        const { data } = await axios.post('http://192.168.8.189:3000/auth/refresh-token', {
+          refresh_token: refreshToken,
+        });
         console.log('New token:', data);
         const newToken = data.accessToken;
         await saveToken('accessToken', data.accessToken);

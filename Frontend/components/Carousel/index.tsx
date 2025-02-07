@@ -1,23 +1,33 @@
-import React, { useState } from 'react'
-import { View, ScrollView, Dimensions, StyleSheet, Text, NativeSyntheticEvent, NativeScrollEvent } from 'react-native'
-import { colors } from '../../theme/theme'
+import React, { useState } from 'react';
 
-const { width } = Dimensions.get('window')
+import {
+  Dimensions,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
-type ItemFunction = () => React.ReactNode
+import { colors } from '../../theme/theme';
+
+const { width } = Dimensions.get('window');
+
+type ItemFunction = () => React.ReactNode;
 
 interface CarouselProps {
-  data: ItemFunction[]
+  data: ItemFunction[];
 }
 
 const Carousel: React.FC<CarouselProps> = ({ data }) => {
-  const [activeIndex, setActiveIndex] = useState(0)
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const scrollPosition = event.nativeEvent.contentOffset.x
-    const index = Math.round(scrollPosition / width)
-    setActiveIndex(index)
-  }
+    const scrollPosition = event.nativeEvent.contentOffset.x;
+    const index = Math.round(scrollPosition / width);
+    setActiveIndex(index);
+  };
 
   return (
     <View style={styles.container}>
@@ -27,7 +37,12 @@ const Carousel: React.FC<CarouselProps> = ({ data }) => {
         showsHorizontalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={2}
-        contentContainerStyle={{ width: width * data.length, gap: 24, marginHorizontal: 1, overflow: 'hidden' }}
+        contentContainerStyle={{
+          width: width * data.length,
+          gap: 24,
+          marginHorizontal: 1,
+          overflow: 'hidden',
+        }}
       >
         {data.map((item, index) => (
           <View key={index} style={[styles.carouselItem, { width }]}>
@@ -37,12 +52,18 @@ const Carousel: React.FC<CarouselProps> = ({ data }) => {
       </ScrollView>
       <View style={styles.pagination}>
         {data.map((_, index) => (
-          <View key={index} style={[styles.paginationDot, activeIndex === index ? styles.activeDot : styles.inactiveDot]} />
+          <View
+            key={index}
+            style={[
+              styles.paginationDot,
+              activeIndex === index ? styles.activeDot : styles.inactiveDot,
+            ]}
+          />
         ))}
       </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -76,6 +97,6 @@ const styles = StyleSheet.create({
   inactiveDot: {
     backgroundColor: colors.accent,
   },
-})
+});
 
-export default Carousel
+export default Carousel;

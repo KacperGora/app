@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
 import { errors } from '../config/errors';
-import { handleError } from '../utils/authUtils';
+import { compareUserPassword, handleError } from '../utils/authUtils';
 import { userService } from '../services/userService';
+import { findUserByKey } from '../models/User';
 
 export const register = async (req: Request, res: Response) => {
   const { username, password } = req.body;
+  console.log(req.body);
   try {
     const response = await userService.registerUser(username, password);
     res.status(201).json({ data: response });
@@ -31,5 +33,29 @@ export const refreshToken = async (req: Request, res: Response) => {
     res.json({ accessToken: newAccessToken });
   } catch (error) {
     handleError(res, errors.TOKEN_REQUIRED);
+  }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  const { userId } = req.body;
+
+  try {
+    await userService.logoutUser(userId);
+    res.status(200).send('User logged out');
+  } catch (error) {
+    handleError(res, errors.TOKEN_REQUIRED);
+  }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  const { userId, newPassword, password } = req.body;
+  try {
+    const user = await findUserByKey('id', userId);
+    const passwordIsValid = await compareUserPassword(password as string, newPassword);
+
+    await userService.changePassword(userId, newPassword);
+    res.status(200).send('Password changed successfully');
+  } catch (error) {
+    handleError(res, errors.INVALID_CREDENTIALS);
   }
 };

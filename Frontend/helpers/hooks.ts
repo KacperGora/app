@@ -1,9 +1,11 @@
-import { useFonts } from 'expo-font';
 import { useContext, useEffect, useState } from 'react';
-import { AuthContext, AuthContextType } from 'context/AuthContext';
-import * as SplashScreen from 'expo-splash-screen';
-import * as SecureStore from 'expo-secure-store';
+
 import { Keyboard } from 'react-native';
+
+import { AuthContext, AuthContextType } from 'context/AuthContext';
+import { useFonts } from 'expo-font';
+import * as SecureStore from 'expo-secure-store';
+import * as SplashScreen from 'expo-splash-screen';
 
 export const useModal = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -34,21 +36,25 @@ export const useLoadFonts = () => {
 };
 
 export const useAuth = () => {
-  const { isLoggedIn, setIsLoggedIn, setLogin, setUserId, userId } = useContext(AuthContext) as AuthContextType;
+  const { isLoggedIn, setIsLoggedIn, setLogin, setUserId, userId } = useContext(
+    AuthContext,
+  ) as AuthContextType;
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkToken = async () => {
       try {
         const token = await SecureStore.getItemAsync('accessToken');
-        setIsLoggedIn(Boolean(token));
+        console.log('Token:', token);
+        setIsLoggedIn(!!token);
       } catch (error) {
+        console.error('Failed to retrieve access token:', error);
       } finally {
         setLoading(false);
       }
     };
     checkToken();
-  }, [setIsLoggedIn, setLogin]);
+  }, []);
 
   return { isLoggedIn, loading, setLogin, setUserId, userId, setIsLoggedIn };
 };

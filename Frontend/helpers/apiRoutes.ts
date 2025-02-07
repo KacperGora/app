@@ -12,5 +12,6 @@ export const apiRoutes = {
     register: '/auth/register',
     refreshToken: '/auth/refresh-token',
     login: '/auth/login',
+    logout: '/auth/logout',
   },
 };

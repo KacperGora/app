@@ -1,4 +1,6 @@
-import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors"
+import { TextStyle } from 'react-native';
+
+import { MD3LightTheme as DefaultTheme } from 'react-native-paper';
 
 export const colors = {
   primary: '#F7CAC9',
@@ -15,74 +17,72 @@ export const colors = {
   darkGray: '#9CA3AF',
   lightBlue: '#EFF6FF',
   darkBlue: '#1E3A8A',
-}
-
-export const typography = {
-  fontRegular: 'Lato-Regular',
-  fontBold: 'Lato-Bold',
-  fontSizes: {
-    h1: 32,
-    h2: 24,
-    body: 16,
-    small: 14,
-  },
-}
-
-export const spacing = {
-  small: 8,
-  medium: 16,
-  large: 24,
-}
+};
 
 export const borderRadius = {
   small: 4,
   medium: 8,
   large: 12,
-}
+};
 
 export const beautyTheme = {
+  ...DefaultTheme,
   colors: {
-    primary: 'rgb(255, 154, 158)',
-    onPrimary: 'rgb(255, 255, 255)',
-    primaryContainer: 'rgb(255, 227, 229)',
-    onPrimaryContainer: 'rgb(95, 0, 16)',
-    secondary: 'rgb(255, 200, 210)',
-    onSecondary: 'rgb(58, 28, 34)',
-    secondaryContainer: 'rgb(255, 240, 243)',
-    onSecondaryContainer: 'rgb(65, 0, 23)',
-    tertiary: 'rgb(255, 180, 165)',
-    onTertiary: 'rgb(60, 0, 10)',
-    tertiaryContainer: 'rgb(255, 220, 213)',
-    onTertiaryContainer: 'rgb(70, 15, 20)',
+    ...DefaultTheme.colors,
+    primary: '#D18E9D',
+    onPrimary: '#FFFFFF',
+    primaryContainer: '#F6E1E5',
+    onPrimaryContainer: '#6C4A5B',
 
-    error: 'rgb(186, 26, 26)',
-    onError: 'rgb(255, 255, 255)',
-    errorContainer: 'rgb(255, 218, 214)',
-    onErrorContainer: 'rgb(65, 0, 2)',
+    secondary: '#B0A8B9',
+    onSecondary: '#FFFFFF',
+    secondaryContainer: '#E8E3ED',
+    onSecondaryContainer: '#4A3D54',
 
-    background: 'rgb(255, 251, 255)',
-    onBackground: 'rgb(51, 43, 47)',
-    surface: 'rgb(255, 252, 253)',
-    onSurface: 'rgb(58, 47, 50)',
-    surfaceVariant: 'rgb(240, 229, 235)',
-    onSurfaceVariant: 'rgb(74, 61, 66)',
-    outline: 'rgb(190, 174, 180)',
-    outlineVariant: 'rgb(224, 215, 220)',
-    shadow: 'rgb(0, 0, 0)',
-    inverseSurface: 'rgb(51, 43, 47)',
-    inverseOnSurface: 'rgb(255, 241, 244)',
-    inversePrimary: 'rgb(255, 180, 190)',
+    tertiary: '#F5D7DC',
+    onTertiary: '#6C4A5B',
+
+    background: '#FFF8FA',
+    onBackground: '#6C4A5B',
+    surface: '#FFFFFF',
+    onSurface: '#6C4A5B',
+
+    error: '#BA1A1A',
+    onError: '#FFFFFF',
+    errorContainer: '#FFDADA',
+    onErrorContainer: '#410002',
+
+    outline: '#E0D1D6',
+    outlineVariant: '#D7C2CA',
+    white: '#FFFFFF',
+    inverseSurface: '#6C4A5B',
+    inverseOnSurface: '#F6E1E5',
+    inversePrimary: '#F6B5C0',
+
     elevation: {
       level0: 'transparent',
-      level1: 'rgb(255, 245, 247)',
-      level2: 'rgb(255, 240, 243)',
-      level3: 'rgb(255, 235, 239)',
-      level4: 'rgb(255, 233, 237)',
-      level5: 'rgb(255, 230, 235)',
+      level1: '#F6E1E5',
+      level2: '#EAD2D8',
+      level3: '#E0C3CA',
+      level4: '#D7B5BD',
+      level5: '#D18E9D',
     },
-
-    surfaceDisabled: 'rgba(51, 43, 47, 0.12)',
-    onSurfaceDisabled: 'white',
-    backdrop: 'rgba(51, 47, 55, 0.2)',
+    surfaceDisabled: 'rgba(108, 74, 91, 0.12)',
+    onSurfaceDisabled: 'rgba(108, 74, 91, 0.38)',
+    backdrop: 'rgba(108, 74, 91, 0.2)',
   },
-}
+  fontSizes: {
+    xlarge: 24,
+    large: 20,
+    regular: 16,
+    medium: 14,
+    small: 12,
+    xSmall: 10,
+  },
+  fontWeight: {
+    regular: '400' as TextStyle['fontWeight'],
+    medium: '500' as TextStyle['fontWeight'],
+    semi: '600' as TextStyle['fontWeight'],
+    bold: '700' as TextStyle['fontWeight'],
+  },
+};

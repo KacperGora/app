@@ -1,4 +1,4 @@
-import { colors } from 'theme/theme'
+import { colors } from 'theme/theme';
 
 export const drawerScreenOptions = {
   headerTintColor: colors.textPrimary,
@@ -6,4 +6,4 @@ export const drawerScreenOptions = {
   drawerInactiveBackgroundColor: colors.background,
   drawerActiveTintColor: colors.textPrimary,
   drawerInactiveTintColor: colors.textSecondary,
-}
+};

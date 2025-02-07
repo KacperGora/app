@@ -1,15 +1,18 @@
 import React, { useCallback, useState } from 'react';
+
 import { StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native';
-import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query';
-import { debounce } from 'lodash';
-import { api } from '@helpers';
+
 import { Loader } from '@components';
-import ServiceItem from '../ServicesItem';
+import { api } from '@helpers';
+import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query';
+import { ServiceType } from '@types';
+import { debounce } from 'lodash';
+import { useTranslation } from 'react-i18next';
 import { Searchbar } from 'react-native-paper';
 import { colors } from 'theme/theme';
-import { useTranslation } from 'react-i18next';
-import { ServiceType } from '@types';
+
+import ServiceItem from '../ServicesItem';
 
 const fetchServices = async (payload: { sortOrder: string; sortBy: string; search?: string }) => {
   try {

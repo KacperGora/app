@@ -1,9 +1,13 @@
-import dayjs from 'dayjs';
 import React from 'react';
+
 import { DATE_FORMAT_FULL_MONTH_WITH_YEAR } from '@helpers';
 import { EventForm } from '@types';
+import dayjs from 'dayjs';
 
-export const handleChange = (date: string, setCurrentDisplayedDate: React.Dispatch<React.SetStateAction<string>>) => {
+export const handleChange = (
+  date: string,
+  setCurrentDisplayedDate: React.Dispatch<React.SetStateAction<string>>,
+) => {
   setCurrentDisplayedDate(dayjs(date).locale('pl').format('MMMM YY'));
 };
 

@@ -1,16 +1,18 @@
 import { StyleSheet } from 'react-native';
 
+import { beautyTheme } from '@theme';
+
+const {
+  colors: { primary, onPrimaryContainer, white, secondary },
+  fontSizes: { large, xlarge, medium: fontMediumSize },
+  fontWeight: { semi },
+} = beautyTheme;
+
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9F1F6',
     padding: 20,
-    marginBlock: 20,
-  },
-  formContainer: {
-    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
   },
   logoContainer: {
     alignItems: 'center',
@@ -18,54 +20,40 @@ export const styles = StyleSheet.create({
   },
   logo: {
     fontSize: 40,
-    fontWeight: 'bold',
-    color: '#D18E9D',
+    fontWeight: semi,
+    color: primary,
+  },
+  formContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+    paddingInline: 20,
   },
   header: {
-    fontSize: 24,
-    fontWeight: '600',
+    fontSize: xlarge,
+    fontWeight: semi,
     marginBottom: 20,
     textAlign: 'center',
-    color: '#6C4A5B',
-  },
-  input: {
-    height: 50,
-    backgroundColor: '#FFF',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    fontSize: 16,
-    color: '#6C4A5B',
-    borderWidth: 1,
-    borderColor: '#E0D1D6',
-  },
-  passwordContainer: {
-    position: 'relative',
-  },
-  eyeIcon: {
-    position: 'absolute',
-    right: 15,
-    top: 15,
+    color: onPrimaryContainer,
   },
   loginButton: {
-    backgroundColor: '#D18E9D',
-    paddingVertical: 15,
-    borderRadius: 10,
+    backgroundColor: primary,
+    width: '100%',
     marginBottom: 20,
-    alignItems: 'center',
   },
   loginButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
+    color: white,
+    fontSize: large,
+    fontWeight: semi,
   },
   linksContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 20,
   },
   linkText: {
-    color: '#D18E9D',
-    fontSize: 14,
+    color: primary,
+    fontSize: fontMediumSize,
     marginVertical: 5,
   },
   socialLoginContainer: {
@@ -73,7 +61,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   socialButton: {
-    backgroundColor: '#B0A8B9',
+    backgroundColor: secondary,
     padding: 12,
     borderRadius: 50,
     marginHorizontal: 10,

@@ -1,13 +1,16 @@
-import React from 'react'
-import { SafeAreaView, Dimensions, Text, View, StyleSheet } from 'react-native'
-import { Card, Title, ToggleButton } from 'react-native-paper'
-import { LineChart } from 'react-native-chart-kit'
-import dayjs from 'dayjs'
-const screenWidth = Dimensions.get('window').width
+import React from 'react';
+
+import { Dimensions, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+
+import dayjs from 'dayjs';
+import { LineChart } from 'react-native-chart-kit';
+import { Card, Title, ToggleButton } from 'react-native-paper';
+
+const screenWidth = Dimensions.get('window').width;
 const lastSixMonths = Array.from({ length: 6 }, (_, i) => {
-  const month = dayjs().locale('pl').subtract(i, 'month').format('MMM')
-  return month
-}).reverse()
+  const month = dayjs().locale('pl').subtract(i, 'month').format('MMM');
+  return month;
+}).reverse();
 
 const CompanyStatistics = () => {
   return (
@@ -29,7 +32,7 @@ const CompanyStatistics = () => {
       }}
       width={screenWidth}
       height={220}
-      yAxisSuffix='PLN'
+      yAxisSuffix="PLN"
       yAxisInterval={1}
       chartConfig={{
         backgroundColor: '#F5F5F5',
@@ -53,10 +56,10 @@ const CompanyStatistics = () => {
       }}
       withOuterLines
     />
-  )
-}
+  );
+};
 
-export default CompanyStatistics
+export default CompanyStatistics;
 
 const styles = StyleSheet.create({
   row: {
@@ -73,4 +76,4 @@ const styles = StyleSheet.create({
     elevation: 2,
     marginHorizontal: 4,
   },
-})
+});

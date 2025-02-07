@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
 export const globalStyles = StyleSheet.create({
   regularText: {
@@ -9,4 +9,4 @@ export const globalStyles = StyleSheet.create({
     fontFamily: 'Lato-Bold',
     fontSize: 16,
   },
-})
+});

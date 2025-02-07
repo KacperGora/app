@@ -13,6 +13,19 @@ export const pl = {
       confirmation: 'Potwierdzenie',
       welcomeBack: 'Witaj ponownie',
     },
+    screenNames: {
+      login: 'Logowanie',
+      register: 'Rejestracja',
+      remindPassword: 'Przypomnij hasło',
+      appointments: 'Wizyty',
+      clients: 'Klienci',
+      company: 'Firma',
+      clientDetails: 'Szczegóły klienta',
+      clientsBase: 'Baza klientów',
+      statistics: 'Statystyki',
+      calendar: 'Kalendarz',
+      homeTabs: 'Strona główna',
+    },
     login: {
       password: 'Hasło',
       showPassword: 'Pokaż hasło',
@@ -20,6 +33,17 @@ export const pl = {
       password: 'Hasło',
       sign: 'Zaloguj',
       forgetPassword: 'Zapomniałeś hasła?',
+    },
+    register: {
+      haveAnAccount: 'Masz już konto?',
+      confirmPassword: 'Potwierdź hasło',
+    },
+    remindPassword: {
+      title: 'Przypomnij hasło',
+      emailPlaceholder: 'Wpisz email',
+      sendButton: 'Wyślij',
+      invalidEmail: 'Niepoprawny email',
+      emailSent: 'Email został wysłany',
     },
     navigation: {
       appointments: 'Wizyty',
@@ -56,7 +80,8 @@ export const pl = {
       serviceDuration: 'Domyslny czas trwania (min)',
       serviceDurationPlaceholder: 'Wpisz czas trwania usługi',
       forgotPassword: 'Nie pamiętasz hasła?',
-      serviceDurationHelper: 'Czas trwania usługi powinien wynosić wielokrotność\n15 minut dla lepszego zarządzania harmonogramem wizyt.',
+      serviceDurationHelper:
+        'Czas trwania usługi powinien wynosić wielokrotność\n15 minut dla lepszego zarządzania harmonogramem wizyt.',
       passwordStrength: 'Siła hasła',
       weak: 'Słabe',
       fair: 'Średnie',

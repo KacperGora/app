@@ -1,3 +1,3 @@
-export * from './calendarTypes'
-export * from './companyTypes'
-export * from './customerTypes'
+export * from './calendarTypes';
+export * from './companyTypes';
+export * from './customerTypes';

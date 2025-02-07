@@ -6,4 +6,4 @@ export const en = {
       signIn: 'Zaloguj się',
     },
   },
-}
+};

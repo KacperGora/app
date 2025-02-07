@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+
 import { Card, Title } from 'react-native-paper';
 
 const Statistics: React.FC = ({}) => {

@@ -1,4 +1,4 @@
-import { EventForm } from "@types";
+import { EventForm } from '@types';
 
 export type CreateEventFormProps = {
   onEventCreateRequest: () => Promise<void>;

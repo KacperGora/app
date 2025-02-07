@@ -1,18 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
-import { Text, Title } from 'react-native-paper';
-import { useQuery } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 
-import { styles } from './style';
-import { apiRoutes, api, getFullName, fromIntervalToMinutes, useAuth } from '@helpers';
-import { DatePicker, Input, Button, Loader, SearchWithList } from '@components';
+import { KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity } from 'react-native';
+
+import { Button, DatePicker, Input, Loader, SearchWithList } from '@components';
+import { api, apiRoutes, fromIntervalToMinutes, getFullName, useAuth } from '@helpers';
 import { CompanyServicesForm } from '@modules/Company';
 import { CustomerForm } from '@modules/Customers';
-import { EventForm, EventFormOptionType, ServiceType, CustomerType } from '@types';
-import { isEventDurationLongerThanADay, initialFormState, formatCurrency, handlePriceChange } from './utils';
+import { useQuery } from '@tanstack/react-query';
+import { CustomerType, EventForm, EventFormOptionType, ServiceType } from '@types';
+import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
+import { Text, Title } from 'react-native-paper';
+
+import { styles } from './style';
 import { CreateEventFormProps } from './type';
+import {
+  formatCurrency,
+  handlePriceChange,
+  initialFormState,
+  isEventDurationLongerThanADay,
+} from './utils';
 
 const {
   event: {
@@ -20,7 +27,10 @@ const {
   },
 } = apiRoutes;
 
-const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest, initialState }) => {
+const CreateEventForm: React.FC<CreateEventFormProps> = ({
+  onEventCreateRequest,
+  initialState,
+}) => {
   const { t } = useTranslation();
   const { userId } = useAuth();
 
@@ -43,11 +53,17 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
     notes: initialState?.notes ?? initialFormState.notes,
     service: initialState?.service ?? initialFormState.service,
   }));
-  const [filteredOptions, setFilteredOptions] = useState<{ clients: CustomerType[]; services: ServiceType[] }>({
+  const [filteredOptions, setFilteredOptions] = useState<{
+    clients: CustomerType[];
+    services: ServiceType[];
+  }>({
     clients: [],
     services: [],
   });
-  const [isOptionFormVisible, setIsOptionFormVisible] = useState<{ client: boolean; service: boolean }>({
+  const [isOptionFormVisible, setIsOptionFormVisible] = useState<{
+    client: boolean;
+    service: boolean;
+  }>({
     client: false,
     service: false,
   });
@@ -127,9 +143,15 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
 
   const renderItem = (name: EventFormOptionType) => (item: ServiceType | CustomerType) => {
     const nameValue =
-      name === 'service' ? (item as ServiceType).name : getFullName((item as CustomerType).name, (item as CustomerType).lastName);
+      name === 'service'
+        ? (item as ServiceType).name
+        : getFullName((item as CustomerType).name, (item as CustomerType).lastName);
     return (
-      <TouchableOpacity key={item.id} onPress={() => handleSelect(name)(item)} style={styles.suggestion}>
+      <TouchableOpacity
+        key={item.id}
+        onPress={() => handleSelect(name)(item)}
+        style={styles.suggestion}
+      >
         <Text style={styles.element}>{nameValue}</Text>
       </TouchableOpacity>
     );
@@ -176,7 +198,12 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
             handleInputChange={handleOptionSearch('clients')}
           />
           {isAddClientOptionVisible && (
-            <Button label={t('form.addClient')} onPress={toggleCreateOption('client')} style={styles.addBtn} labelStyle={styles.btnLabel} />
+            <Button
+              label={t('form.addClient')}
+              onPress={toggleCreateOption('client')}
+              style={styles.addBtn}
+              labelStyle={styles.btnLabel}
+            />
           )}
           <SearchWithList
             label={t('form.selectService')}
@@ -195,7 +222,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
             />
           )}
           <Input
-            keyboardType='numeric'
+            keyboardType="numeric"
             placeholder={t('form.price')}
             onChangeText={handleChange('price')}
             onBlur={handlePriceInputBlur}
@@ -203,8 +230,18 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
             value={form.price}
             label={t('form.price')}
           />
-          <DatePicker label={t('calendar.startDate')} value={form.start} onChange={handleChange('start')} minDate={dayjs().toISOString()} />
-          <DatePicker label={t('calendar.endDate')} value={form.end} onChange={handleChange('end')} minDate={form.start} />
+          <DatePicker
+            label={t('calendar.startDate')}
+            value={form.start}
+            onChange={handleChange('start')}
+            minDate={dayjs().toISOString()}
+          />
+          <DatePicker
+            label={t('calendar.endDate')}
+            value={form.end}
+            onChange={handleChange('end')}
+            minDate={form.start}
+          />
           <Input
             maxLength={500}
             onChangeText={handleChange('notes')}
@@ -213,7 +250,12 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
             multiline
             style={[styles.input, styles.textArea]}
           />
-          <Button label={t('form.save')} style={styles.submitButton} onPress={handleSubmit} labelStyle={styles.btnLabel} />
+          <Button
+            label={t('form.save')}
+            style={styles.submitButton}
+            onPress={handleSubmit}
+            labelStyle={styles.btnLabel}
+          />
         </>
       )}
     </>

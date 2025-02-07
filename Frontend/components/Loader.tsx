@@ -1,10 +1,12 @@
-import React, { useEffect, useRef } from 'react'
-import { View, StyleSheet, Animated, Easing } from 'react-native'
+import { borderRadius } from '@theme';
+import React, { useEffect, useRef } from 'react';
+
+import { Animated, Easing, StyleSheet, View } from 'react-native';
 
 const Loader = () => {
-  const drop1 = useRef(new Animated.Value(0)).current
-  const drop2 = useRef(new Animated.Value(0)).current
-  const drop3 = useRef(new Animated.Value(0)).current
+  const drop1 = useRef(new Animated.Value(0)).current;
+  const drop2 = useRef(new Animated.Value(0)).current;
+  const drop3 = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const createAnimation = (animatedValue: Animated.Value | Animated.ValueXY, delay: number) => {
@@ -24,17 +26,17 @@ const Loader = () => {
             useNativeDriver: true,
           }),
         ]),
-      )
-    }
+      );
+    };
 
-    const animation1 = createAnimation(drop1, 0)
-    const animation2 = createAnimation(drop2, 250)
-    const animation3 = createAnimation(drop3, 500)
+    const animation1 = createAnimation(drop1, 0);
+    const animation2 = createAnimation(drop2, 250);
+    const animation3 = createAnimation(drop3, 500);
 
-    animation1.start()
-    animation2.start()
-    animation3.start()
-  }, [drop1, drop2, drop3])
+    animation1.start();
+    animation2.start();
+    animation3.start();
+  }, [drop1, drop2, drop3]);
 
   return (
     <View style={styles.container}>
@@ -42,8 +44,9 @@ const Loader = () => {
       <Animated.View style={[styles.drop, styles.drop2, { transform: [{ translateY: drop2 }] }]} />
       <Animated.View style={[styles.drop, styles.drop3, { transform: [{ translateY: drop3 }] }]} />
     </View>
-  )
-}
+  );
+};
+const { medium } = borderRadius
 
 const styles = StyleSheet.create({
   container: {
@@ -56,18 +59,18 @@ const styles = StyleSheet.create({
   drop: {
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: medium,
     marginHorizontal: 10,
   },
   drop1: {
-    backgroundColor: '#2b3a67', // Color for the first drop
+    backgroundColor: '#2b3a67',
   },
   drop2: {
-    backgroundColor: '#ff6347', // Color for the second drop
+    backgroundColor: '#ff6347',
   },
   drop3: {
-    backgroundColor: '#32cd32', // Color for the third drop
+    backgroundColor: '#32cd32',
   },
-})
+});
 
-export default Loader
+export default Loader;

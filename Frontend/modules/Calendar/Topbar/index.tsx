@@ -1,21 +1,33 @@
-import React, { useContext } from 'react'
-import { View, Text, StyleSheet, Pressable } from 'react-native'
-import dayjs from 'dayjs'
-import { AuthContext, AuthContextType } from '../../../context/AuthContext'
-import { colors } from '../../../theme/theme'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import React, { useContext } from 'react';
 
-const today = dayjs().format('DD')
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+
+import { api, apiRoutes } from '@helpers';
+import dayjs from 'dayjs';
+import * as SecureStore from 'expo-secure-store';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import { AuthContext, AuthContextType } from '../../../context/AuthContext';
+import { colors } from '../../../theme/theme';
+
+const today = dayjs().format('DD');
 
 type TopbarProps = {
-  onPress: any
-  date: string
-  displayedCalendarMonth: string
-}
+  onPress: any;
+  date: string;
+  displayedCalendarMonth: string;
+};
 
 const Topbar: React.FC<TopbarProps> = ({ onPress, date, displayedCalendarMonth }) => {
-  const { setIsLoggedIn, userId } = useContext(AuthContext) as AuthContextType
+  const { setIsLoggedIn, userId } = useContext(AuthContext) as AuthContextType;
+
+  const handleLogout = async () => {
+    setIsLoggedIn(false);
+    await SecureStore.deleteItemAsync('accessToken');
+    await SecureStore.deleteItemAsync('refreshToken');
+    await api.post(apiRoutes.auth.logout, { userId });
+  };
   return (
     <View style={styles.topBar}>
       <TouchableOpacity>
@@ -25,14 +37,14 @@ const Topbar: React.FC<TopbarProps> = ({ onPress, date, displayedCalendarMonth }
         <Text style={{ fontSize: 12, fontFamily: 'Lato-Regular' }}>{today}</Text>
       </Pressable>
       <View style={{ flexDirection: 'row', gap: 12 }}></View>
-      <Pressable style={styles.logoutButton} onPress={() => setIsLoggedIn(false)}>
-        <Icon name='logout' size={24} color={colors.textPrimary} />
+      <Pressable style={styles.logoutButton} onPress={handleLogout}>
+        <Icon name="logout" size={24} color={colors.textPrimary} />
       </Pressable>
     </View>
-  )
-}
+  );
+};
 
-export default Topbar
+export default Topbar;
 
 const styles = StyleSheet.create({
   topBar: {
@@ -63,4 +75,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontFamily: 'Lato-Bold',
   },
-})
+});
