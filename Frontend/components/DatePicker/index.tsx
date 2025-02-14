@@ -1,13 +1,17 @@
-import { useTranslation } from 'react-i18next';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { fromDateString } from '../../helpers/toString';
 import { useEffect, useState } from 'react';
-import { Button, Text, TextInput } from 'react-native-paper';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { DEFAULT_DATE_FORMAT_WITH_TIME } from '../../helpers/constants';
+
 import { StyleSheet, View } from 'react-native';
+
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import Input from 'components/TextInputWithCounter';
 import dayjs from 'dayjs';
-import { colors } from 'theme/theme';
+import { useTranslation } from 'react-i18next';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Button, Text, TextInput } from 'react-native-paper';
+import { beautyTheme, colors } from 'theme/theme';
+
+import { DEFAULT_DATE_FORMAT_WITH_TIME } from '../../helpers/constants';
+import { fromDateString } from '../../helpers/toString';
 
 type DatePickerProps = {
   label: string;
@@ -32,31 +36,30 @@ const DatePicker: React.FC<DatePickerProps> = ({ label, value, onChange, minDate
     onChange(date);
   };
 
-  const customTheme = {
-    colors: {
-      background: 'white',
-    },
-  };
-
   useEffect(() => {
     setDate(value);
   }, [value]);
-  
+
   return (
     <View style={styles.dateTimeContainer}>
       {showDatePicker ? (
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
           <DateTimePicker
             value={dayjs(date).toDate()}
-            mode='datetime'
-            display='compact'
+            mode="datetime"
+            display="compact"
             onChange={handleChange}
-            locale='pl'
+            locale="pl"
             minuteInterval={15}
             minimumDate={minDate ? dayjs(minDate).toDate() : undefined}
-            style={{ width: '100%' }}
           />
-          <Button style={{ backgroundColor: colors.black, borderRadius: 4 }} onPress={onSaveBtnPress}>
+          <Button
+            style={{
+              backgroundColor: beautyTheme.colors.onBackground,
+              borderRadius: beautyTheme.shape.borderRadius,
+            }}
+            onPress={onSaveBtnPress}
+          >
             <Text style={{ color: colors.white }}>{t('form.save')}</Text>
           </Button>
         </View>
@@ -64,9 +67,12 @@ const DatePicker: React.FC<DatePickerProps> = ({ label, value, onChange, minDate
         <TouchableOpacity onPress={toggleDatePicker}>
           <TextInput
             label={label}
-            mode='outlined'
-            value={fromDateString({ string: date.toString(), format: DEFAULT_DATE_FORMAT_WITH_TIME })}
-            theme={customTheme}
+            mode="outlined"
+            value={fromDateString({
+              string: date.toString(),
+              format: DEFAULT_DATE_FORMAT_WITH_TIME,
+            })}
+            theme={{ colors: { background: 'white' } }}
             style={{ pointerEvents: 'none' }}
           />
         </TouchableOpacity>

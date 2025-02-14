@@ -1,7 +1,7 @@
 import CustomerDetail from './CustomerDetail';
-import CustomerList from './CustomerList';
-import CustomerForm from './CustomerForm';
-import Statistics from './Statistics';
 import CustomerDetailListRow from './CustomerDetailListRow';
+import CustomerForm from './CustomerForm';
+import CustomerList from './CustomerList';
+import Statistics from './Statistics';
 
 export { CustomerDetail, CustomerList, CustomerForm, Statistics, CustomerDetailListRow };

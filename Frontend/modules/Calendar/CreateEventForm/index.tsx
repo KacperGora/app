@@ -1,18 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
-import { Text, Title } from 'react-native-paper';
+
+import { TouchableOpacity, View } from 'react-native';
+
+import {
+  Button,
+  DatePicker,
+  Input,
+  KeyboardAvoidingContainer,
+  Loader,
+  SearchWithList,
+} from '@components';
+import { api, apiRoutes, fromIntervalToMinutes, getFullName, useAuth } from '@helpers';
+import { CompanyServicesForm, CustomerForm } from '@modules';
 import { useQuery } from '@tanstack/react-query';
+import { CustomerType, EventForm, EventFormOptionType, ServiceType } from '@types';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
+import { Text, Title } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from './style';
-import { apiRoutes, api, getFullName, fromIntervalToMinutes, useAuth } from '@helpers';
-import { DatePicker, Input, Button, Loader, SearchWithList } from '@components';
-import { CompanyServicesForm } from '@modules/Company';
-import { CustomerForm } from '@modules/Customers';
-import { EventForm, EventFormOptionType, ServiceType, CustomerType } from '@types';
-import { isEventDurationLongerThanADay, initialFormState, formatCurrency, handlePriceChange } from './utils';
 import { CreateEventFormProps } from './type';
+import {
+  formatCurrency,
+  handlePriceChange,
+  initialFormState,
+  isEventDurationLongerThanADay,
+} from './utils';
 
 const {
   event: {
@@ -20,7 +34,10 @@ const {
   },
 } = apiRoutes;
 
-const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest, initialState }) => {
+const CreateEventForm: React.FC<CreateEventFormProps> = ({
+  onEventCreateRequest,
+  initialState,
+}) => {
   const { t } = useTranslation();
   const { userId } = useAuth();
 
@@ -31,6 +48,9 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
     queryKey: [queryKey, userId],
     queryFn: async () => {
       const { data } = await api.get(eventOptions);
+      if (!data) {
+        throw new Error('No data');
+      }
       return data;
     },
   });
@@ -43,11 +63,17 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
     notes: initialState?.notes ?? initialFormState.notes,
     service: initialState?.service ?? initialFormState.service,
   }));
-  const [filteredOptions, setFilteredOptions] = useState<{ clients: CustomerType[]; services: ServiceType[] }>({
+  const [filteredOptions, setFilteredOptions] = useState<{
+    clients: CustomerType[];
+    services: ServiceType[];
+  }>({
     clients: [],
     services: [],
   });
-  const [isOptionFormVisible, setIsOptionFormVisible] = useState<{ client: boolean; service: boolean }>({
+  const [isOptionFormVisible, setIsOptionFormVisible] = useState<{
+    client: boolean;
+    service: boolean;
+  }>({
     client: false,
     service: false,
   });
@@ -108,7 +134,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
   const handleSubmit = async () => {
     try {
       await api.post(apiRoutes.event.create, form);
-      await onEventCreateRequest();
+      // await onEventCreateRequest();
     } catch (error) {
       console.log(error);
     } finally {
@@ -127,9 +153,15 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
 
   const renderItem = (name: EventFormOptionType) => (item: ServiceType | CustomerType) => {
     const nameValue =
-      name === 'service' ? (item as ServiceType).name : getFullName((item as CustomerType).name, (item as CustomerType).lastName);
+      name === 'service'
+        ? (item as ServiceType).name
+        : getFullName((item as CustomerType).name, (item as CustomerType).lastName);
     return (
-      <TouchableOpacity key={item.id} onPress={() => handleSelect(name)(item)} style={styles.suggestion}>
+      <TouchableOpacity
+        key={item.id}
+        onPress={() => handleSelect(name)(item)}
+        style={styles.suggestion}
+      >
         <Text style={styles.element}>{nameValue}</Text>
       </TouchableOpacity>
     );
@@ -161,12 +193,10 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
   }
 
   return (
-    <>
+    <SafeAreaView style={styles.container}>
       <Title style={styles.formTitle}>{t('calendar.addNewVisit')}</Title>
-      {isLoading || !data ? (
-        <Loader />
-      ) : (
-        <>
+      <View style={styles.formContainer}>
+        <View>
           <SearchWithList
             label={t('form.selectClient')}
             placeholder={t('form.typeToSearch')}
@@ -176,47 +206,68 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onEventCreateRequest,
             handleInputChange={handleOptionSearch('clients')}
           />
           {isAddClientOptionVisible && (
-            <Button label={t('form.addClient')} onPress={toggleCreateOption('client')} style={styles.addBtn} labelStyle={styles.btnLabel} />
-          )}
-          <SearchWithList
-            label={t('form.selectService')}
-            placeholder={t('form.typeToSearch')}
-            list={services}
-            renderItem={renderItem('service')}
-            searchValue={search.servicesSearch}
-            handleInputChange={handleOptionSearch('services')}
-          />
-          {isAddServiceFormVisible && (
             <Button
-              label={t('form.addService')}
-              onPress={toggleCreateOption('service')}
-              style={styles.addBtn}
+              label={t('form.addClient')}
+              onPress={toggleCreateOption('client')}
               labelStyle={styles.btnLabel}
+              style={{ alignSelf: 'flex-start' }}
+              mode="text"
             />
           )}
-          <Input
-            keyboardType='numeric'
-            placeholder={t('form.price')}
-            onChangeText={handleChange('price')}
-            onBlur={handlePriceInputBlur}
-            style={styles.input}
-            value={form.price}
-            label={t('form.price')}
+        </View>
+        <SearchWithList
+          label={t('form.selectService')}
+          placeholder={t('form.typeToSearch')}
+          list={services}
+          renderItem={renderItem('service')}
+          searchValue={search.servicesSearch}
+          handleInputChange={handleOptionSearch('services')}
+        />
+        {isAddServiceFormVisible && (
+          <Button
+            mode="text"
+            label={t('form.addService')}
+            onPress={toggleCreateOption('service')}
+            labelStyle={styles.btnLabel}
+            style={{ alignSelf: 'flex-start' }}
           />
-          <DatePicker label={t('calendar.startDate')} value={form.start} onChange={handleChange('start')} minDate={dayjs().toISOString()} />
-          <DatePicker label={t('calendar.endDate')} value={form.end} onChange={handleChange('end')} minDate={form.start} />
-          <Input
+        )}
+        <Input
+          keyboardType="numeric"
+          placeholder={t('form.price')}
+          onChangeText={handleChange('price')}
+          onBlur={handlePriceInputBlur}
+          value={form.price}
+          label={t('form.price')}
+        />
+        <DatePicker
+          label={t('calendar.startDate')}
+          value={form.start}
+          onChange={handleChange('start')}
+          minDate={dayjs().toISOString()}
+        />
+        <DatePicker
+          label={t('calendar.endDate')}
+          value={form.end}
+          onChange={handleChange('end')}
+          minDate={form.start}
+        />
+        {/* <Input
             maxLength={500}
             onChangeText={handleChange('notes')}
             placeholder={t('calendar.notes')}
             value={form?.notes}
             multiline
             style={[styles.input, styles.textArea]}
-          />
-          <Button label={t('form.save')} style={styles.submitButton} onPress={handleSubmit} labelStyle={styles.btnLabel} />
-        </>
-      )}
-    </>
+          /> */}
+        <Button
+          label={t('form.save')}
+          style={styles.addBtn}
+          onPress={handleSubmit}
+          labelStyle={styles.btnLabel}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 

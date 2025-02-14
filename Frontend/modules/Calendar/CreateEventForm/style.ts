@@ -1,14 +1,19 @@
 import { StyleSheet } from 'react-native';
-import { colors } from 'theme/theme';
+
+import { beautyTheme, colors } from 'theme/theme';
 
 export const styles = StyleSheet.create({
   formTitle: {
     marginBottom: 16,
-    color: colors.textPrimary,
+    color: beautyTheme.colors.onBackground,
+    fontSize: 24,
     fontWeight: 'bold',
   },
+  container: {
+    backgroundColor: 'red',
+  },
   suggestion: {
-    paddingVertical: 8,
+    paddingVertical: beautyTheme.spacing.m,
     width: 'auto',
     borderRadius: 4,
     borderBottomColor: colors.textSecondary,
@@ -25,23 +30,20 @@ export const styles = StyleSheet.create({
   dateTimeContainer: {
     marginBottom: 8,
   },
-  submitButton: {
-    paddingVertical: 8,
-    backgroundColor: 'black',
-    borderRadius: 8,
-    width: '100%',
-  },
   textArea: {
     height: 100,
     borderColor: 'black',
   },
   btnLabel: {
-    color: colors.black,
-    width: '100%',
-    textAlign: 'center',
+    color: 'white',
     fontWeight: '600',
+    textAlign: 'center',
   },
   addBtn: {
-    paddingVertical: 8,
+    width: '100%',
+  },
+  formContainer: {
+    gap: beautyTheme.spacing.l,
+    flex: 1,
   },
 });

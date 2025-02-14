@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import { Alert, StyleSheet, Text, View } from 'react-native';
+
+import { api, apiRoutes, getFullName } from '@helpers';
+import { useNavigation } from '@react-navigation/native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CustomerType } from '@types';
-import { useNavigation } from '@react-navigation/native';
-import { apiRoutes, getFullName, api } from '@helpers';
 import { useTranslation } from 'react-i18next';
 import { Card } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from 'theme/theme';
 
 type CustomerDetailProps = {
@@ -16,7 +18,9 @@ type CustomerDetailProps = {
     };
   };
 };
-const CustomerDetail: React.FC<CustomerDetailProps> = ({ route = { params: { customer: {} as CustomerType } } }) => {
+const CustomerDetail: React.FC<CustomerDetailProps> = ({
+  route = { params: { customer: {} as CustomerType } },
+}) => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
@@ -30,7 +34,9 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ route = { params: { cus
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clientList'] });
-      Alert.alert(t('global.success'), t('client.deletetionSuccess'), [{ text: 'OK', onPress: () => navigation.goBack() }]);
+      Alert.alert(t('global.success'), t('client.deletetionSuccess'), [
+        { text: 'OK', onPress: () => navigation.goBack() },
+      ]);
     },
     onError: (error: any) => {
       Alert.alert(t('global.error'), `${t('client.deletionError')} ${error.message}`);
@@ -62,7 +68,12 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ route = { params: { cus
       <View style={styles.header}>
         <Card.Title title={getFullName(name, lastName)} style={{ flex: 1 }} />
         <Card.Actions>
-          <Icon.Button name='delete' backgroundColor={'transparent'} iconStyle={{ color: 'red' }} onPress={handleDelete}></Icon.Button>
+          <Icon.Button
+            name="delete"
+            backgroundColor={'transparent'}
+            iconStyle={{ color: 'red' }}
+            onPress={handleDelete}
+          ></Icon.Button>
         </Card.Actions>
       </View>
       <Card.Content>

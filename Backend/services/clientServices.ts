@@ -13,8 +13,8 @@ export const clientService = {
     if (![ASC, DESC].includes(sortOrder)) {
       throw new CustomError('Invalid sortOrder', 400)
     }
-    const clients = await fetchDatabaseClients(userId, { search, sortBy, sortOrder })
-    return clients
+    const clients = await fetchDatabaseClients(userId, { search, sortBy, sortOrder }) || []
+    return clients || []
   },
   async addClient(client: { name: string; last_name: string; phone_number: string; userId: string; notes?: string }) {
     if (!client.name || !client.last_name || !client.phone_number || !client.userId) {

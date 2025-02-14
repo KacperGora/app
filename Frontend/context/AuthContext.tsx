@@ -1,5 +1,11 @@
-import React, { createContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
-import * as Keychain from 'react-native-keychain';
+import React, {
+  createContext,
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 
 export type AuthContextType = {
   isLoggedIn: boolean | null;
@@ -21,5 +27,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoggedIn(false);
   }, []);
 
-  return <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, login, setLogin, userId, setUserId }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, login, setLogin, userId, setUserId }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

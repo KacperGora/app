@@ -1,23 +1,25 @@
-import React, { useState } from 'react'
-import { View, StyleSheet, Image, TouchableOpacity } from 'react-native'
-import * as ImagePicker from 'expo-image-picker'
-import { TextInput, Button, Text } from 'react-native-paper'
-import { colors } from 'theme/theme'
-import { useTranslation } from 'react-i18next'
+import React, { useState } from 'react';
+
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+
+import * as ImagePicker from 'expo-image-picker';
+import { useTranslation } from 'react-i18next';
+import { Button, Text, TextInput } from 'react-native-paper';
+import { colors } from 'theme/theme';
 
 const EmployeeForm = () => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const [employeeForm, setEmployeeForm] = useState({
     name: '',
     phoneNumber: '',
     position: '',
     image: '',
-  })
-  const { name, phoneNumber, position, image } = employeeForm
+  });
+  const { name, phoneNumber, position, image } = employeeForm;
 
   const handleInputChange = (key: string) => (value: string) => {
-    setEmployeeForm((prev) => ({ ...prev, [key]: value }))
-  }
+    setEmployeeForm((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleImagePick = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -27,12 +29,12 @@ const EmployeeForm = () => {
       quality: 1,
       base64: true,
       legacy: true,
-    })
+    });
 
     if (!result.canceled) {
-      setEmployeeForm((prev) => ({ ...prev, image: result.assets[0].uri }))
+      setEmployeeForm((prev) => ({ ...prev, image: result.assets[0].uri }));
     }
-  }
+  };
   const handleImageCapture = async () => {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -41,38 +43,53 @@ const EmployeeForm = () => {
       quality: 1,
       base64: true,
       legacy: true,
-    })
+    });
 
     if (!result.canceled) {
-      setEmployeeForm((prev) => ({ ...prev, image: result.assets[0].uri }))
+      setEmployeeForm((prev) => ({ ...prev, image: result.assets[0].uri }));
     }
-  }
+  };
 
-  const handleSubmit = () => {
-  }
+  const handleSubmit = () => {};
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t('Employee Form')}</Text>
-      <TextInput label='Name' value={name} onChangeText={handleInputChange('name')} mode='outlined' style={styles.input} />
       <TextInput
-        label='Email'
+        label="Name"
+        value={name}
+        onChangeText={handleInputChange('name')}
+        mode="outlined"
+        style={styles.input}
+      />
+      <TextInput
+        label="Email"
         value={phoneNumber}
         onChangeText={handleInputChange('phoneNumber')}
         style={styles.input}
-        mode='outlined'
-        keyboardType='email-address'
+        mode="outlined"
+        keyboardType="email-address"
       />
-      <TextInput mode='outlined' label='Position' value={position} onChangeText={handleInputChange('position')} style={styles.input} />
+      <TextInput
+        mode="outlined"
+        label="Position"
+        value={position}
+        onChangeText={handleInputChange('position')}
+        style={styles.input}
+      />
       <TouchableOpacity onPress={handleImagePick} style={styles.imagePicker}>
-        {image ? <Image source={{ uri: image }} style={styles.image} /> : <Text style={styles.imagePlaceholder}>Pick an image</Text>}
+        {image ? (
+          <Image source={{ uri: image }} style={styles.image} />
+        ) : (
+          <Text style={styles.imagePlaceholder}>Pick an image</Text>
+        )}
       </TouchableOpacity>
-      <Button mode='contained' onPress={handleSubmit} style={styles.button}>
+      <Button mode="contained" onPress={handleSubmit} style={styles.button}>
         Submit
       </Button>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -113,6 +130,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: '#000',
   },
-})
+});
 
-export default EmployeeForm
+export default EmployeeForm;

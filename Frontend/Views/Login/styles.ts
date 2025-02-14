@@ -1,69 +1,70 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
+
+import { beautyTheme } from '@theme';
+
+const {
+  colors: { primary, onPrimaryContainer, white, secondary },
+  fontSizes: { xlarge, medium: fontMediumSize },
+  fontWeight: { semi },
+} = beautyTheme;
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    gap: beautyTheme.spacing.xl,
+    justifyContent: 'center',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: beautyTheme.spacing.xl,
+  },
+  logo: {
+    fontSize: 40,
+    fontWeight: semi,
+    color: primary,
+  },
+  formContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+    paddingInline: 20,
   },
   header: {
-    flex: 1,
-    position: 'relative',
-    height: 80,
+    fontSize: xlarge,
+    fontWeight: semi,
+    textAlign: 'center',
+    color: onPrimaryContainer,
   },
-  gradient: {
-    flex: 0.95,
+  loginButton: {
+    backgroundColor: primary,
+    width: '100%',
+    marginBottom: 20,
+  },
+  loginButtonText: {
+    color: white,
+    fontSize: fontMediumSize,
+    fontWeight: semi,
+  },
+  linksContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  linkText: {
+    color: primary,
+    fontSize: fontMediumSize,
+    marginVertical: 5,
+  },
+  socialLoginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  socialButton: {
+    backgroundColor: secondary,
+    padding: 12,
+    borderRadius: 50,
+    marginHorizontal: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ff9a9e',
-    borderBottomLeftRadius: 100,
-    borderBottomRightRadius: 100,
   },
-  appName: {
-    fontSize: 42,
-    fontWeight: 'bold',
-    color: '#fff',
-    width: '100%',
-    textAlign: 'center',
-    fontFamily: 'Lato-Regular',
-  },
-  wave: {
-    position: 'absolute',
-    bottom: 0,
-    elevation: 1,
-    left: 0,
-    right: 0,
-    backgroundColor: '#fff',
-  },
-  tagline: {
-    fontSize: 18,
-    color: '#fff',
-    marginTop: 10,
-    fontWeight: '500',
-    fontFamily: 'Lato-B',
-  },
-  form: {
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    backgroundColor: '#fff',
-    height: '60%',
-  },
-  input: {
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    borderColor: '#fff',
-  },
-  button: {
-    marginTop: 10,
-    borderRadius: 8,
-  },
-  signupButton: {
-    marginTop: 20,
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-})
+});

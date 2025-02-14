@@ -1,11 +1,13 @@
-import i18n from 'i18n/i18n'
-import * as z from 'zod'
+import i18n from 'i18n/i18n';
+import * as z from 'zod';
 
 export const serviceFormSchema = z.object({
   serviceName: z.string().min(1, { message: i18n.t('validation.fieldRequired') }),
   serviceDescription: z.string().optional(),
   servicePrice: z.union([
-    z.number({ invalid_type_error: i18n.t('validation.mustBeNumber') }).positive({ message: i18n.t('validation.mustBePositiveNumber') }),
+    z
+      .number({ invalid_type_error: i18n.t('validation.mustBeNumber') })
+      .positive({ message: i18n.t('validation.mustBePositiveNumber') }),
     z
       .string()
       .regex(/^\d+([.,]\d{1,2})?$/, { message: i18n.t('validation.mustBePositiveNumber') })
@@ -22,19 +24,17 @@ export const serviceFormSchema = z.object({
       .transform(Number)
       .refine((data) => data % 15 === 0, { message: i18n.t('validation.mutlitleBy15') }),
   ]),
-})
+});
 
 export const get15stepValue = (text: string) => {
-  const input = parseInt(text, 10)
+  const input = parseInt(text, 10);
   if (!isNaN(input)) {
-    const rounded = Math.round(input / 15) * 15
-    return rounded.toString()
+    const rounded = Math.round(input / 15) * 15;
+    return rounded.toString();
   } else {
-    return ''
+    return '';
   }
-}
-
-
+};
 
 export const validateServiceForm = ({
   serviceName,
@@ -42,27 +42,27 @@ export const validateServiceForm = ({
   servicePrice,
   serviceDuration,
 }: {
-  serviceName: string
-  serviceDescription: string
-  servicePrice: string
-  serviceDuration: string
+  serviceName: string;
+  serviceDescription: string;
+  servicePrice: string;
+  serviceDuration: string;
 }) => {
   const formData = {
     serviceName,
     serviceDescription,
     servicePrice,
     serviceDuration,
-  }
+  };
   try {
-    serviceFormSchema.parse(formData)
-    return
+    serviceFormSchema.parse(formData);
+    return;
   } catch (err) {
     if (err instanceof z.ZodError) {
-      const errorMessages: { [key: string]: string } = {}
+      const errorMessages: { [key: string]: string } = {};
       err.errors.forEach((error) => {
-        errorMessages[error.path[0]] = error.message
-      })
-      return errorMessages
+        errorMessages[error.path[0]] = error.message;
+      });
+      return errorMessages;
     }
   }
-}
+};

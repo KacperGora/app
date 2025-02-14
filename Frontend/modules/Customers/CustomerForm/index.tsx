@@ -1,29 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, Platform, Keyboard } from 'react-native';
+import React, { useState } from 'react';
+
+import { StyleSheet, View } from 'react-native';
+
+import { Button, Input } from '@components';
+import { api, apiRoutes } from '@helpers';
+import FormTitle from 'components/FormTitle';
 import { useTranslation } from 'react-i18next';
+
 import TextInputWithCounter from '../../../components/TextInputWithCounter';
 import { colors } from '../../../theme/theme';
-import { customerFieldsConfig, initialCustomerFormValues } from './utils';
 import { Client, CustomerComponentProps } from './type';
-import { apiRoutes, api, useKeyboardStatus } from '@helpers';
-import { Button, Input } from '@components';
-import FormTitle from 'components/FormTitle';
+import { customerFieldsConfig, initialCustomerFormValues } from './utils';
 
 const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) => {
   const { t } = useTranslation();
 
   const [clientForm, setClientForm] = useState<Client>(initialCustomerFormValues);
-  const [error, setError] = useState('');
-  const [containerHeight, setContainerHeight] = useState(0);
 
   const handleChange = (key: keyof Client) => (value: string) => {
     setClientForm((prev) => ({ ...prev, [key]: value }));
   };
+
   const onClientSave = async (client: Client) => {
     try {
       await api.post(apiRoutes.client.addClient.path, client);
     } catch (error: any) {
-      setError(error.message);
+      // setError(error.message);
     } finally {
       setClientForm(initialCustomerFormValues);
     }
@@ -44,7 +46,7 @@ const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) =
             key={key}
             style={styles.input}
             placeholder={t(placeholder)}
-            value={clientForm[value as keyof Client]}
+            value={clientForm[value as keyof Client] || ''}
             onChangeText={handleChange(key as keyof Client)}
             keyboardType={keyboardType || 'default'}
           />
@@ -57,8 +59,19 @@ const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) =
           multiline
           style={styles.textArea}
         />
-        <Button label={t('form.save')} onPress={handleSubmit} style={styles.button} labelStyle={styles.buttonLabel} />
-        <Button label={t('form.goBack')} onPress={handleSubmit} style={styles.goBackButton} labelStyle={styles.goBackBtnLabel} />
+        <Button
+          label={t('form.save')}
+          onPress={handleSubmit}
+          style={styles.button}
+          labelStyle={styles.buttonLabel}
+        />
+        <Button
+          label={t('form.goBack')}
+          onPress={handleSubmit}
+          mode="outlined"
+          // style={styles.goBackButton}
+          // labelStyle={styles.goBackBtnLabel}
+        />
       </View>
     </>
   );
@@ -66,7 +79,6 @@ const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) =
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
     alignContent: 'flex-start',
     justifyContent: 'flex-start',
   },
@@ -89,24 +101,16 @@ const styles = StyleSheet.create({
     height: 100,
   },
   button: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: colors.black,
-    color: colors.white,
-    borderRadius: 8,
     width: '100%',
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   buttonLabel: {
     color: colors.white,
+    width: '100%',
+    textAlign: 'center',
   },
   goBackButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    color: colors.black,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.gray,

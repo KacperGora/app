@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { StyleSheet } from 'react-native';
-import { TextInput, Button, Text, Divider } from 'react-native-paper';
-import { debounce } from 'lodash';
-import { get15stepValue, validateServiceForm } from './utils';
+
+import { StyleSheet, View } from 'react-native';
+
 import { api } from '@helpers';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import FormTitle from 'components/FormTitle';
+import KeyboardAvoidingContainer from 'components/KeyboardAvoidingContainer';
+import { debounce } from 'lodash';
+import { useTranslation } from 'react-i18next';
+import { Button, Divider, Text, TextInput } from 'react-native-paper';
+
+import { get15stepValue, validateServiceForm } from './utils';
 
 const CompanyServicesForm: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
   const { t } = useTranslation();
@@ -20,14 +24,6 @@ const CompanyServicesForm: React.FC<{ onClose?: () => void }> = ({ onClose }) =>
   const { serviceName, serviceDescription, servicePrice, serviceDuration } = form;
   const [hasErrors, setHasErrors] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string } | undefined>(undefined);
-
-  const handleServiceDurationChange = useCallback(
-    debounce((text) => {
-      const value = get15stepValue(text);
-      setForm((prev) => ({ ...prev, serviceDuration: value }));
-    }, 300),
-    [],
-  );
 
   const { mutate, error } = useMutation({
     mutationFn: async () => {
@@ -51,17 +47,22 @@ const CompanyServicesForm: React.FC<{ onClose?: () => void }> = ({ onClose }) =>
   };
 
   useEffect(() => {
-    const errors = validateServiceForm({ serviceName, serviceDescription, servicePrice, serviceDuration });
+    const errors = validateServiceForm({
+      serviceName,
+      serviceDescription,
+      servicePrice,
+      serviceDuration,
+    });
     setFormErrors(errors);
     setHasErrors(errors ? Object.keys(errors).length > 0 : false);
   }, [serviceName, serviceDescription, servicePrice, serviceDuration]);
 
   return (
-    <>
+    <View style={{ flex: 1, flexGrow: 1 }}>
       <FormTitle title={t('form.addService')} onClose={onClose} />
       <Divider style={styles.divider} />
       <TextInput
-        mode='outlined'
+        mode="outlined"
         value={serviceName}
         onChangeText={handleFormChange('serviceName')}
         label={t('form.serviceName')}
@@ -72,7 +73,7 @@ const CompanyServicesForm: React.FC<{ onClose?: () => void }> = ({ onClose }) =>
       {formErrors?.serviceName && <Text style={styles.errorText}>{formErrors.serviceName}</Text>}
       <TextInput
         placeholder={t('form.serviceDescriptionPlaceholder')}
-        mode='outlined'
+        mode="outlined"
         value={serviceDescription}
         onChangeText={handleFormChange('servicePrice')}
         label={t('form.serviceDescription')}
@@ -80,44 +81,47 @@ const CompanyServicesForm: React.FC<{ onClose?: () => void }> = ({ onClose }) =>
         multiline
         error={!!formErrors?.serviceDescription}
       />
-      {formErrors?.serviceDescription && <Text style={styles.errorText}>{formErrors.serviceDescription}</Text>}
+      {formErrors?.serviceDescription && (
+        <Text style={styles.errorText}>{formErrors.serviceDescription}</Text>
+      )}
 
       <TextInput
         label={t('form.servicePrice')}
-        mode='outlined'
+        mode="outlined"
         value={servicePrice}
         onChangeText={handleFormChange('servicePrice')}
         placeholder={t('form.servicePricePlaceholder')}
-        keyboardType='numbers-and-punctuation'
+        keyboardType="numbers-and-punctuation"
         style={styles.input}
         error={!!formErrors?.servicePrice}
       />
       {formErrors?.servicePrice && <Text style={styles.errorText}>{formErrors.servicePrice}</Text>}
       <TextInput
-        mode='outlined'
+        mode="outlined"
         value={serviceDuration}
         onChangeText={(text) => {
           setForm((prev) => ({ ...prev, serviceDuration: text }));
-          handleServiceDurationChange(text);
         }}
         label={t('form.serviceDuration')}
         placeholder={t('form.serviceDurationPlaceholder')}
-        keyboardType='numeric'
+        keyboardType="numeric"
         style={styles.input}
         error={!!formErrors?.serviceDuration}
       />
       <Text style={styles.helperText}>{t('form.serviceDurationHelper')}</Text>
-      {formErrors?.serviceDuration && <Text style={styles.errorText}>{formErrors.serviceDuration}</Text>}
+      {formErrors?.serviceDuration && (
+        <Text style={styles.errorText}>{formErrors.serviceDuration}</Text>
+      )}
 
       <Button
         disabled={hasErrors}
-        mode='contained'
+        mode="contained"
         onPress={() => mutate()}
         style={[styles.submitButton, hasErrors && styles.buttonReadOnly]}
       >
         {t('form.save')}
       </Button>
-    </>
+    </View>
   );
 };
 

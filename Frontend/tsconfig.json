@@ -1,18 +1,22 @@
 {
-  "extends": "./node_modules/expo/tsconfig.base",
   "compilerOptions": {
     "esModuleInterop": true,
     "strict": true,
+    "jsx": "react-native",
     "baseUrl": "./",
+    "resolveJsonModule": true,
     "paths": {
       "@components": ["components/"],
-      "@views/*": ["Views/*"],
-      "@modules/*": ["modules/*"],
+      "@views": ["Views/"],
+      "@modules": ["modules/"],
       "navigation/*": ["navigation/*"],
       "utils/*": ["utils/*"],
       "assets/*": ["assets/*"],
       "@helpers": ["helpers/"],
-      "@types" : ["types/"]
+      "@types": ["types/"],
+      "@navigators": ["navigation/*"],
+      "@theme": ["theme/theme.ts"]
     }
-  }
+  },
+  "extends": "expo/tsconfig.base"
 }

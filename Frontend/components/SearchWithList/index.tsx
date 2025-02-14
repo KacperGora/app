@@ -1,8 +1,8 @@
 import { StyleSheet, View } from 'react-native';
-import i18next from 'i18next';
 
 import { Input } from '@components';
 import { CustomerType, ServiceType } from '@types';
+import i18next from 'i18next';
 
 type SearchWithListProps = {
   label: string;
@@ -22,21 +22,23 @@ const SearchWithList: React.FC<SearchWithListProps> = ({
   renderItem,
 }) => {
   return (
-    <View style={styles.searchWithList}>
-      <Input style={styles.input} value={searchValue} onChangeText={handleInputChange} label={label} placeholder={placeholder} />
-      {Boolean(searchValue.length && list.length) && <View style={styles.suggestionsContainer}>{list.map(renderItem)}</View>}
-    </View>
+    <>
+      <Input
+        value={searchValue}
+        onChangeText={handleInputChange}
+        label={label}
+        placeholder={placeholder}
+      />
+      {Boolean(searchValue.length && list.length) && (
+        <View style={styles.suggestionsContainer}>{list.map(renderItem)}</View>
+      )}
+    </>
   );
 };
 
 export default SearchWithList;
 
 const styles = StyleSheet.create({
-  input: {
-    marginBottom: 8,
-    backgroundColor: '#fff',
-  },
-  searchWithList: {},
   suggestionsContainer: {
     backgroundColor: '#fff',
     borderRadius: 4,

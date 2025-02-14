@@ -9,7 +9,9 @@ export const initialFormState = {
 };
 
 export const isEventDurationLongerThanADay = (start: string, end: string) => {
-  return dayjs(start).isValid() && dayjs(end).isValid() && dayjs(start).diff(dayjs(end), 'day') !== 0;
+  return (
+    dayjs(start).isValid() && dayjs(end).isValid() && dayjs(start).diff(dayjs(end), 'day') !== 0
+  );
 };
 
 export const formatCurrency = (amount: number = 0, currency: string = 'PLN'): string => {
@@ -18,7 +20,9 @@ export const formatCurrency = (amount: number = 0, currency: string = 'PLN'): st
     return '';
   }
   try {
-    return new Intl.NumberFormat('pl-PL', { style: 'currency', currency }).format(amount).replace(',', '.');
+    return new Intl.NumberFormat('pl-PL', { style: 'currency', currency })
+      .format(amount)
+      .replace(',', '.');
   } catch (error) {
     console.error('Error formatting currency:', error);
     return '';

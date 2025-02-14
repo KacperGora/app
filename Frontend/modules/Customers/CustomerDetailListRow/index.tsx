@@ -1,27 +1,28 @@
-import dayjs from 'dayjs'
-import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { DEFAULT_DATE_FORMAT } from '../../../helpers/constants'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { useNavigation } from '@react-navigation/native'
+import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-type PhoneMethod = 'tel' | 'sms'
+import { useNavigation } from '@react-navigation/native';
+import { NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '@views/Login/types';
+import dayjs from 'dayjs';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { NavigationProp } from '@react-navigation/native'
-import { Customer } from '../CustomerList'
-import { RootStackParamList } from '@views/Login/types'
+import { DEFAULT_DATE_FORMAT } from '../../../helpers/constants';
+import { Customer } from '../CustomerList';
+
+type PhoneMethod = 'tel' | 'sms';
 
 const CustomerDetailListRow: React.FC<{ customer: Customer }> = ({ customer }) => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
-  const { lastName, name, phoneNumber } = customer
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { lastName, name, phoneNumber } = customer;
 
-  const isContactDisplayed = Boolean(phoneNumber)
+  const isContactDisplayed = Boolean(phoneNumber);
   const handlePhonePress = (type: PhoneMethod) => () => {
-    let url = `${type}:${phoneNumber}`
+    let url = `${type}:${phoneNumber}`;
     if (type === 'sms') {
-      url += `?body=${encodeURIComponent('Przypomnienie o wizycie w salonie dnia: ' + dayjs().format(DEFAULT_DATE_FORMAT))}`
+      url += `?body=${encodeURIComponent('Przypomnienie o wizycie w salonie dnia: ' + dayjs().format(DEFAULT_DATE_FORMAT))}`;
     }
-    Linking.openURL(url)
-  }
+    Linking.openURL(url);
+  };
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate('CustomerDetail', { customer })}
@@ -34,16 +35,19 @@ const CustomerDetailListRow: React.FC<{ customer: Customer }> = ({ customer }) =
           <TouchableOpacity onPress={handlePhonePress('tel')} accessibilityLabel={`Call ${name}`}>
             <Text style={styles.phone}>{}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handlePhonePress('sms')} accessibilityLabel={`Send SMS to ${name}`}>
-            <Icon name='message-outline' size={24} color='#666' />
+          <TouchableOpacity
+            onPress={handlePhonePress('sms')}
+            accessibilityLabel={`Send SMS to ${name}`}
+          >
+            <Icon name="message-outline" size={24} color="#666" />
           </TouchableOpacity>
         </View>
       )}
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-export default CustomerDetailListRow
+export default CustomerDetailListRow;
 
 const styles = StyleSheet.create({
   item: {
@@ -89,4 +93,4 @@ const styles = StyleSheet.create({
     width: 50,
   },
   leftActionIcon: {},
-})
+});

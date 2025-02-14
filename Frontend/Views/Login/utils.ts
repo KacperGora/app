@@ -1,6 +1,7 @@
 import { api } from '@helpers';
-import { LoginForm, LoginSuccess } from './types';
 import * as SecureStore from 'expo-secure-store';
+
+import { LoginForm, LoginSuccess } from './types';
 
 export const validateLoginForm = (form: LoginForm) => {
   if (!form.username || !form.password) {

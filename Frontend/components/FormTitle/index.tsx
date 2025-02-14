@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { StyleSheet, Text, View } from 'react-native';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const FormTitle: React.FC<{ title: string; onClose?: () => void }> = ({ title, onClose }) => {
@@ -7,7 +9,7 @@ const FormTitle: React.FC<{ title: string; onClose?: () => void }> = ({ title, o
   return (
     <View style={styles.header}>
       <Text style={styles.title}>{title}</Text>
-      {displayCloseIcon && <Icon name='close' size={24} onPress={onClose} />}
+      {displayCloseIcon && <Icon name="close" size={24} onPress={onClose} />}
     </View>
   );
 };

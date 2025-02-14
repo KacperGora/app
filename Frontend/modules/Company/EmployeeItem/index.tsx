@@ -1,11 +1,14 @@
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-import { View, Text, Image, Pressable, Linking, StyleSheet } from 'react-native'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { Employee } from '../../../types/companyTypes'
+import React from 'react';
+
+import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+
+import { Employee } from '../../../types/companyTypes';
 
 const EmployeeItem: React.FC<Employee> = ({ name, position, contact, imageSrc }) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <View style={styles.itemContainer}>
@@ -13,20 +16,20 @@ const EmployeeItem: React.FC<Employee> = ({ name, position, contact, imageSrc })
         <Image source={imageSrc} style={styles.image} />
         <View style={{ display: 'flex', gap: 8, flexDirection: 'row' }}>
           <Pressable onPress={() => Linking.openURL(`tel:${contact}`)}>
-            <MaterialCommunityIcons name='phone' size={24} />
+            <MaterialCommunityIcons name="phone" size={24} />
           </Pressable>
           <Pressable onPress={() => Linking.openURL(`sms:${contact}`)}>
-            <MaterialCommunityIcons name='message-text-outline' size={24} />
+            <MaterialCommunityIcons name="message-text-outline" size={24} />
           </Pressable>
         </View>
       </View>
       <Text style={styles.name}>{name}</Text>
       <Text style={styles.position}>{t('company.position', { position: position })}</Text>
     </View>
-  )
-}
+  );
+};
 
-export default EmployeeItem
+export default EmployeeItem;
 
 const styles = StyleSheet.create({
   itemContainer: {
@@ -68,4 +71,4 @@ const styles = StyleSheet.create({
       height: 2,
     },
   },
-})
+});

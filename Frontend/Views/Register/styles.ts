@@ -1,47 +1,57 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
+
+import { beautyTheme } from 'theme/theme';
+
+const {
+  colors: { primary, onPrimaryContainer, white, onTertiary },
+  fontSizes: { regular, xlarge, medium },
+  fontWeight: { semi },
+} = beautyTheme;
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollContainer: {
-    flexGrow: 1,
+    backgroundColor: '#F9F1F6',
+    padding: 20,
     justifyContent: 'center',
-    padding: 24,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 24,
+  header: {
+    fontSize: xlarge,
+    fontWeight: semi,
+    marginBottom: 20,
     textAlign: 'center',
-    color: '#333',
-    fontFamily: 'Lato-Bold',
+    color: onPrimaryContainer,
   },
-  input: {
-    marginBottom: 16,
-    backgroundColor: '#fff',
-    position: 'relative',
-  },
-  eyeIcon: {
-    position: 'absolute',
-    right: '5%',
-    top: '30%',
-    bottom: 0,
-    justifyContent: 'center',
+  registerButton: {
+    backgroundColor: primary,
+    width: '100%',
+    borderRadius: 10,
+    marginBottom: 20,
     alignItems: 'center',
-    zIndex: 100,
-    elevation: 100,
   },
-  button: {
-    marginTop: 24,
-    borderRadius: 8,
+  registerButtonText: {
+    color: white,
+    fontSize: regular,
+    fontWeight: semi,
   },
-  buttonContent: {
-    height: 48,
+  linksContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
-  buttonLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  linkText: {
+    color: onTertiary,
+    fontSize: medium,
   },
-})
+  boldLinkText: {
+    fontWeight: semi,
+    color: primary,
+    marginLeft: 4,
+  },
+  formContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+  },
+});

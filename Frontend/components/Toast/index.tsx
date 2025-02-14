@@ -1,25 +1,27 @@
-import React from 'react'
-import { View, Text, StyleSheet, Animated } from 'react-native'
-import { useEffect, useRef, useState } from 'react'
-import { useTheme } from 'react-native-paper'
+import React from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+import { Animated, StyleSheet, Text, View } from 'react-native';
+
+import { useTheme } from 'react-native-paper';
 
 interface ToastProps {
-  message: string
-  duration?: number
-  onClose?: () => void
+  message: string;
+  duration?: number;
+  onClose?: () => void;
 }
 
 const Toast: React.FC<ToastProps> = ({ message, duration = 3000, onClose }) => {
-  const [visible, setVisible] = useState(true)
-  const opacity = useRef(new Animated.Value(0)).current
-  const theme = useTheme()
+  const [visible, setVisible] = useState(true);
+  const opacity = useRef(new Animated.Value(0)).current;
+  const theme = useTheme();
 
   useEffect(() => {
     Animated.timing(opacity, {
       toValue: 1,
       duration: 500,
       useNativeDriver: true,
-    }).start()
+    }).start();
 
     const timer = setTimeout(() => {
       Animated.timing(opacity, {
@@ -27,24 +29,24 @@ const Toast: React.FC<ToastProps> = ({ message, duration = 3000, onClose }) => {
         duration: 500,
         useNativeDriver: true,
       }).start(() => {
-        setVisible(false)
+        setVisible(false);
         if (onClose) {
-          onClose()
+          onClose();
         }
-      })
-    }, duration)
+      });
+    }, duration);
 
-    return () => clearTimeout(timer)
-  }, [duration, onClose, opacity])
+    return () => clearTimeout(timer);
+  }, [duration, onClose, opacity]);
 
-  if (!visible) return null
+  if (!visible) return null;
 
   return (
     <Animated.View style={[styles.toast, { opacity, backgroundColor: theme.colors.surface }]}>
       <Text style={{ color: theme.colors.onSurface }}>{message}</Text>
     </Animated.View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   toast: {
@@ -56,6 +58,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     elevation: 2,
   },
-})
+});
 
-export default Toast
+export default Toast;

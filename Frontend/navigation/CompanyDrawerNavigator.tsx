@@ -1,17 +1,25 @@
 import React, { useRef, useState } from 'react';
+
 import { Keyboard, StyleSheet } from 'react-native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import i18next from 'i18next';
-import BottomSheet from '@gorhom/bottom-sheet';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import { BottomSheetFormWrapper } from '@components';
-import { CompanyServicesForm, CompanyServices, EmployeeForm, Employees, FinanceView } from '@modules/Company';
+import BottomSheet from '@gorhom/bottom-sheet';
+import {
+  CompanyServices,
+  CompanyServicesForm,
+  EmployeeForm,
+  Employees,
+  FinanceView,
+} from '@modules';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import i18next from 'i18next';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Drawer = createDrawerNavigator();
 type FormType = 'customer' | 'employee' | 'service';
 
-export const CompanyDrawerNavigator = () => {
+export const CompanyDrawerNavigator = ({}) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [formType, setFormType] = useState<FormType>('customer');
 
@@ -20,11 +28,11 @@ export const CompanyDrawerNavigator = () => {
     bottomSheetRef.current?.expand();
     Keyboard.dismiss();
   };
-  
+
   return (
     <>
       <Drawer.Navigator
-        initialRouteName='company'
+        initialRouteName="company"
         screenOptions={{
           drawerType: 'front',
           headerRightContainerStyle: styles.headerRightContainer,
@@ -38,17 +46,17 @@ export const CompanyDrawerNavigator = () => {
         <Drawer.Screen
           name={i18next.t('company.dashboard')}
           options={{
-            drawerIcon: () => <Icon name='view-dashboard' size={24} />,
+            drawerIcon: () => <Icon name="view-dashboard" size={24} />,
           }}
           component={FinanceView}
         />
         <Drawer.Screen
           name={i18next.t('company.employees')}
           options={{
-            drawerIcon: () => <Icon name='account-group' size={24} />,
+            drawerIcon: () => <Icon name="account-group" size={24} />,
             headerRight: () => (
               <TouchableOpacity onPress={() => onFormToggle('employee')}>
-                <Icon name='plus' size={24} color='#000' style={{ marginRight: 15 }} />
+                <Icon name="plus" size={24} color="#000" style={{ marginRight: 15 }} />
               </TouchableOpacity>
             ),
           }}
@@ -57,10 +65,10 @@ export const CompanyDrawerNavigator = () => {
         <Drawer.Screen
           name={i18next.t('company.services')}
           options={{
-            drawerIcon: () => <Icon name='cash-register' size={24} />,
+            drawerIcon: () => <Icon name="cash-register" size={24} />,
             headerRight: () => (
               <TouchableOpacity onPress={() => onFormToggle('service')}>
-                <Icon name='plus' size={24} color='#000' style={{ marginRight: 15 }} />
+                <Icon name="plus" size={24} color="#000" style={{ marginRight: 15 }} />
               </TouchableOpacity>
             ),
           }}

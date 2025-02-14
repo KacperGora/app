@@ -1,9 +1,11 @@
-import { useFonts } from 'expo-font';
 import { useContext, useEffect, useState } from 'react';
-import { AuthContext, AuthContextType } from 'context/AuthContext';
-import * as SplashScreen from 'expo-splash-screen';
-import * as SecureStore from 'expo-secure-store';
+
 import { Keyboard } from 'react-native';
+
+import { AuthContext, AuthContextType } from 'context/AuthContext';
+import { useFonts } from 'expo-font';
+import * as SecureStore from 'expo-secure-store';
+import * as SplashScreen from 'expo-splash-screen';
 
 export const useModal = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -16,8 +18,8 @@ export const useModal = () => {
 
 export const useLoadFonts = () => {
   const [fontsLoaded] = useFonts({
-    'Lato-Regular': require('assets/fonts/Lato-Regular.ttf'),
-    'Lato-Bold': require('assets/fonts/Lato-Bold.ttf'),
+    // 'Lato-Regular': require('assets/fonts/Lato-Regular.ttf'),
+    // 'Lato-Bold': require('assets/fonts/Lato-Bold.ttf'),
   });
 
   useEffect(() => {
@@ -34,25 +36,26 @@ export const useLoadFonts = () => {
 };
 
 export const useAuth = () => {
-  const { isLoggedIn, setIsLoggedIn, setLogin, setUserId, userId } = useContext(AuthContext) as AuthContextType;
+  const { isLoggedIn, setIsLoggedIn, setLogin, setUserId, userId } = useContext(
+    AuthContext,
+  ) as AuthContextType;
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkToken = async () => {
       try {
         const token = await SecureStore.getItemAsync('accessToken');
-        console.log(token);
-        setIsLoggedIn(Boolean(token));
+        setIsLoggedIn(!!token);
       } catch (error) {
-        console.error('Error getting token', error);
+        console.error('Failed to retrieve access token:', error);
       } finally {
         setLoading(false);
       }
     };
     checkToken();
-  }, [setIsLoggedIn, setLogin]);
+  }, []);
 
-  return { isLoggedIn, loading, setLogin, setUserId, userId };
+  return { isLoggedIn, loading, setLogin, setUserId, userId, setIsLoggedIn };
 };
 
 export const useKeyboardStatus = () => {
