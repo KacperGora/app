@@ -7,18 +7,15 @@ import { ProgressBar } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { beautyTheme, colors } from 'theme/theme';
 
-import { getPasswordMessage, getPasswordStrength, strengthColors, strengthLabels } from './utils';
 import { styles } from './styles';
+import { getPasswordMessage, getPasswordStrength, strengthColors, strengthLabels } from './utils';
 
 type PasswordStrengthProps = {
   password: string;
   passwordConfirmation: string;
 };
 
-const PasswordStrength: React.FC<PasswordStrengthProps> = ({
-  password,
-  passwordConfirmation,
-}) => {
+const PasswordStrength: React.FC<PasswordStrengthProps> = ({ password, passwordConfirmation }) => {
   const { t } = useTranslation();
   const strength = getPasswordStrength(password);
   const passwordMessage = getPasswordMessage(password, passwordConfirmation);
@@ -43,7 +40,5 @@ const PasswordStrength: React.FC<PasswordStrengthProps> = ({
     </View>
   );
 };
-
-
 
 export default PasswordStrength;

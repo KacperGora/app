@@ -1,28 +1,25 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { beautyTheme } from '@theme';
 import { Customers } from '@views';
 import i18n from 'i18n/i18n';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { colors } from 'theme/theme';
 
 import CalendarDrawerNavigator from './CalendarDrawerNavigator';
 import CompanyDrawerNavigator from './CompanyDrawerNavigator';
 
 const Tab = createBottomTabNavigator();
 
-
-
 export const HomeTabs = () => (
   <Tab.Navigator
     screenOptions={{
       headerShown: false,
-      tabBarActiveTintColor: colors.textPrimary,
-      tabBarInactiveTintColor: colors.textSecondary,
+      tabBarActiveTintColor: beautyTheme.colors.primary,
+      tabBarInactiveTintColor: beautyTheme.colors.onSurface,
       tabBarStyle: {
-        backgroundColor: colors.white,
+        backgroundColor: beautyTheme.colors.background,
         borderRadius: 15,
-        height: 90,
         ...style.shadow,
       },
     }}
@@ -31,8 +28,12 @@ export const HomeTabs = () => (
       name={i18n.t('navigation.appointments')}
       component={CalendarDrawerNavigator}
       options={{
-        tabBarIcon: ({ color, size, focused }) => (
-          <Icon name="calendar" color={focused ? colors.black : colors.darkBlue} size={size} />
+        tabBarIcon: ({ size, focused }) => (
+          <Icon
+            name="calendar"
+            color={focused ? beautyTheme.colors.primary : beautyTheme.colors.onSurface}
+            size={size}
+          />
         ),
       }}
     />
@@ -40,16 +41,25 @@ export const HomeTabs = () => (
       name={i18n.t('navigation.clients')}
       component={Customers}
       options={{
-        tabBarIcon: ({ color, size }) => <Icon name="account-group" color={color} size={size} />,
+        tabBarIcon: ({ size, focused }) => (
+          <Icon
+            name="account-group"
+            color={focused ? beautyTheme.colors.primary : beautyTheme.colors.onSurface}
+            size={size}
+          />
+        ),
       }}
     />
-
     <Tab.Screen
       name={i18n.t('navigation.company')}
       component={CompanyDrawerNavigator}
       options={{
-        tabBarIcon: ({ color, size, focused }) => (
-          <Icon name="briefcase" color={focused ? color : 'gray'} size={size} />
+        tabBarIcon: ({ size, focused }) => (
+          <Icon
+            name="briefcase"
+            color={focused ? beautyTheme.colors.primary : beautyTheme.colors.onSurface}
+            size={size}
+          />
         ),
       }}
     />

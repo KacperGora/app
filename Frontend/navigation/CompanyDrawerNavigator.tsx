@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import { Keyboard, StyleSheet } from 'react-native';
 
@@ -10,9 +10,8 @@ import {
   EmployeeForm,
   Employees,
   FinanceView,
-} from '@modules/Company';
+} from '@modules';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { useNavigation } from '@react-navigation/native';
 import i18next from 'i18next';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';

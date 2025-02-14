@@ -3,81 +3,82 @@ import React, { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 
 import { Button, Input, KeyboardAvoidingContainer, ScreenWrapper } from '@components';
-import { api, apiRoutes } from '@helpers';
+import { api, apiRoutes, isRequestActive, SCREEN_NAME_CONFIG } from '@helpers';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useMutation } from '@tanstack/react-query';
+import { useNotification } from 'helpers/notification';
 import { useTranslation } from 'react-i18next';
+import { RootStackParamList } from 'Views/Login/types';
 
 import { styles } from './styles';
 import { InputChangeHandler, RegisterForm } from './types';
 
+const { Login } = SCREEN_NAME_CONFIG;
+
 const RegisterScreen = () => {
   const { t } = useTranslation();
+  const { navigate } = useNavigation<NavigationProp<RootStackParamList>>();
+  const { showNotification } = useNotification();
 
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [form, setForm] = useState<RegisterForm>({
     username: '',
     password: '',
     confirmPassword: '',
   });
 
-  const { mutateAsync } = useMutation({
+  const { mutateAsync, status } = useMutation<void, { code: string }>({
     mutationFn: async () => {
-      await api.post(apiRoutes.auth.register, form);
+      const { username, password } = form;
+      await api.post(apiRoutes.auth.register, { username, password });
+      showNotification(t('register.success'), 'success');
+      navigate({ name: Login, params: '' });
     },
     onError: (error) => {
-      Alert.alert('Error', error.message);
+      showNotification(error.code, 'error');
     },
   });
-
-  const handleRegister = async () => {
-    const { username, password, confirmPassword } = form;
-    const formIsValid = username && password && confirmPassword && confirmPassword === password;
-    if (formIsValid) {
-      await mutateAsync();
-    } else {
-      Alert.alert('Error', t('register.formError'));
-    }
-  };
 
   const handleInputChange: InputChangeHandler = (key) => (value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handlePasswordVisibility = () => {
-    setIsPasswordVisible((prevState) => !prevState);
-  };
-
   return (
     <KeyboardAvoidingContainer>
-      <ScreenWrapper style={styles.formContainer}>
-        <Text style={styles.header}>{t('global.signUp')}</Text>
-        <Input
-          value={form.username}
-          placeholder={t('form.username')}
-          onChangeText={handleInputChange('username')}
-        />
-        <Input
-          isPassword
-          placeholder={t('form.password')}
-          value={form.password}
-          onChangeText={handleInputChange('password')}
-        />
-        <Input
-          placeholder={t('form.confirmPassword')}
-          value={form.confirmPassword}
-          onChangeText={handleInputChange('confirmPassword')}
-        />
+      <Text style={styles.header}>{t('global.signUp')}</Text>
+      <Input
+        value={form.username}
+        placeholder={t('form.username')}
+        onChangeText={handleInputChange('username')}
+      />
+      <Input
+        isPassword
+        placeholder={t('form.password')}
+        value={form.password}
+        onChangeText={handleInputChange('password')}
+      />
+      <Input
+        placeholder={t('form.confirmPassword')}
+        value={form.confirmPassword}
+        onChangeText={handleInputChange('confirmPassword')}
+      />
+      <Button
+        label={t('global.signUp')}
+        onPress={() => mutateAsync()}
+        isDisabled={
+          isRequestActive(status) || !form.username || !form.password || !form.confirmPassword
+        }
+        style={styles.registerButton}
+        labelStyle={styles.registerButtonText}
+      />
+      <View style={styles.linksContainer}>
+        <Text style={styles.linkText}>{t('register.haveAnAccount')}</Text>
         <Button
-          label={t('global.signUp')}
-          onPress={handleRegister}
-          style={styles.registerButton}
-          labelStyle={styles.registerButtonText}
+          mode="text"
+          label={t('global.signIn')}
+          onPress={() => navigate({ name: Login, params: '' })}
+          labelStyle={styles.boldLinkText}
         />
-        <View style={styles.linksContainer}>
-          <Text style={styles.linkText}>{t('register.haveAnAccount')}</Text>
-          <Button label={t('global.signIn')} onPress={() => {}} labelStyle={styles.boldLinkText} />
-        </View>
-      </ScreenWrapper>
+      </View>
     </KeyboardAvoidingContainer>
   );
 };

@@ -1,9 +1,9 @@
-import { borderRadius } from '@theme';
 import React, { useState } from 'react';
 
 import { StyleSheet, TextStyle, TouchableOpacity } from 'react-native';
 import { StyleProp, ViewStyle } from 'react-native';
 
+import { beautyTheme, borderRadius } from '@theme';
 import { Button as ButtonComponent, Text } from 'react-native-paper';
 
 type ButtonProps = {
@@ -23,7 +23,7 @@ const Button: React.FC<ButtonProps> = ({
   labelStyle,
   loading,
   isDisabled,
-  mode,
+  mode = 'contained',
 }) => {
   const [isPressed, setIsPressed] = useState(false);
 
@@ -33,24 +33,53 @@ const Button: React.FC<ButtonProps> = ({
       onPressOut={() => setIsPressed(false)}
       onPress={onPress}
       disabled={loading || isDisabled}
-      style={[styles.button, style, isPressed && styles.buttonPressed]}
+      style={[
+        styles.button,
+        isPressed && styles.buttonPressed,
+        isDisabled && styles.buttonDisabled,
+        style,
+        loading && styles.buttonLoading,
+      ]}
     >
-      <ButtonComponent mode={mode} loading={loading} disabled={loading || isDisabled}>
-        <Text style={labelStyle}>{label}</Text>
+      <ButtonComponent
+        mode={mode}
+        loading={loading}
+        disabled={loading || isDisabled}
+        style={[
+          styles.button,
+          loading && styles.buttonLoadingComponent,
+          isDisabled && styles.buttonDisabled,
+        ]}
+      >
+        <Text style={[labelStyle, isDisabled && styles.buttonLabelDisabled]}>{label}</Text>
       </ButtonComponent>
     </TouchableOpacity>
   );
 };
-const { medium } = borderRadius;
 
 const styles = StyleSheet.create({
   button: {
     alignSelf: 'center',
-    borderRadius: medium,
-    paddingVertical: 6,
+    borderRadius: borderRadius.medium,
   },
   buttonPressed: {
     opacity: 0.8,
+  },
+  buttonLoading: {
+    opacity: 0.75,
+  },
+  buttonLoadingComponent: {
+    borderRadius: borderRadius.medium,
+    backgroundColor: 'transparent',
+  },
+  buttonDisabled: {
+    backgroundColor: beautyTheme.colors.onSurfaceDisabled,
+    borderRadius: borderRadius.medium,
+    width: '100%',
+  },
+  buttonLabelDisabled: {
+    opacity: 0.5,
+    color: beautyTheme.colors.white,
   },
 });
 

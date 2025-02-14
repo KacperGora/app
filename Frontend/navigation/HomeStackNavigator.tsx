@@ -1,13 +1,20 @@
 import React from 'react';
 
+import { SCREEN_NAME_CONFIG } from '@helpers';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Login, Register, RemindPassword } from '@views';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { HomeTabs } from './HomeTabsNavigator';
-import { SCREEN_NAME_CONFIG } from '@helpers';
 
-const { Login: login, Register: register, RemindPassword: remindPassword, HomeTabs: homeTabs } = SCREEN_NAME_CONFIG;
+const {
+  Login: login,
+  Register: register,
+  RemindPassword: remindPassword,
+  HomeTabs: homeTabs,
+} = SCREEN_NAME_CONFIG;
+
 const Stack = createStackNavigator();
 
 export const AppNavigator = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => (

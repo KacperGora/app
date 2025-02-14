@@ -18,8 +18,8 @@ export const useModal = () => {
 
 export const useLoadFonts = () => {
   const [fontsLoaded] = useFonts({
-    'Lato-Regular': require('assets/fonts/Lato-Regular.ttf'),
-    'Lato-Bold': require('assets/fonts/Lato-Bold.ttf'),
+    // 'Lato-Regular': require('assets/fonts/Lato-Regular.ttf'),
+    // 'Lato-Bold': require('assets/fonts/Lato-Bold.ttf'),
   });
 
   useEffect(() => {
@@ -45,7 +45,6 @@ export const useAuth = () => {
     const checkToken = async () => {
       try {
         const token = await SecureStore.getItemAsync('accessToken');
-        console.log('Token:', token);
         setIsLoggedIn(!!token);
       } catch (error) {
         console.error('Failed to retrieve access token:', error);

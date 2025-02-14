@@ -1,3 +1,4 @@
+import { Calendar } from '@views';
 import i18next from 'i18next';
 
 export const DEFAULT_DATE_FORMAT = 'DD/MM/YY';
@@ -13,8 +14,9 @@ export const HOUR_CELL_WIDTH = 60;
 export const DEFAULT_CURRENCY = 'PLN';
 
 export const SCREEN_NAME_CONFIG = {
-  Login: 'Login',
-  Register: 'Register',
-  RemindPassword: 'RemindPassword',
-  HomeTabs: 'HomeTabs',
+  Login: 'Login' as const,
+  Register: 'Register' as const,
+  RemindPassword: 'RemindPassword' as const,
+  HomeTabs: 'HomeTabs' as const,
+  Calendar: 'Calendar' as const,
 };

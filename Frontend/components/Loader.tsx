@@ -1,7 +1,8 @@
-import { borderRadius } from '@theme';
 import React, { useEffect, useRef } from 'react';
 
 import { Animated, Easing, StyleSheet, View } from 'react-native';
+
+import { borderRadius } from '@theme';
 
 const Loader = () => {
   const drop1 = useRef(new Animated.Value(0)).current;
@@ -46,7 +47,7 @@ const Loader = () => {
     </View>
   );
 };
-const { medium } = borderRadius
+const { medium } = borderRadius;
 
 const styles = StyleSheet.create({
   container: {
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'transparent',
   },
   drop: {
     width: 20,

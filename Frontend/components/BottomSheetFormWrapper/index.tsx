@@ -1,13 +1,10 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 
-import { Dimensions, Keyboard, StyleSheet, View } from 'react-native';
+import { Keyboard, StyleSheet, View } from 'react-native';
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import { useNavigation } from '@react-navigation/native';
+import { beautyTheme } from '@theme';
 import KeyboardAvoidingContainer from 'components/KeyboardAvoidingContainer';
-import { use } from 'i18next';
-import { ScrollView } from 'react-native-gesture-handler';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 type BottomSheetFormWrapperProps = {
   children: React.ReactNode;
@@ -36,18 +33,20 @@ const BottomSheetFormWrapper = forwardRef<BottomSheet, BottomSheetFormWrapperPro
     return (
       <BottomSheet
         ref={bottomSheetRef}
-        snapPoints={['12%', '50%', '85%']}
+        snapPoints={['12%', '50%', '90%']}
         onChange={handleChange}
         enablePanDownToClose
+        style={{ backgroundColor: 'transparent' }}
         enableHandlePanningGesture
         index={-1}
+        backgroundStyle={{ backgroundColor: beautyTheme.colors.background }}
         backdropComponent={({ animatedIndex, style }) =>
           toggleForm && <View style={[style, backdropStyle.backdrop]} />
         }
       >
-        <BottomSheetView style={styles.sheetContent}>
-          <KeyboardAvoidingContainer>{children}</KeyboardAvoidingContainer>
-        </BottomSheetView>
+        <KeyboardAvoidingContainer>
+          <BottomSheetView style={styles.sheetContent}>{children}</BottomSheetView>
+        </KeyboardAvoidingContainer>
       </BottomSheet>
     );
   },
@@ -55,21 +54,23 @@ const BottomSheetFormWrapper = forwardRef<BottomSheet, BottomSheetFormWrapperPro
 
 export default BottomSheetFormWrapper;
 
+const styles = StyleSheet.create({
+  sheetContent: {
+    flexGrow: 1,
+    paddingHorizontal: beautyTheme.spacing.xl,
+    paddingVertical: 0,
+    borderTopLeftRadius: beautyTheme.shape.borderRadius,
+    borderTopRightRadius: beautyTheme.shape.borderRadius,
+  },
+});
+
 export const backdropStyle = StyleSheet.create({
   backdrop: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: beautyTheme.colors.backdrop,
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-  },
-});
-
-const styles = StyleSheet.create({
-  sheetContent: {
-    paddingHorizontal: 16,
-    paddingVertical: 0,
-    height: Dimensions.get('window').height - 120,
   },
 });

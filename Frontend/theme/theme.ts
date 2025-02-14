@@ -61,11 +61,11 @@ export const beautyTheme = {
 
     elevation: {
       level0: 'transparent',
-      level1: '#F6E1E5',
-      level2: '#EAD2D8',
-      level3: '#E0C3CA',
-      level4: '#D7B5BD',
-      level5: '#D18E9D',
+      level1: 'rgba(246, 225, 229, 0.5)',
+      level2: 'rgba(234, 210, 216, 0.5)',
+      level3: 'rgba(224, 195, 202, 0.5)',
+      level4: 'rgba(215, 181, 189, 0.5)',
+      level5: 'rgba(209, 142, 157, 0.5)',
     },
     surfaceDisabled: 'rgba(108, 74, 91, 0.12)',
     onSurfaceDisabled: 'rgba(108, 74, 91, 0.38)',
@@ -78,6 +78,15 @@ export const beautyTheme = {
     medium: 14,
     small: 12,
     xSmall: 10,
+  },
+  spacing: {
+    s: 4,
+    m: 8,
+    l: 16,
+    xl: 20,
+  },
+  shape: {
+    borderRadius: 8,
   },
   fontWeight: {
     regular: '400' as TextStyle['fontWeight'],

@@ -1,7 +1,7 @@
 export interface TextInputWithCounterProps {
   placeholder: string;
   value: string;
-  onChangeText: (text: string) => void;
+  onChangeText?: (text: string) => void;
   onBlur?: (text: string) => void;
   maxLength?: number;
   multiline?: boolean;

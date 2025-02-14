@@ -27,3 +27,5 @@ export const toSnakeCase = (obj: any): any => {
 };
 
 export const getFullName = (name: string, lastName: string): string => `${name} ${lastName}`;
+
+export const isRequestActive = (status: string) => ['loading', 'pending'].includes(status);

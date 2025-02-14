@@ -2,11 +2,9 @@ import React from 'react';
 
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 
+import { colors } from '@theme';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Title } from 'react-native-paper';
-
-import { colors } from '@theme';
-
 
 const Company = () => {
   return (

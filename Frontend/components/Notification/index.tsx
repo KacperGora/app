@@ -1,8 +1,8 @@
-import { borderRadius } from '@theme';
 import React, { useEffect, useState } from 'react';
 
 import { Animated, Dimensions, StyleSheet, Text, View } from 'react-native';
 
+import { borderRadius } from '@theme';
 import { Snackbar } from 'react-native-paper';
 
 interface ToastProps {

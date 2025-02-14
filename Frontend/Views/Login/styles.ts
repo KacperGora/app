@@ -4,19 +4,19 @@ import { beautyTheme } from '@theme';
 
 const {
   colors: { primary, onPrimaryContainer, white, secondary },
-  fontSizes: { large, xlarge, medium: fontMediumSize },
+  fontSizes: { xlarge, medium: fontMediumSize },
   fontWeight: { semi },
 } = beautyTheme;
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    gap: beautyTheme.spacing.xl,
     justifyContent: 'center',
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: beautyTheme.spacing.xl,
   },
   logo: {
     fontSize: 40,
@@ -32,7 +32,6 @@ export const styles = StyleSheet.create({
   header: {
     fontSize: xlarge,
     fontWeight: semi,
-    marginBottom: 20,
     textAlign: 'center',
     color: onPrimaryContainer,
   },
@@ -43,7 +42,7 @@ export const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: white,
-    fontSize: large,
+    fontSize: fontMediumSize,
     fontWeight: semi,
   },
   linksContainer: {

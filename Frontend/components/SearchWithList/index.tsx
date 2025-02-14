@@ -22,9 +22,8 @@ const SearchWithList: React.FC<SearchWithListProps> = ({
   renderItem,
 }) => {
   return (
-    <View style={styles.searchWithList}>
+    <>
       <Input
-        style={styles.input}
         value={searchValue}
         onChangeText={handleInputChange}
         label={label}
@@ -33,18 +32,13 @@ const SearchWithList: React.FC<SearchWithListProps> = ({
       {Boolean(searchValue.length && list.length) && (
         <View style={styles.suggestionsContainer}>{list.map(renderItem)}</View>
       )}
-    </View>
+    </>
   );
 };
 
 export default SearchWithList;
 
 const styles = StyleSheet.create({
-  input: {
-    marginBottom: 8,
-    backgroundColor: '#fff',
-  },
-  searchWithList: {},
   suggestionsContainer: {
     backgroundColor: '#fff',
     borderRadius: 4,

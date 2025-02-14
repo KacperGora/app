@@ -25,16 +25,17 @@ const Input: React.FC<TextInputWithCounterProps> = ({
   isPassword = false,
 }) => {
   const [isSecureText, setIsSecureText] = useState(isPassword);
-  console.log(isSecureText);
+
   const toggleSecureText = () => {
     setIsSecureText((prev) => !prev);
   };
 
   return (
-    <View style={[styles.container, style]}>
+    <View style={[style]}>
       <PaperInput
         style={styles.input}
         label={label}
+        error={Boolean(errorMessage)}
         placeholder={placeholder}
         value={value}
         onChangeText={onChangeText}
@@ -70,9 +71,6 @@ const Input: React.FC<TextInputWithCounterProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
   input: {
     height: 50,
     borderRadius: 12,

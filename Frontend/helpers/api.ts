@@ -14,7 +14,6 @@ export const saveToken = async (key: TokenKey, value: string) => {
 
 export const getToken = async (key: TokenKey) => {
   const value = await SecureStore.getItemAsync(key);
-  console.log(value);
   return value;
 };
 
@@ -23,7 +22,8 @@ const deleteToken = async (key: TokenKey) => {
 };
 
 const api = axios.create({
-  baseURL: 'http://192.168.8.189:3000',
+  baseURL: 'http://192.168.8.103:3000',
+  timeout: 10000,
 });
 
 api.interceptors.request.use(
@@ -32,7 +32,9 @@ api.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+    console.log(config.data, 'config.data');
     if (config.data) {
+      console.log(config.data, 'config.data');
       config.data = toSnakeCase(config.data);
     }
     return config;
@@ -45,25 +47,33 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   async (response) => {
     if (response.data) {
-      response.data = toCamelCase(response.data);
+      // Apply camelCase transformation to the response data
+      const transformedData = toCamelCase(response.data);
+
+      // Return the entire response object with the transformed data
+      return { ...response, data: transformedData };
     }
+
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
+
     if (error.response && [401, 403].includes(error.response.status)) {
       try {
         const refreshToken = await getToken('refreshToken');
         if (!refreshToken) {
-          return Promise.reject(error);
+          return Promise.reject(error.response.data);
         }
 
-        const { data } = await axios.post('http://192.168.8.189:3000/auth/refresh-token', {
+        const { data } = await axios.post('http://192.168.8.103:3000/auth/refresh-token', {
           refresh_token: refreshToken,
         });
-        console.log('New token:', data);
+
         const newToken = data.accessToken;
-        await saveToken('accessToken', data.accessToken);
+
+        await saveToken('accessToken', newToken);
+
         originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
 
         return api.request(originalRequest);
@@ -73,12 +83,10 @@ api.interceptors.response.use(
         return Promise.reject(error);
       }
     }
-
     if (error.response) {
       return Promise.reject(error.response.data);
-    } else {
-      return Promise.reject(error);
     }
+    return Promise.reject(error);
   },
 );
 

@@ -46,7 +46,7 @@ const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) =
             key={key}
             style={styles.input}
             placeholder={t(placeholder)}
-            value={clientForm[value as keyof Client]}
+            value={clientForm[value as keyof Client] || ''}
             onChangeText={handleChange(key as keyof Client)}
             keyboardType={keyboardType || 'default'}
           />
@@ -68,8 +68,9 @@ const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) =
         <Button
           label={t('form.goBack')}
           onPress={handleSubmit}
-          style={styles.goBackButton}
-          labelStyle={styles.goBackBtnLabel}
+          mode="outlined"
+          // style={styles.goBackButton}
+          // labelStyle={styles.goBackBtnLabel}
         />
       </View>
     </>
@@ -78,7 +79,6 @@ const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) =
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
     alignContent: 'flex-start',
     justifyContent: 'flex-start',
   },
@@ -101,24 +101,16 @@ const styles = StyleSheet.create({
     height: 100,
   },
   button: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: colors.black,
-    color: colors.white,
-    borderRadius: 8,
     width: '100%',
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   buttonLabel: {
     color: colors.white,
+    width: '100%',
+    textAlign: 'center',
   },
   goBackButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    color: colors.black,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.gray,

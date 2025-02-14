@@ -2,19 +2,19 @@ import React, { useRef, useState } from 'react';
 
 import { Keyboard, TouchableOpacity, View } from 'react-native';
 
-import BottomSheet from '@gorhom/bottom-sheet';
 import { BottomSheetFormWrapper } from '@components';
+import BottomSheet from '@gorhom/bottom-sheet';
 import { api, apiRoutes, useAuth } from '@helpers';
 import { CustomerDetail, CustomerForm, CustomerList, Statistics } from '@modules';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useQuery } from '@tanstack/react-query';
+import { beautyTheme, colors } from '@theme';
 import { CustomerType } from '@types';
 import { useTranslation } from 'react-i18next';
 import { ToggleButton } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { colors } from '@theme';
 import { drawerScreenOptions } from './utils';
 
 const {
@@ -25,16 +25,37 @@ type ToggleEnum = 'day' | 'week' | 'month';
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
-const HeaderRight = ({ onPress }: { onPress: () => void }) => (
-  <TouchableOpacity onPress={onPress}>
-    <Icon name="plus" size={24} color={colors.textPrimary} style={{ marginRight: 15 }} />
-  </TouchableOpacity>
+const HeaderRight = ({
+  onAddPress,
+  onSearchPress,
+}: {
+  onAddPress: () => void;
+  onSearchPress: () => void;
+}) => (
+  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    <TouchableOpacity onPress={onSearchPress}>
+      <Icon
+        name="magnify"
+        size={24}
+        color={beautyTheme.colors.onBackground}
+        style={{ marginRight: 15 }}
+      />
+    </TouchableOpacity>
+    <TouchableOpacity onPress={onAddPress}>
+      <Icon
+        name="plus"
+        size={24}
+        color={beautyTheme.colors.onBackground}
+        style={{ marginRight: 15 }}
+      />
+    </TouchableOpacity>
+  </View>
 );
 
 const CustomerListWithDrawer = () => {
   const { t } = useTranslation();
-  const { userId } = useAuth();
   const [toggle, setToggle] = useState<ToggleEnum>('day');
+  const [searchbarOpen, setSearchbarOpen] = useState(false);
   const bottomSheetRef = useRef<BottomSheet | null>(null);
 
   const { data: clients = [], refetch } = useQuery<CustomerType[]>({
@@ -50,6 +71,10 @@ const CustomerListWithDrawer = () => {
     bottomSheetRef.current?.expand();
   };
 
+  const handleSearchbarToggle = () => {
+    Keyboard.dismiss();
+    setSearchbarOpen((prev) => !prev);
+  };
   const handleFormClose = async () => {
     Keyboard.dismiss();
     bottomSheetRef.current?.close();
@@ -60,16 +85,32 @@ const CustomerListWithDrawer = () => {
     <>
       <Drawer.Navigator
         initialRouteName="CustomerListDrawer"
-        screenOptions={{ ...drawerScreenOptions, drawerType: 'front' }}
+        screenOptions={{
+          headerStyle: { backgroundColor: beautyTheme.colors.background },
+          drawerType: 'front',
+          headerTintColor: beautyTheme.colors.onBackground,
+          drawerActiveBackgroundColor: beautyTheme.colors.tertiary,
+          drawerActiveTintColor: beautyTheme.colors.onTertiary,
+          overlayColor: beautyTheme.colors.elevation.level1,
+          drawerStyle: { backgroundColor: beautyTheme.colors.background },
+        }}
       >
         <Drawer.Screen
           name="CustomerListDrawer"
           options={{
             title: t('navigation.clientsBase'),
-            headerRight: () => <HeaderRight onPress={handleFormToggle} />,
+            headerRight: () => (
+              <HeaderRight onAddPress={handleFormToggle} onSearchPress={handleSearchbarToggle} />
+            ),
           }}
         >
-          {() => <CustomerList clients={clients} />}
+          {() => (
+            <CustomerList
+              clients={clients}
+              isSearchbarVisible={searchbarOpen}
+              onSearchbarClose={handleSearchbarToggle}
+            />
+          )}
         </Drawer.Screen>
         <Drawer.Screen
           name="CustomerDetailDrawer"

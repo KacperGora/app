@@ -2,31 +2,43 @@ import React, { useRef, useState } from 'react';
 
 import { Dimensions, StyleSheet } from 'react-native';
 
+import { BottomSheetFormWrapper } from '@components';
+import BottomSheet from '@gorhom/bottom-sheet';
 import {
   DATE_FORMAT_FULL_MONTH_WITH_YEAR,
   DATE_FORMAT_YYYY_MM_DD,
   HOUR_CELL_WIDTH,
   LOCALE_PL,
+  SCREEN_NAME_CONFIG,
 } from '@helpers';
 import { CalendarKitHandle } from '@howljs/calendar-kit';
-import Topbar from '@modules/Calendar/Topbar';
+import { CreateEventForm, Topbar } from '@modules';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import { beautyTheme } from '@theme';
 import { Calendar, CALENDAR_ENUM, today } from '@views';
 import dayjs from 'dayjs';
 import i18next from 'i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const Drawer = createDrawerNavigator();
+import { calendarDrawerScreenConfig } from './utils';
+
 const width = Dimensions.get('window').width - HOUR_CELL_WIDTH;
 const currentMonth = dayjs().locale(LOCALE_PL).format(DATE_FORMAT_FULL_MONTH_WITH_YEAR);
-const { day, fullWeek, withoutWeekends } = CALENDAR_ENUM;
+
+const Drawer = createDrawerNavigator();
 
 export const CalendarDrawerNavigator = () => {
+  const bottomSheetRef = useRef<BottomSheet>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);
+
   const [displayedCalendarMonth, setDisplayedCalendarMonth] = useState<string>(currentMonth);
 
   const handleMonthChange = (date: string) => {
     setDisplayedCalendarMonth(date);
+  };
+
+  const onFormToggle = () => {
+    bottomSheetRef.current?.expand();
   };
 
   const navigateToToday = () => {
@@ -37,71 +49,56 @@ export const CalendarDrawerNavigator = () => {
   };
 
   return (
-    <Drawer.Navigator
-      initialRouteName="Calendar"
-      screenOptions={() => ({
-        headerTitle: () => (
-          <Topbar
-            onPress={navigateToToday}
-            date={today}
-            displayedCalendarMonth={displayedCalendarMonth}
-          />
-        ),
-        drawerType: 'front',
-        headerRightContainerStyle: styles.headerRightContainer,
-        headerTintColor: '#333',
-        drawerActiveBackgroundColor: 'rgba(0, 0, 0, 0.1)',
-        drawerActiveTintColor: '#333',
-        overlayColor: 'rgba(0, 0, 0, 0.5)',
-        headerTitleContainerStyle: styles.headerTitleContainer,
-        headerLeftContainerStyle: styles.headerLeftContainer,
-      })}
-    >
-      <Drawer.Screen
-        name={i18next.t('calendar.fullWeek')}
-        options={{
-          drawerIcon: () => <Icon name="calendar-week" size={24} />,
-        }}
+    <>
+      <Drawer.Navigator
+        initialRouteName={SCREEN_NAME_CONFIG.Calendar}
+        screenOptions={() => ({
+          headerTitle: () => (
+            <Topbar
+              onPress={navigateToToday}
+              date={today}
+              displayedCalendarMonth={displayedCalendarMonth}
+            />
+          ),
+          drawerType: 'front',
+          headerTintColor: beautyTheme.colors.onBackground,
+          drawerActiveBackgroundColor: beautyTheme.colors.tertiary,
+          drawerActiveTintColor: beautyTheme.colors.onTertiary,
+          overlayColor: beautyTheme.colors.elevation.level1,
+          headerTitleContainerStyle: styles.headerTitleContainer,
+          headerLeftContainerStyle: styles.headerLeftContainer,
+          drawerStyle: { backgroundColor: beautyTheme.colors.background },
+        })}
       >
-        {() => (
-          <Calendar
-            ref={calendarRef}
-            params={{ mode: fullWeek, onMonthChange: handleMonthChange }}
-          />
-        )}
-      </Drawer.Screen>
+        {calendarDrawerScreenConfig.map(({ name, icon, mode }) => (
+          <Drawer.Screen
+            key={name}
+            name={i18next.t(name)}
+            options={{
+              drawerIcon: () => (
+                <Icon name={icon} size={24} color={beautyTheme.colors.onTertiary} />
+              ),
+            }}
+          >
+            {() => (
+              <Calendar
+                ref={calendarRef}
+                params={{ mode, onMonthChange: handleMonthChange }}
+                onFormToggle={onFormToggle}
+              />
+            )}
+          </Drawer.Screen>
+        ))}
+      </Drawer.Navigator>
 
-      <Drawer.Screen
-        name={i18next.t('calendar.withoutWeekends')}
-        options={{
-          drawerIcon: () => <Icon name="calendar-range" size={24} />,
-        }}
-      >
-        {() => (
-          <Calendar
-            ref={calendarRef}
-            params={{ mode: withoutWeekends, onMonthChange: handleMonthChange }}
-          />
-        )}
-      </Drawer.Screen>
-      <Drawer.Screen
-        name={i18next.t('calendar.dailyCalendar')}
-        options={{
-          drawerIcon: () => <Icon name="calendar" size={24} />,
-        }}
-      >
-        {() => (
-          <Calendar ref={calendarRef} params={{ mode: day, onMonthChange: handleMonthChange }} />
-        )}
-      </Drawer.Screen>
-    </Drawer.Navigator>
+      <BottomSheetFormWrapper ref={bottomSheetRef}>
+        <CreateEventForm />
+      </BottomSheetFormWrapper>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  headerRightContainer: {
-    backgroundColor: 'red',
-  },
   headerTitleContainer: {
     flex: 1,
     marginLeft: 0,
@@ -114,6 +111,7 @@ const styles = StyleSheet.create({
   headerLeftContainer: {
     minWidth: 60,
     maxWidth: 60,
+    backgroundColor: beautyTheme.colors.background,
   },
 });
 

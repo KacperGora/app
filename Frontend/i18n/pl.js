@@ -12,6 +12,8 @@ export const pl = {
       error: 'Błąd',
       confirmation: 'Potwierdzenie',
       welcomeBack: 'Witaj ponownie',
+      send: 'Wyślij',
+      noData: 'Brak danych',
     },
     screenNames: {
       login: 'Logowanie',
@@ -138,6 +140,9 @@ export const pl = {
       dailyCalendar: 'Jeden dzień',
       fullWeek: 'Tydzień',
       withoutWeekends: 'Bez weekendów',
+    },
+    error: {
+      INVALID_CREDENTIALS: 'Niepoprawne dane logowania',
     },
   },
 };

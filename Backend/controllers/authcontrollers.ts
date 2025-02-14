@@ -6,7 +6,6 @@ import { findUserByKey } from '../models/User';
 
 export const register = async (req: Request, res: Response) => {
   const { username, password } = req.body;
-  console.log(req.body);
   try {
     const response = await userService.registerUser(username, password);
     res.status(201).json({ data: response });

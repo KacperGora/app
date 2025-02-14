@@ -4,16 +4,18 @@ import { ActivityIndicator, AppRegistry } from 'react-native';
 
 import { useAuth, useLoadFonts } from '@helpers';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { beautyTheme, colors } from '@theme';
+import { NotificationProvider } from 'helpers/notification';
 import 'intl-pluralrules';
 import { AppNavigator } from 'navigation/HomeStackNavigator';
 import { I18nextProvider } from 'react-i18next';
 import { PaperProvider } from 'react-native-paper';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AuthProvider } from './context/AuthContext';
 import i18n from './i18n/i18n';
 import { name as appName } from './package.json';
-import { beautyTheme, colors } from '@theme';
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.error,
@@ -30,11 +32,11 @@ const App: React.FC<{ fontsLoaded: boolean }> = ({ fontsLoaded }) => {
   }
 
   return (
-    <I18nextProvider i18n={i18n}>
-      <PaperProvider theme={beautyTheme}>
+    <PaperProvider theme={beautyTheme}>
+      <NotificationProvider>
         <AppNavigator isLoggedIn={isLoggedIn} />
-      </PaperProvider>
-    </I18nextProvider>
+      </NotificationProvider>
+    </PaperProvider>
   );
 };
 
