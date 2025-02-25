@@ -1,9 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 
-import { Dimensions, StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 
-import { BottomSheetFormWrapper } from '@components';
-import BottomSheet from '@gorhom/bottom-sheet';
+import { BottomSheetFormWrapper, CustomBottomSheet, KeyboardAvoidingContainer } from '@components';
 import {
   DATE_FORMAT_FULL_MONTH_WITH_YEAR,
   DATE_FORMAT_YYYY_MM_DD,
@@ -15,9 +14,10 @@ import { CalendarKitHandle } from '@howljs/calendar-kit';
 import { CreateEventForm, Topbar } from '@modules';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { beautyTheme } from '@theme';
-import { Calendar, CALENDAR_ENUM, today } from '@views';
+import { Calendar, today } from '@views';
 import dayjs from 'dayjs';
 import i18next from 'i18next';
+import MinimizedFormContent from 'modules/Calendar/MinimizedFormContent';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { calendarDrawerScreenConfig } from './utils';
@@ -26,33 +26,49 @@ const width = Dimensions.get('window').width - HOUR_CELL_WIDTH;
 const currentMonth = dayjs().locale(LOCALE_PL).format(DATE_FORMAT_FULL_MONTH_WITH_YEAR);
 
 const Drawer = createDrawerNavigator();
+const { height: WINDOW_HEIGHT } = Dimensions.get('window');
+
+const SNAP_POINTS = [WINDOW_HEIGHT * 0.2, WINDOW_HEIGHT * 0.85] as const;
 
 export const CalendarDrawerNavigator = () => {
-  const bottomSheetRef = useRef<BottomSheet>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);
 
   const [displayedCalendarMonth, setDisplayedCalendarMonth] = useState<string>(currentMonth);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [currentBottomSheetIndex, setCurrentBottomSheetIndex] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<{ start: string; end: string }>({
+    start: dayjs().toISOString(),
+    end: dayjs().toISOString(),
+  });
+  const onCurrentIndexChange = useCallback((index: number) => {
+    setCurrentBottomSheetIndex(index);
+  }, []);
 
-  const handleMonthChange = (date: string) => {
+  const handleMonthChange = useCallback((date: string) => {
     setDisplayedCalendarMonth(date);
-  };
+  }, []);
 
-  const onFormToggle = () => {
-    bottomSheetRef.current?.expand();
-  };
+  const onFormToggle = useCallback((dateSelected: { start: string; end: string }) => {
+    setSelectedDate(dateSelected);
+    setIsFormVisible((prev) => !prev);
+  }, []);
 
-  const navigateToToday = () => {
+  const navigateToToday = useCallback(() => {
     calendarRef.current?.goToDate({
       date: dayjs().format(DATE_FORMAT_YYYY_MM_DD),
     });
     handleMonthChange(currentMonth);
-  };
+  }, [handleMonthChange]);
 
+  const handleCloseForm = useCallback(() => {
+    setIsFormVisible(false);
+  }, []);
+  console.log(currentBottomSheetIndex, 'currentBottomSheetIndex');
   return (
     <>
       <Drawer.Navigator
         initialRouteName={SCREEN_NAME_CONFIG.Calendar}
-        screenOptions={() => ({
+        screenOptions={{
           headerTitle: () => (
             <Topbar
               onPress={navigateToToday}
@@ -68,7 +84,7 @@ export const CalendarDrawerNavigator = () => {
           headerTitleContainerStyle: styles.headerTitleContainer,
           headerLeftContainerStyle: styles.headerLeftContainer,
           drawerStyle: { backgroundColor: beautyTheme.colors.background },
-        })}
+        }}
       >
         {calendarDrawerScreenConfig.map(({ name, icon, mode }) => (
           <Drawer.Screen
@@ -85,15 +101,33 @@ export const CalendarDrawerNavigator = () => {
                 ref={calendarRef}
                 params={{ mode, onMonthChange: handleMonthChange }}
                 onFormToggle={onFormToggle}
+                currentBottomSheetIndex={currentBottomSheetIndex}
               />
             )}
           </Drawer.Screen>
         ))}
       </Drawer.Navigator>
-
-      <BottomSheetFormWrapper ref={bottomSheetRef}>
-        <CreateEventForm />
-      </BottomSheetFormWrapper>
+      <CustomBottomSheet
+        isVisible={isFormVisible}
+        onClose={handleCloseForm}
+        onCurrentIndexChange={onCurrentIndexChange}
+        snapPoints={SNAP_POINTS}
+        minimizedContent={
+          <MinimizedFormContent
+            initialDateState={selectedDate}
+            onExpand={() => {}}
+            client="Karoina Pajor"
+            serviceName="Maniucre Klasyczn"
+          />
+        }
+      >
+        <CreateEventForm
+          initialDateState={selectedDate}
+          onEventCreateRequest={async () => {
+            console.log('Event created!');
+          }}
+        />
+      </CustomBottomSheet>
     </>
   );
 };

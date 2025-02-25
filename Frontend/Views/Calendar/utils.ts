@@ -134,5 +134,4 @@ export const calendarContainerConfig = {
   locale: 'pl',
   initialLocales: plConfig,
   theme: customTheme,
-  allowDragToCreate: true,
 };

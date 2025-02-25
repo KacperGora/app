@@ -12,7 +12,7 @@ module.exports = [
     },
     plugins: {
       react: reactPlugin,
-      import: importPlugin, // Dodaj wtyczkę import
+      import: importPlugin,
     },
     rules: {
       'react/react-in-jsx-scope': 'off',

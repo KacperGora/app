@@ -4,4 +4,6 @@ export type CustomerType = {
   lastName: string;
   phoneNumber: string;
   notes?: string;
+  lastVisit?: string;
+  nextVisit?: string;
 };

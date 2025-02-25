@@ -1,8 +1,7 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { BottomSheetFormWrapper } from '@components';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { api, DATE_FORMAT_FULL_MONTH_WITH_YEAR, useAuth } from '@helpers';
 import {
@@ -15,7 +14,6 @@ import {
   OnEventResponse,
   PackedEvent,
 } from '@howljs/calendar-kit';
-import { CreateEventForm } from '@modules';
 import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { EventForm } from '@types';
@@ -24,7 +22,7 @@ import 'intl-pluralrules';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Text } from 'react-native-paper';
 
-import { CALENDAR_ENUM, calendarContainerConfig, customTheme, eventEmptyState } from './utils';
+import { CALENDAR_ENUM, calendarContainerConfig, eventEmptyState } from './utils';
 
 const { withoutWeekends } = CALENDAR_ENUM;
 
@@ -33,7 +31,8 @@ export type CalendarRouteProp = {
     mode: number;
     onMonthChange: (date: string) => void;
   };
-  onFormToggle: () => void;
+  onFormToggle: (dateSelected: any) => void;
+  currentBottomSheetIndex?: number;
 };
 
 const fetchList = async () => {
@@ -49,7 +48,7 @@ const fetchList = async () => {
   return parseEvents;
 };
 const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(
-  ({ params, onFormToggle }, ref) => {
+  ({ params, onFormToggle, currentBottomSheetIndex }, ref) => {
     const { mode } = useMemo(() => params, [params]);
     const navigation = useNavigation();
     const { userId } = useAuth();
@@ -73,7 +72,7 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(
         start,
         end,
       }));
-      onFormToggle();
+      onFormToggle({ start, end });
       bottomSheetRef.current?.expand();
     };
 
@@ -91,7 +90,7 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(
         end: end.dateTime || '',
         notes: eventToUpdate.notes,
       }));
-      onFormToggle();
+      onFormToggle({ start: start.dateTime, end: end.dateTime });
       bottomSheetRef.current?.expand();
     };
 
@@ -102,7 +101,7 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(
     useEffect(() => {
       const unsubscribe = navigation.addListener('state', () => {
         refetch();
-        onFormToggle();
+        onFormToggle({});
         bottomSheetRef.current?.close();
       });
 
@@ -110,31 +109,30 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(
     }, [dataUpdatedAt, refetch, navigation]);
 
     return (
-      <GestureHandlerRootView>
-        <CalendarContainer
-          ref={ref}
-          allowDragToEdit
-          events={data}
-          hideWeekDays={mode === withoutWeekends ? [5, 6] : []}
-          numberOfDays={mode}
-          onDateChanged={handleDateChange}
-          onDragEventEnd={onDragEventEnd}
-          onDragCreateEventEnd={handleEventChange}
-          onRefresh={fetchList}
-          overlapType="no-overlap"
-          {...calendarContainerConfig}
-        >
-          <CalendarHeader />
-          <CalendarBody
-            showNowIndicator
-            renderEvent={(event: PackedEvent) => (
-              <View>
-                <Text>{event.title}</Text>
-              </View>
-            )}
-          />
-        </CalendarContainer>
-      </GestureHandlerRootView>
+      <CalendarContainer
+        ref={ref}
+        allowDragToEdit
+        events={data}
+        hideWeekDays={mode === withoutWeekends ? [5, 6] : []}
+        numberOfDays={mode}
+        onDateChanged={handleDateChange}
+        onDragEventEnd={onDragEventEnd}
+        onDragCreateEventEnd={handleEventChange}
+        onRefresh={fetchList}
+        overlapType="no-overlap"
+        allowDragToCreate={!Boolean(currentBottomSheetIndex)}
+        {...calendarContainerConfig}
+      >
+        <CalendarHeader />
+        <CalendarBody
+          showNowIndicator
+          renderEvent={(event: PackedEvent) => (
+            <View>
+              <Text>{event.title}</Text>
+            </View>
+          )}
+        />
+      </CalendarContainer>
     );
   },
 );

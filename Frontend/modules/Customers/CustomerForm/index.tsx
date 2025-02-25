@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Button, Input } from '@components';
+import { Button, Input, KeyboardAvoidingContainer } from '@components';
 import { api, apiRoutes } from '@helpers';
 import FormTitle from 'components/FormTitle';
 import { useTranslation } from 'react-i18next';
@@ -65,6 +65,7 @@ const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) =
           style={styles.button}
           labelStyle={styles.buttonLabel}
         />
+
         <Button
           label={t('form.goBack')}
           onPress={handleSubmit}

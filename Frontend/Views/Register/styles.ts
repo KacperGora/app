@@ -3,18 +3,12 @@ import { StyleSheet } from 'react-native';
 import { beautyTheme } from 'theme/theme';
 
 const {
-  colors: { primary, onPrimaryContainer, white, onTertiary },
+  colors: { primary, onPrimaryContainer, white, onTertiary, background },
   fontSizes: { regular, xlarge, medium },
   fontWeight: { semi },
 } = beautyTheme;
 
 export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9F1F6',
-    padding: 20,
-    justifyContent: 'center',
-  },
   header: {
     fontSize: xlarge,
     fontWeight: semi,
@@ -36,7 +30,6 @@ export const styles = StyleSheet.create({
   },
   linksContainer: {
     alignItems: 'center',
-    marginTop: 20,
     flexDirection: 'row',
     justifyContent: 'center',
   },
@@ -48,10 +41,5 @@ export const styles = StyleSheet.create({
     fontWeight: semi,
     color: primary,
     marginLeft: 4,
-  },
-  formContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
-    justifyContent: 'center',
   },
 });

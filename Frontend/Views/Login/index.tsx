@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 
 import { styles } from './styles';
 import { LoginForm, LoginSuccess, RootStackParamList } from './types';
-import { loginSuccessHandler } from './utils';
+import { loginApiHandler, loginSuccessHandler, validateLogin } from './utils';
 
 const LoginScreen = () => {
   const { t } = useTranslation();
@@ -22,10 +22,10 @@ const LoginScreen = () => {
   const { showNotification } = useNotification();
 
   const [form, setForm] = useState<LoginForm>({ username: '', password: '' });
+  const [isFormValid, setIsFormValid] = useState(false);
 
   const { mutateAsync: handleLogin, status } = useMutation<LoginSuccess, { code: string }>({
-    mutationFn: async () =>
-      await api.post(apiRoutes.auth.login, { username: 'Gorinek', password: 'Gazeta93.' }),
+    mutationFn: async () => await loginApiHandler(form),
     onSuccess: async (data: LoginSuccess) => {
       await loginSuccessHandler(data, setIsLoggedIn, setUserId);
     },
@@ -39,54 +39,60 @@ const LoginScreen = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    setIsFormValid(validateLogin(form).success);
+  }, [form]);
+
   return (
-    <KeyboardAvoidingContainer>
-      <View style={styles.logoContainer}>
-        <Text style={styles.logo}>Appoitment</Text>
-      </View>
-      <Text style={styles.header}>{t('global.welcomeBack')}</Text>
-      <Input
-        placeholder={t('global.login')}
-        value={form.username}
-        onChangeText={handleFormChange('username')}
-      />
-      <Input
-        placeholder={t('login.password')}
-        value={form.password}
-        onChangeText={handleFormChange('password')}
-        isPassword
-      />
-      <Button
-        label={t('global.signIn')}
-        onPress={handleLogin}
-        style={styles.loginButton}
-        labelStyle={styles.loginButtonText}
-        loading={isRequestActive(status)}
-        isDisabled={!form.username || !form.password}
-      />
-      <View style={styles.linksContainer}>
-        <Button
-          label={t('login.forgetPassword')}
-          onPress={() => navigate({ name: 'RemindPassword', params: '' })}
-          labelStyle={styles.linkText}
-          mode="text"
+    <ScreenWrapper>
+      <KeyboardAvoidingContainer>
+        <View style={styles.logoContainer}>
+          <Text style={styles.logo}>Appoitment</Text>
+        </View>
+        <Text style={styles.header}>{t('global.welcomeBack')}</Text>
+        <Input
+          placeholder={t('global.login')}
+          value={form.username}
+          onChangeText={handleFormChange('username')}
+        />
+        <Input
+          placeholder={t('login.password')}
+          value={form.password}
+          onChangeText={handleFormChange('password')}
+          isPassword
         />
         <Button
-          label={t('login.dontHaveAccount')}
-          onPress={() => navigate({ name: 'Register', params: '' })}
-          labelStyle={styles.linkText}
-          mode="text"
+          label={t('global.signIn')}
+          onPress={handleLogin}
+          style={styles.loginButton}
+          labelStyle={styles.loginButtonText}
+          loading={isRequestActive(status)}
+          isDisabled={!isFormValid}
         />
-      </View>
-      <View style={styles.socialLoginContainer}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Ionicons name="logo-google" size={24} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Ionicons name="logo-facebook" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingContainer>
+        <View style={styles.linksContainer}>
+          <Button
+            label={t('login.forgetPassword')}
+            onPress={() => navigate({ name: 'RemindPassword', params: '' })}
+            labelStyle={styles.linkText}
+            mode="text"
+          />
+          <Button
+            label={t('login.dontHaveAccount')}
+            onPress={() => navigate({ name: 'Register', params: '' })}
+            labelStyle={styles.linkText}
+            mode="text"
+          />
+        </View>
+        <View style={styles.socialLoginContainer}>
+          <TouchableOpacity style={styles.socialButton}>
+            <Ionicons name="logo-google" size={24} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.socialButton}>
+            <Ionicons name="logo-facebook" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingContainer>
+    </ScreenWrapper>
   );
 };
 

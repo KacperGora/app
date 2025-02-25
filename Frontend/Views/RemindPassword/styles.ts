@@ -29,6 +29,8 @@ export const styles = StyleSheet.create({
     color: white,
     fontSize: fontMediumSize,
     fontWeight: semi,
+    width: '100%',
+    textAlign: 'center'
   },
   errorText: {
     color: error,

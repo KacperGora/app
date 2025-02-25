@@ -3,7 +3,6 @@ import React, { ReactNode } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleProp,
@@ -12,31 +11,29 @@ import {
 } from 'react-native';
 
 import { beautyTheme } from '@theme';
-import ScreenWrapper from 'components/ScreenWrapper';
-import { useTheme } from 'react-native-paper';
 
 type Props = {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
+  contentStyle?: StyleProp<ViewStyle>;
+  keyboardVerticalOffset?: number;
 };
+const { spacing } = beautyTheme;
 
-const KeyboardAvoidingContainer = ({ children, style }: Props) => {
-  const theme = useTheme();
-
+const KeyboardAvoidingContainer = ({ children, style, contentStyle }: Props) => {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <KeyboardAvoidingView
+      style={[styles.contentContainer, style]}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+    >
+      <ScrollView
+        contentContainerStyle={[styles.screenWrapper, contentStyle]}
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[styles.contentContainer, style]}
-        >
-          <ScreenWrapper style={styles.screenWrapper}>{children}</ScreenWrapper>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        {children}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -44,12 +41,16 @@ export default KeyboardAvoidingContainer;
 
 const styles = StyleSheet.create({
   contentContainer: {
+    justifyContent: 'center',
     flexGrow: 1,
-    justifyContent: 'flex-start',
     paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) + 50 : 0,
   },
   screenWrapper: {
-    flex: 1,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
+    alignContent: 'center',
+    paddingInline: spacing.l,
+    flexDirection: 'column',
+    gap: spacing.l,
+    flexGrow: 1,
   },
 });

@@ -4,29 +4,20 @@ import { beautyTheme, colors } from 'theme/theme';
 
 export const styles = StyleSheet.create({
   formTitle: {
-    marginBottom: 16,
+    marginBottom: beautyTheme.spacing.l,
     color: beautyTheme.colors.onBackground,
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  container: {
-    backgroundColor: 'red',
+    fontSize: beautyTheme.fontSizes.xlarge,
+    fontWeight: beautyTheme.fontWeight.semi,
   },
   suggestion: {
     paddingVertical: beautyTheme.spacing.m,
-    width: 'auto',
     borderRadius: 4,
-    borderBottomColor: colors.textSecondary,
-    borderBottomWidth: 1,
   },
   element: {
     color: colors.textPrimary,
-    fontWeight: 'bold',
+    fontWeight: beautyTheme.fontWeight.medium,
   },
-  input: {
-    marginBottom: 8,
-    backgroundColor: '#fff',
-  },
+
   dateTimeContainer: {
     marginBottom: 8,
   },
@@ -35,15 +26,30 @@ export const styles = StyleSheet.create({
     borderColor: 'black',
   },
   btnLabel: {
-    color: 'white',
-    fontWeight: '600',
-    textAlign: 'center',
+    color: beautyTheme.colors.onBackground,
+    fontWeight: beautyTheme.fontWeight.medium,
+    textAlign: 'left',
+    width: '100%',
   },
-  addBtn: {
+  submitBtnLabel: {
+    textAlign: 'center',
     width: '100%',
   },
   formContainer: {
     gap: beautyTheme.spacing.l,
-    flex: 1,
+  },
+  timeLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: beautyTheme.spacing.s,
+    marginBottom: beautyTheme.spacing.xl,
+    backgroundColor: beautyTheme.colors.surfaceDisabled,
+    borderRadius: beautyTheme.shape.borderRadius,
+    padding: beautyTheme.spacing.m,
+  },
+  timeLabel: {
+    color: beautyTheme.colors.onBackground,
+    fontWeight: 'bold',
+    fontSize: beautyTheme.fontSizes.medium,
   },
 });

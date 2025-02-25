@@ -10,7 +10,10 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { beautyTheme, colors } from 'theme/theme';
 
-import { DEFAULT_DATE_FORMAT_WITH_TIME } from '../../helpers/constants';
+import {
+  DATE_FORMAT_DATE_DDD_MM_YYYY_HH_MM,
+  DEFAULT_DATE_FORMAT_WITH_TIME,
+} from '../../helpers/constants';
 import { fromDateString } from '../../helpers/toString';
 
 type DatePickerProps = {
@@ -47,7 +50,6 @@ const DatePicker: React.FC<DatePickerProps> = ({ label, value, onChange, minDate
           <DateTimePicker
             value={dayjs(date).toDate()}
             mode="datetime"
-            display="compact"
             onChange={handleChange}
             locale="pl"
             minuteInterval={15}
@@ -65,16 +67,12 @@ const DatePicker: React.FC<DatePickerProps> = ({ label, value, onChange, minDate
         </View>
       ) : (
         <TouchableOpacity onPress={toggleDatePicker}>
-          <TextInput
-            label={label}
-            mode="outlined"
-            value={fromDateString({
-              string: date.toString(),
-              format: DEFAULT_DATE_FORMAT_WITH_TIME,
+          <Text style={styles.dateTimeContainer}>
+            {fromDateString({
+              string: date?.toString(),
+              format: DATE_FORMAT_DATE_DDD_MM_YYYY_HH_MM,
             })}
-            theme={{ colors: { background: 'white' } }}
-            style={{ pointerEvents: 'none' }}
-          />
+          </Text>
         </TouchableOpacity>
       )}
     </View>
@@ -84,5 +82,8 @@ export default DatePicker;
 const styles = StyleSheet.create({
   dateTimeContainer: {
     marginBottom: 16,
+    color: colors.textPrimary,
+    fontWeight: 'bold',
+    marginLeft: 20,
   },
 });

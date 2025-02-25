@@ -11,16 +11,18 @@ const ScreenWrapper: React.FC<{ children: ReactNode; style?: StyleProp<ViewStyle
   const theme = useTheme();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }, style]}>
-      {children}
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.container, style]}>{children}</View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    flexGrow: 1,
     justifyContent: 'center',
   },
 });

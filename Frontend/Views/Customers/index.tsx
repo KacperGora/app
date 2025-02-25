@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 
 import { Keyboard, TouchableOpacity, View } from 'react-native';
 
-import { BottomSheetFormWrapper } from '@components';
+import { BottomSheetFormWrapper, CustomBottomSheet } from '@components';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { api, apiRoutes, useAuth } from '@helpers';
 import { CustomerDetail, CustomerForm, CustomerList, Statistics } from '@modules';
@@ -57,6 +57,7 @@ const CustomerListWithDrawer = () => {
   const [toggle, setToggle] = useState<ToggleEnum>('day');
   const [searchbarOpen, setSearchbarOpen] = useState(false);
   const bottomSheetRef = useRef<BottomSheet | null>(null);
+  const [isFormVisible, setFormVisible] = useState(false);
 
   const { data: clients = [], refetch } = useQuery<CustomerType[]>({
     queryKey: [getList.queryKey],
@@ -66,9 +67,8 @@ const CustomerListWithDrawer = () => {
     },
   });
 
-  const handleFormToggle = () => {
-    Keyboard.dismiss();
-    bottomSheetRef.current?.expand();
+  const toggleForm = () => {
+    setFormVisible((prev) => !prev);
   };
 
   const handleSearchbarToggle = () => {
@@ -100,7 +100,7 @@ const CustomerListWithDrawer = () => {
           options={{
             title: t('navigation.clientsBase'),
             headerRight: () => (
-              <HeaderRight onAddPress={handleFormToggle} onSearchPress={handleSearchbarToggle} />
+              <HeaderRight onAddPress={toggleForm} onSearchPress={handleSearchbarToggle} />
             ),
           }}
         >
@@ -137,9 +137,9 @@ const CustomerListWithDrawer = () => {
           {() => <Statistics />}
         </Drawer.Screen>
       </Drawer.Navigator>
-      <BottomSheetFormWrapper ref={bottomSheetRef}>
-        <CustomerForm onSubmit={handleFormClose} />
-      </BottomSheetFormWrapper>
+      <CustomBottomSheet isVisible={isFormVisible} onClose={toggleForm}>
+        <CustomerForm onSubmit={async () => {}} onClose={toggleForm} />
+      </CustomBottomSheet>
     </>
   );
 };

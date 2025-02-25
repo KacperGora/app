@@ -1,10 +1,12 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 
-import { Keyboard, StyleSheet, View } from 'react-native';
+import { Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
 import { beautyTheme } from '@theme';
 import KeyboardAvoidingContainer from 'components/KeyboardAvoidingContainer';
+import ScreenWrapper from 'components/ScreenWrapper';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 type BottomSheetFormWrapperProps = {
   children: React.ReactNode;
@@ -35,18 +37,13 @@ const BottomSheetFormWrapper = forwardRef<BottomSheet, BottomSheetFormWrapperPro
         ref={bottomSheetRef}
         snapPoints={['12%', '50%', '90%']}
         onChange={handleChange}
+        containerStyle={styles.bottomSheetContainer}
         enablePanDownToClose
-        style={{ backgroundColor: 'transparent' }}
         enableHandlePanningGesture
         index={-1}
-        backgroundStyle={{ backgroundColor: beautyTheme.colors.background }}
-        backdropComponent={({ animatedIndex, style }) =>
-          toggleForm && <View style={[style, backdropStyle.backdrop]} />
-        }
+        style={{ flex: 1, flexGrow: 1 }}
       >
-        <KeyboardAvoidingContainer>
-          <BottomSheetView style={styles.sheetContent}>{children}</BottomSheetView>
-        </KeyboardAvoidingContainer>
+        <BottomSheetView style={styles.sheetContent}>{children}</BottomSheetView>
       </BottomSheet>
     );
   },
@@ -56,11 +53,20 @@ export default BottomSheetFormWrapper;
 
 const styles = StyleSheet.create({
   sheetContent: {
-    flexGrow: 1,
     paddingHorizontal: beautyTheme.spacing.xl,
     paddingVertical: 0,
+    flex: 1,
+    flexGrow: 1,
     borderTopLeftRadius: beautyTheme.shape.borderRadius,
     borderTopRightRadius: beautyTheme.shape.borderRadius,
+  },
+  bottomSheetContainer: {
+    flex: 1,
+  },
+  scrollViewContainer: {
+    flexGrow: 1,
+    padding: beautyTheme.spacing.xl,
+    alignItems: 'center',
   },
 });
 

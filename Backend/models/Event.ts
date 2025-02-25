@@ -8,6 +8,7 @@ export const createDataBaseEvent = async (event: any) => {
     VALUES ($1, $2, $3, $4, $5, $6, $7)
   `
   const values = [service, start, end, client_id, notes, Number(price), userId]
+  console.log(values);
   try {
     return await db.none(query, values)
   } catch (error) {

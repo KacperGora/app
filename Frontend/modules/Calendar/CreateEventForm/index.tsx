@@ -2,22 +2,16 @@ import React, { useEffect, useState } from 'react';
 
 import { TouchableOpacity, View } from 'react-native';
 
-import {
-  Button,
-  DatePicker,
-  Input,
-  KeyboardAvoidingContainer,
-  Loader,
-  SearchWithList,
-} from '@components';
+import { Button, DatePicker, Input, SearchWithList } from '@components';
 import { api, apiRoutes, fromIntervalToMinutes, getFullName, useAuth } from '@helpers';
 import { CompanyServicesForm, CustomerForm } from '@modules';
 import { useQuery } from '@tanstack/react-query';
+import { beautyTheme } from '@theme';
 import { CustomerType, EventForm, EventFormOptionType, ServiceType } from '@types';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Text, Title } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { styles } from './style';
 import { CreateEventFormProps } from './type';
@@ -37,6 +31,7 @@ const {
 const CreateEventForm: React.FC<CreateEventFormProps> = ({
   onEventCreateRequest,
   initialState,
+  initialDateState,
 }) => {
   const { t } = useTranslation();
   const { userId } = useAuth();
@@ -57,12 +52,13 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
 
   const [search, setSearch] = useState({ clientsSearch: '', servicesSearch: '' });
   const [form, setForm] = useState<EventForm>(() => ({
-    start: initialState?.start ?? initialFormState.start,
-    end: initialState?.end ?? initialFormState.end,
+    start: initialDateState.start,
+    end: initialDateState.end,
     clientId: initialState?.clientId ?? initialFormState.clientId,
     notes: initialState?.notes ?? initialFormState.notes,
     service: initialState?.service ?? initialFormState.service,
   }));
+
   const [filteredOptions, setFilteredOptions] = useState<{
     clients: CustomerType[];
     services: ServiceType[];
@@ -166,18 +162,10 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
       </TouchableOpacity>
     );
   };
-
   useEffect(() => {
-    setForm(
-      initialState || {
-        start: '',
-        end: '',
-        clientId: '',
-        service: '',
-      },
-    );
-  }, [initialState]);
-
+    const { end, start } = initialDateState;
+    setForm((prev) => ({ ...prev, start, end }));
+  }, [initialDateState]);
   useEffect(() => {
     if (isEventDurationLongerThanADay(form.start, form.end)) {
       setForm((prev) => ({ ...prev, end: form.start }));
@@ -193,10 +181,14 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <>
       <Title style={styles.formTitle}>{t('calendar.addNewVisit')}</Title>
       <View style={styles.formContainer}>
         <View>
+          <View style={styles.timeLabelContainer}>
+            <Icon name="account-outline" size={24} color={beautyTheme.colors.onSurfaceVariant} />
+            <Text style={styles.timeLabel}>{t('form.customerData')}</Text>
+          </View>
           <SearchWithList
             label={t('form.selectClient')}
             placeholder={t('form.typeToSearch')}
@@ -215,23 +207,28 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
             />
           )}
         </View>
-        <SearchWithList
-          label={t('form.selectService')}
-          placeholder={t('form.typeToSearch')}
-          list={services}
-          renderItem={renderItem('service')}
-          searchValue={search.servicesSearch}
-          handleInputChange={handleOptionSearch('services')}
-        />
-        {isAddServiceFormVisible && (
-          <Button
-            mode="text"
-            label={t('form.addService')}
-            onPress={toggleCreateOption('service')}
-            labelStyle={styles.btnLabel}
-            style={{ alignSelf: 'flex-start' }}
+        <View>
+          <View style={styles.timeLabelContainer}>
+            <Icon name="brush" size={24} color={beautyTheme.colors.onSurfaceVariant} />
+            <Text style={styles.timeLabel}>{t('form.serviceData')}</Text>
+          </View>
+          <SearchWithList
+            label={t('form.selectService')}
+            placeholder={t('form.typeToSearch')}
+            list={services}
+            renderItem={renderItem('service')}
+            searchValue={search.servicesSearch}
+            handleInputChange={handleOptionSearch('services')}
           />
-        )}
+          {isAddServiceFormVisible && (
+            <Button
+              mode="text"
+              label={t('form.addService')}
+              onPress={toggleCreateOption('service')}
+              labelStyle={styles.btnLabel}
+            />
+          )}
+        </View>
         <Input
           keyboardType="numeric"
           placeholder={t('form.price')}
@@ -240,34 +237,27 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
           value={form.price}
           label={t('form.price')}
         />
-        <DatePicker
-          label={t('calendar.startDate')}
-          value={form.start}
-          onChange={handleChange('start')}
-          minDate={dayjs().toISOString()}
-        />
-        <DatePicker
-          label={t('calendar.endDate')}
-          value={form.end}
-          onChange={handleChange('end')}
-          minDate={form.start}
-        />
-        {/* <Input
-            maxLength={500}
-            onChangeText={handleChange('notes')}
-            placeholder={t('calendar.notes')}
-            value={form?.notes}
-            multiline
-            style={[styles.input, styles.textArea]}
-          /> */}
-        <Button
-          label={t('form.save')}
-          style={styles.addBtn}
-          onPress={handleSubmit}
-          labelStyle={styles.btnLabel}
-        />
+        <View>
+          <View style={styles.timeLabelContainer}>
+            <Icon name="calendar-clock" size={24} color={beautyTheme.colors.onSurfaceVariant} />
+            <Text style={styles.timeLabel}>{t('form.appointmentDate')}</Text>
+          </View>
+          <DatePicker
+            label={t('calendar.startDate')}
+            value={form.start}
+            onChange={handleChange('start')}
+            minDate={dayjs()?.toISOString()}
+          />
+          <DatePicker
+            label={t('calendar.endDate')}
+            value={form.end}
+            onChange={handleChange('end')}
+            minDate={form.start}
+          />
+        </View>
+        <Button label={t('form.save')} onPress={handleSubmit} labelStyle={styles.submitBtnLabel} />
       </View>
-    </SafeAreaView>
+    </>
   );
 };
 

@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 
+
+
 import { StyleSheet, TextStyle, TouchableOpacity } from 'react-native';
 import { StyleProp, ViewStyle } from 'react-native';
 
+
+
 import { beautyTheme, borderRadius } from '@theme';
 import { Button as ButtonComponent, Text } from 'react-native-paper';
+
+
+
+
 
 type ButtonProps = {
   label: string;
@@ -61,6 +69,7 @@ const styles = StyleSheet.create({
   button: {
     alignSelf: 'center',
     borderRadius: borderRadius.medium,
+    width: '100%',
   },
   buttonPressed: {
     opacity: 0.8,

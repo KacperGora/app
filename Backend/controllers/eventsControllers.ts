@@ -24,10 +24,9 @@ export const getEvents = async (req: Request, res: Response) => {
 
 export const createEvent = async (req: Request, res: Response) => {
   const userId = req.user.id;
-
+  console.log(req.body);
   await createDataBaseEvent({ ...req.body, userId });
 };
-
 export const updateEvent = async (req: Request, res: Response) => {
   const userId = req.user.id;
   const eventId = req.body.id;

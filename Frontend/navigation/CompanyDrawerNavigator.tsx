@@ -75,10 +75,6 @@ export const CompanyDrawerNavigator = ({}) => {
           component={CompanyServices}
         />
       </Drawer.Navigator>
-      <BottomSheetFormWrapper ref={bottomSheetRef}>
-        {formType === 'employee' && <EmployeeForm />}
-        {formType === 'service' && <CompanyServicesForm />}
-      </BottomSheetFormWrapper>
     </>
   );
 };

@@ -1,5 +1,6 @@
-import { beautyTheme } from "@theme";
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
+
+import { beautyTheme } from '@theme';
 
 export const styles = StyleSheet.create({
   searchBar: {
@@ -15,6 +16,7 @@ export const styles = StyleSheet.create({
   },
   animatedContainer: {
     overflow: 'hidden',
+    backgroundColor: 'yellow',
   },
   inputStyle: {
     color: beautyTheme.colors.onPrimaryContainer,
@@ -25,5 +27,10 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  list: {
+    flex: 1,
+    gap: 30,
+    marginVertical: beautyTheme.spacing.m,
   },
 });

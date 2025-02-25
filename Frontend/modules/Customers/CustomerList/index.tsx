@@ -38,10 +38,11 @@ const CustomerList: React.FC<CustomerListType> = ({
     setSearchQuery('');
     onSearchbarClose();
   };
+
   const renderItem = ({ item }: { item: CustomerType }) => {
     return <CustomerDetailListRow customer={item} />;
   };
-console.log(clients);
+
   useEffect(() => {
     Animated.timing(searchBarOpacity, {
       toValue: isSearchbarVisible ? 1 : 0,
@@ -67,8 +68,12 @@ console.log(clients);
         )}
       </Animated.View>
       <FlatList
+        style={styles.list}
         data={clients}
-        contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          gap: 20,
+        }}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         ListEmptyComponent={NoData}

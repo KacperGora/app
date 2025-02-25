@@ -58,7 +58,7 @@ const CompanyServicesForm: React.FC<{ onClose?: () => void }> = ({ onClose }) =>
   }, [serviceName, serviceDescription, servicePrice, serviceDuration]);
 
   return (
-    <View style={{ flex: 1, flexGrow: 1 }}>
+    <KeyboardAvoidingContainer>
       <FormTitle title={t('form.addService')} onClose={onClose} />
       <Divider style={styles.divider} />
       <TextInput
@@ -121,7 +121,7 @@ const CompanyServicesForm: React.FC<{ onClose?: () => void }> = ({ onClose }) =>
       >
         {t('form.save')}
       </Button>
-    </View>
+    </KeyboardAvoidingContainer>
   );
 };
 

@@ -5,26 +5,52 @@ import { toCamelCase, toSnakeCase } from './utils';
 
 type TokenKey = 'accessToken' | 'refreshToken';
 
+const API_BASE_URL = 'http://192.168.8.103:3000';
+
 export const saveToken = async (key: TokenKey, value: string) => {
-  if (typeof key !== 'string' || typeof value !== 'string') {
-    throw new Error('Invalid value provided to SecureStore');
+  try {
+    if (typeof key !== 'string' || typeof value !== 'string') {
+      throw new Error('Invalid value provided to SecureStore');
+    }
+    await SecureStore.setItemAsync(key, value);
+  } catch (error) {
+    console.error('Error saving token:', error);
   }
-  await SecureStore.setItemAsync(key, value);
 };
 
 export const getToken = async (key: TokenKey) => {
-  const value = await SecureStore.getItemAsync(key);
-  return value;
+  try {
+    return await SecureStore.getItemAsync(key);
+  } catch (error) {
+    console.error('Error retrieving token:', error);
+    return null;
+  }
 };
 
 const deleteToken = async (key: TokenKey) => {
-  await SecureStore.deleteItemAsync(key);
+  try {
+    await SecureStore.deleteItemAsync(key);
+  } catch (error) {
+    console.error('Error deleting token:', error);
+  }
 };
 
 const api = axios.create({
-  baseURL: 'http://192.168.8.103:3000',
+  baseURL: API_BASE_URL,
   timeout: 10000,
 });
+
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+const subscribeTokenRefresh = (cb: (token: string) => void) => {
+  refreshSubscribers.push(cb);
+};
+
+const onRefreshed = (token: string) => {
+  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+};
 
 api.interceptors.request.use(
   async (config) => {
@@ -32,61 +58,66 @@ api.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    console.log(config.data, 'config.data');
     if (config.data) {
-      console.log(config.data, 'config.data');
       config.data = toSnakeCase(config.data);
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
 api.interceptors.response.use(
   async (response) => {
     if (response.data) {
-      // Apply camelCase transformation to the response data
-      const transformedData = toCamelCase(response.data);
-
-      // Return the entire response object with the transformed data
-      return { ...response, data: transformedData };
+      return { ...response, data: toCamelCase(response.data) };
     }
-
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
 
     if (error.response && [401, 403].includes(error.response.status)) {
-      try {
-        const refreshToken = await getToken('refreshToken');
-        if (!refreshToken) {
-          return Promise.reject(error.response.data);
+      if (!originalRequest._retry) {
+        originalRequest._retry = true;
+
+        if (isRefreshing) {
+          return new Promise((resolve) => {
+            subscribeTokenRefresh((token) => {
+              originalRequest.headers['Authorization'] = `Bearer ${token}`;
+              resolve(api.request(originalRequest));
+            });
+          });
         }
 
-        const { data } = await axios.post('http://192.168.8.103:3000/auth/refresh-token', {
-          refresh_token: refreshToken,
-        });
+        isRefreshing = true;
+        try {
+          const refreshToken = await getToken('refreshToken');
+          if (!refreshToken) {
+            throw new Error('No refresh token available');
+          }
 
-        const newToken = data.accessToken;
+          const { data } = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
+            refresh_token: refreshToken,
+          });
 
-        await saveToken('accessToken', newToken);
+          const newToken = data.accessToken;
+          await saveToken('accessToken', newToken);
 
-        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          onRefreshed(newToken);
+          isRefreshing = false;
 
-        return api.request(originalRequest);
-      } catch (e) {
-        await deleteToken('accessToken');
-        await deleteToken('refreshToken');
-        return Promise.reject(error);
+          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          return api.request(originalRequest);
+        } catch (e) {
+          console.error('Token refresh failed:', e);
+          await deleteToken('accessToken');
+          await deleteToken('refreshToken');
+          isRefreshing = false;
+        }
       }
     }
-    if (error.response) {
-      return Promise.reject(error.response.data);
-    }
-    return Promise.reject(error);
+
+    return Promise.reject(error.response ? error.response.data : error);
   },
 );
 

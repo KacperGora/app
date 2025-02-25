@@ -72,7 +72,7 @@ const Input: React.FC<TextInputWithCounterProps> = ({
 
 const styles = StyleSheet.create({
   input: {
-    height: 50,
+    minHeight: 50,
     borderRadius: 12,
     paddingHorizontal: 12,
     fontSize: 16,

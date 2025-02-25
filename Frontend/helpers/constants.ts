@@ -6,6 +6,7 @@ export const DATE_FORMAT_YYYY_MM_DD = 'YYYY-MM-DD';
 export const DATE_FORMAT_MMM_YYYY = 'MMM YYYY';
 export const DATE_FORMAT_FULL_MONTH_WITH_YEAR = 'MMMM YYYY';
 export const DEFAULT_DATE_FORMAT_WITH_TIME = 'DD/MM/YY HH:mm';
+export const DATE_FORMAT_DATE_DDD_MM_YYYY_HH_MM = 'ddd, DD MMM YYYY HH:mm';
 
 export const LOCALE_PL = 'pl';
 

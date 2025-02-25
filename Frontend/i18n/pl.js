@@ -14,6 +14,7 @@ export const pl = {
       welcomeBack: 'Witaj ponownie',
       send: 'Wyślij',
       noData: 'Brak danych',
+      success: 'Sukces',
     },
     screenNames: {
       login: 'Logowanie',
@@ -39,6 +40,7 @@ export const pl = {
     register: {
       haveAnAccount: 'Masz już konto?',
       confirmPassword: 'Potwierdź hasło',
+      success: 'Konto zostało utworzone',
     },
     remindPassword: {
       title: 'Przypomnij hasło',
@@ -100,6 +102,9 @@ export const pl = {
       notes: 'Notatki',
       addService: 'Dodaj nową usługę',
       goBack: 'Wróć',
+      customerData: 'Dane klienta',
+      serviceData: 'Dane usługi',
+      appointmentDate: 'Data wizyty',
     },
     validation: {
       fieldRequired: 'Pole jest wymagane',
@@ -141,8 +146,16 @@ export const pl = {
       fullWeek: 'Tydzień',
       withoutWeekends: 'Bez weekendów',
     },
+    formError: {
+      usernameLength: 'Nazwa użytkownika musi mieć co najmniej 3 znaki',
+      passwordLength: 'Hasło musi mieć co najmniej 6 znaków',
+    },
     error: {
       INVALID_CREDENTIALS: 'Niepoprawne dane logowania',
+      USER_ALREADY_EXISTS: 'Użytkownik już istnieje',
+      usernameLength: 'Nazwa użytkownika musi mieć co najmniej 3 znaki',
+      passwordsDontMatch: 'Hasła nie pasują do siebie',
+      passwordLength: 'Hasło musi mieć co najmniej 6 znaków',
     },
   },
 };

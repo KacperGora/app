@@ -43,26 +43,24 @@ const RemindPassword = () => {
   };
 
   return (
-    <KeyboardAvoidingContainer>
-      <ScreenWrapper style={styles.formContainer}>
-        <Text style={styles.header}>{t('remindPassword.title')}</Text>
-        <Input
-          placeholder={t('remindPassword.emailPlaceholder')}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        {successMessage ? <Text style={styles.successText}>{successMessage}</Text> : null}
-        <Button
-          label={t('global.send')}
-          onPress={handleRemindPassword}
-          loading={isLoading}
-          style={styles.buttonStyle}
-          labelStyle={styles.buttonLabel}
-          mode="contained"
-        />
-      </ScreenWrapper>
+    <KeyboardAvoidingContainer style={{ justifyContent: 'center', flex: 1, gap: 20, padding: 20 }}>
+      <Text style={styles.header}>{t('remindPassword.title')}</Text>
+      <Input
+        placeholder={t('remindPassword.emailPlaceholder')}
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+      />
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      {successMessage ? <Text style={styles.successText}>{successMessage}</Text> : null}
+      <Button
+        label={t('global.send')}
+        onPress={handleRemindPassword}
+        loading={isLoading}
+        style={styles.buttonStyle}
+        labelStyle={styles.buttonLabel}
+        mode="contained"
+      />
     </KeyboardAvoidingContainer>
   );
 };
