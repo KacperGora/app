@@ -13,7 +13,6 @@ export const getClients = async (req: Request, res: Response): Promise<void> => 
   }
   try {
     const clients = (await clientService.getClients(userId, req.query)) || [];
-    console.log(clients);
     res.status(200).json(clients || []);
   } catch (error) {
     res.status(500).send('Error getting clients');

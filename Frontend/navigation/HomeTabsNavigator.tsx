@@ -1,80 +1,55 @@
-import { StyleSheet } from 'react-native';
-
+import { SCREEN_NAME_CONFIG } from '@helpers';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { beautyTheme } from '@theme';
-import { Customers } from '@views';
-import i18n from 'i18n/i18n';
+import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import CalendarDrawerNavigator from './CalendarDrawerNavigator';
 import CompanyDrawerNavigator from './CompanyDrawerNavigator';
+import { CustomerListWithDrawer } from './CustomerNavigation';
+import { homeTabsScreenConfig } from './utils';
+
+export const renderTabIcon =
+  (name: string) =>
+  ({ size, focused }: { size: number; focused: boolean }) => (
+    <Icon
+      name={name}
+      color={focused ? beautyTheme.colors.primary : beautyTheme.colors.onSurface}
+      size={size}
+    />
+  );
 
 const Tab = createBottomTabNavigator();
 
-export const HomeTabs = () => (
-  <Tab.Navigator
-    screenOptions={{
-      headerShown: false,
-      tabBarActiveTintColor: beautyTheme.colors.primary,
-      tabBarInactiveTintColor: beautyTheme.colors.onSurface,
-      tabBarStyle: {
-        backgroundColor: beautyTheme.colors.background,
-        borderRadius: 15,
-        ...style.shadow,
-      },
-    }}
-  >
-    <Tab.Screen
-      name={i18n.t('navigation.appointments')}
-      component={CalendarDrawerNavigator}
-      options={{
-        tabBarIcon: ({ size, focused }) => (
-          <Icon
-            name="calendar"
-            color={focused ? beautyTheme.colors.primary : beautyTheme.colors.onSurface}
-            size={size}
-          />
-        ),
-      }}
-    />
-    <Tab.Screen
-      name={i18n.t('navigation.clients')}
-      component={Customers}
-      options={{
-        tabBarIcon: ({ size, focused }) => (
-          <Icon
-            name="account-group"
-            color={focused ? beautyTheme.colors.primary : beautyTheme.colors.onSurface}
-            size={size}
-          />
-        ),
-      }}
-    />
-    <Tab.Screen
-      name={i18n.t('navigation.company')}
-      component={CompanyDrawerNavigator}
-      options={{
-        tabBarIcon: ({ size, focused }) => (
-          <Icon
-            name="briefcase"
-            color={focused ? beautyTheme.colors.primary : beautyTheme.colors.onSurface}
-            size={size}
-          />
-        ),
-      }}
-    />
-  </Tab.Navigator>
-);
+export const HomeTabs = () => {
+  const { t } = useTranslation();
 
-export const style = StyleSheet.create({
-  shadow: {
-    shadowColor: '#7F5DF0',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5,
-  },
-});
+  return (
+    <Tab.Navigator screenOptions={homeTabsScreenConfig}>
+      <Tab.Screen
+        name={SCREEN_NAME_CONFIG.Calendar}
+        component={CalendarDrawerNavigator}
+        options={{
+          title: t('navigation.appointments'),
+          tabBarIcon: renderTabIcon('calendar'),
+        }}
+      />
+      <Tab.Screen
+        name={SCREEN_NAME_CONFIG.CustomerList}
+        component={CustomerListWithDrawer}
+        options={{
+          title: t('navigation.clients'),
+          tabBarIcon: renderTabIcon('account-group'),
+        }}
+      />
+      <Tab.Screen
+        name={SCREEN_NAME_CONFIG.Company}
+        component={CompanyDrawerNavigator}
+        options={{
+          title: t('navigation.company'),
+          tabBarIcon: renderTabIcon('domain'),
+        }}
+      />
+    </Tab.Navigator>
+  );
+};

@@ -4,7 +4,6 @@ import { SCREEN_NAME_CONFIG } from '@helpers';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Login, Register, RemindPassword } from '@views';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { HomeTabs } from './HomeTabsNavigator';
 

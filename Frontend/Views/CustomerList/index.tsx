@@ -1,29 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Animated, FlatList, StyleSheet, Text } from 'react-native';
+import { Animated, FlatList } from 'react-native';
 
-import { ScreenWrapper } from '@components';
-import { beautyTheme } from '@theme';
+import { NoData, ScreenWrapper } from '@components';
 import { CustomerType } from '@types';
-import NoData from 'components/NoData';
 import { useTranslation } from 'react-i18next';
 import { Searchbar, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import CustomerDetailListRow from '../CustomerDetailListRow';
+import CustomerDetailListRow from '../../modules/Customers/CustomerDetailListRow';
 import { styles } from './style';
 
 type CustomerListType = {
   clients: CustomerType[];
   isSearchbarVisible: boolean;
   onSearchbarClose: () => void;
-  isAddCustomerFormVisible: boolean;
 };
 const CustomerList: React.FC<CustomerListType> = ({
   clients,
   isSearchbarVisible,
   onSearchbarClose,
-  isAddCustomerFormVisible,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();

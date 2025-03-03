@@ -1,3 +1,4 @@
+import { CustomerList } from '@modules';
 import { Calendar } from '@views';
 import i18next from 'i18next';
 
@@ -20,4 +21,12 @@ export const SCREEN_NAME_CONFIG = {
   RemindPassword: 'RemindPassword' as const,
   HomeTabs: 'HomeTabs' as const,
   Calendar: 'Calendar' as const,
+  CustomerList: 'CustomerList' as const,
+  CustomerDetail: 'CustomerDetail' as const,
+  CustomerStatistics: 'CustomerStatistics' as const,
+  Company: 'Company' as const,
+  CustomerListDrawer: 'CustomerListDrawer' as const,
+  CompanyDashboard: 'CompanyDashboard' as const,
+  CompanyEmployees: 'CompanyEmployees' as const,
+  CompanyServices: 'CompanyServices' as const,
 };

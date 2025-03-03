@@ -25,7 +25,6 @@ export const loginSuccessHandler = async (
 ) => {
   try {
     const { accessToken, refreshToken, user } = data;
-    console.log(data);
     if (!accessToken || !refreshToken || !user?.id) {
       throw new Error('Invalid login response data');
     }
@@ -38,7 +37,6 @@ export const loginSuccessHandler = async (
     setUserId(user.id);
     setIsLoggedIn(true);
   } catch (error) {
-    console.log(error);
     throw new Error('Error while handling login success');
   }
 };

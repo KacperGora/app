@@ -23,10 +23,23 @@ export const getEvents = async (req: Request, res: Response) => {
 };
 
 export const createEvent = async (req: Request, res: Response) => {
-  const userId = req.user.id;
-  console.log(req.body);
-  await createDataBaseEvent({ ...req.body, userId });
+  if (!req.body) {
+    res.status(400).json({ message: 'Event data is required' });
+    return;
+  }
+  if (!req.body.price) {
+    res.status(400).json({ message: 'Price is required' });
+    return;
+  }
+ 
+  try {
+    await createDataBaseEvent({ ...req.body, userId: req.user.id });
+    res.status(200).json({ message: 'Event created successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating event', error: (error as Error).message });
+  }
 };
+
 export const updateEvent = async (req: Request, res: Response) => {
   const userId = req.user.id;
   const eventId = req.body.id;

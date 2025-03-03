@@ -44,12 +44,13 @@ const MinimizedFormContent: React.FC<MinimizedFormContentProps> = ({
 
 const styles = StyleSheet.create({
   container: {
+    width: '100%',
     flex: 1,
   },
   content: {
     flexDirection: 'column',
     alignItems: 'flex-start',
-    backgroundColor: '#',
+    width: '100%',
     borderRadius: 8,
     padding: beautyTheme.spacing.s,
     elevation: 2,

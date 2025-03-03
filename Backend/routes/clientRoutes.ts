@@ -5,8 +5,8 @@ import { authenticateToken } from '../middleware/authMiddleWare'
 const router = express.Router()
 
 router.use(authenticateToken)
-router.post('/addClient', addClient)
 router.get('/getClient', getClients)
+router.post('/addClient', addClient)
 router.post('/delete', deleteClient)
 
 export default router

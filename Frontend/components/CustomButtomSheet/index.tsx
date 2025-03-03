@@ -3,7 +3,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
+  Keyboard,
   KeyboardAvoidingView,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   PanResponder,
   Platform,
   ScrollView,
@@ -39,23 +42,24 @@ const CustomBottomSheet: React.FC<CustomBottomSheetPropsType> = ({
 }) => {
   const translateY = useRef(new Animated.Value(WINDOW_HEIGHT)).current;
   const [currentSnapIndex, setCurrentSnapIndex] = useState(0);
-
   const scrollViewRef = useRef<ScrollView>(null);
   const isScrolling = useRef(false);
+  const scrollOffset = useRef(0);
+  const isContentScrollable = useRef(false);
   const bottomSheetSnapPoints = snapPoints || SNAP_POINTS;
 
   const snapTo = useCallback(
     (index: number) => {
       if (index < 0 || index >= bottomSheetSnapPoints.length) return;
       setCurrentSnapIndex(index);
-      onCurrentIndexChange && onCurrentIndexChange(index || 0);
+      onCurrentIndexChange?.(index);
       scrollViewRef.current?.scrollTo({ y: 0, animated: true });
       Animated.spring(translateY, {
         toValue: bottomSheetSnapPoints[index],
         ...ANIMATION_CONFIG.spring,
       }).start();
     },
-    [translateY, bottomSheetSnapPoints],
+    [translateY, bottomSheetSnapPoints, onCurrentIndexChange],
   );
 
   const closeSheet = useCallback(() => {
@@ -64,45 +68,65 @@ const CustomBottomSheet: React.FC<CustomBottomSheetPropsType> = ({
       ...ANIMATION_CONFIG.timing,
     }).start(() => {
       setCurrentSnapIndex(0);
-      onCurrentIndexChange && onCurrentIndexChange(0);
+      onCurrentIndexChange?.(0);
+      onClose();
     });
-  }, [translateY, onClose]);
+  }, [translateY, onCurrentIndexChange]);
 
   useEffect(() => {
     if (isVisible) {
       snapTo(0);
     } else {
-      closeSheet();
+      // closeSheet();
     }
   }, [isVisible, snapTo, closeSheet]);
 
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, { dy }) => {
-        if (isScrolling.current) return false;
+        if (isScrolling.current && scrollOffset.current > 0 && isContentScrollable.current) {
+          return false;
+        }
         return Math.abs(dy) > 5;
       },
       onPanResponderMove: (_, { dy }) => {
         const newTranslateY = bottomSheetSnapPoints[currentSnapIndex] + dy;
-        if (newTranslateY >= bottomSheetSnapPoints[0] && newTranslateY <= WINDOW_HEIGHT) {
+        if (newTranslateY >= bottomSheetSnapPoints[0]) {
           translateY.setValue(newTranslateY);
-        } else if (newTranslateY < bottomSheetSnapPoints[0]) {
-          translateY.setValue(bottomSheetSnapPoints[0]);
-        } else {
-          translateY.setValue(WINDOW_HEIGHT);
         }
       },
-      onPanResponderRelease: (_, { dy }) => {
-        if (dy < -50 && currentSnapIndex < bottomSheetSnapPoints.length - 1) {
-          snapTo(currentSnapIndex + 1);
-        } else if (dy > 50 && currentSnapIndex > 0) {
-          snapTo(currentSnapIndex - 1);
-        } else {
+      onPanResponderRelease: (_, { dy, vy }) => {
+        const currentPos = bottomSheetSnapPoints[currentSnapIndex] + dy;
+        Keyboard.dismiss();
+        if (isScrolling.current && scrollOffset.current > 0 && isContentScrollable.current) {
           snapTo(currentSnapIndex);
+          return;
+        }
+
+        const closestIndex = bottomSheetSnapPoints.reduce(
+          (prev, curr, index) =>
+            Math.abs(curr - currentPos) < Math.abs(bottomSheetSnapPoints[prev] - currentPos)
+              ? index
+              : prev,
+          0,
+        );
+
+        if (dy > 100 || (vy > 0.5 && dy > 0)) {
+          closeSheet();
+        } else if (dy < -50 || vy < -0.5) {
+          snapTo(Math.min(currentSnapIndex + 1, bottomSheetSnapPoints.length - 1));
+        } else if (dy > 50) {
+          snapTo(Math.max(currentSnapIndex - 1, 0));
+        } else {
+          snapTo(closestIndex);
         }
       },
     }),
   ).current;
+
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    scrollOffset.current = event.nativeEvent.contentOffset.y;
+  }, []);
 
   const handleScrollBeginDrag = useCallback(() => {
     isScrolling.current = true;
@@ -111,6 +135,14 @@ const CustomBottomSheet: React.FC<CustomBottomSheetPropsType> = ({
   const handleScrollEndDrag = useCallback(() => {
     isScrolling.current = false;
   }, []);
+
+  const handleContentSizeChange = useCallback(
+    (contentWidth: number, contentHeight: number) => {
+      const scrollViewHeight = WINDOW_HEIGHT - bottomSheetSnapPoints[currentSnapIndex];
+      isContentScrollable.current = contentHeight > scrollViewHeight;
+    },
+    [bottomSheetSnapPoints, currentSnapIndex],
+  );
 
   return (
     <Animated.View
@@ -150,8 +182,10 @@ const CustomBottomSheet: React.FC<CustomBottomSheetPropsType> = ({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           bounces={false}
+          onScroll={handleScroll}
           onScrollBeginDrag={handleScrollBeginDrag}
           onScrollEndDrag={handleScrollEndDrag}
+          onContentSizeChange={handleContentSizeChange}
           scrollEventThrottle={16}
         >
           {currentSnapIndex === 1 && minimizedContent ? minimizedContent : children}
@@ -165,6 +199,7 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     bottom: 0,
+    width: '100%',
     height: WINDOW_HEIGHT,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -194,6 +229,7 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
     flexGrow: 1,
     justifyContent: 'flex-start',
+    width: '100%',
   },
 });
 

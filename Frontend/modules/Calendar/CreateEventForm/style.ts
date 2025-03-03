@@ -34,6 +34,8 @@ export const styles = StyleSheet.create({
   submitBtnLabel: {
     textAlign: 'center',
     width: '100%',
+    color: beautyTheme.colors.white,
+    fontWeight: beautyTheme.fontWeight.medium,
   },
   formContainer: {
     gap: beautyTheme.spacing.l,
