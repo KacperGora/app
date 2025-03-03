@@ -1,4 +1,6 @@
+import { EventForm } from '@types';
 import dayjs from 'dayjs';
+import { z } from 'zod';
 
 export const initialFormState = {
   start: '',
@@ -35,4 +37,17 @@ export const handlePriceChange = (text: string) => {
     .replace(',', '.')
     .replace(/(\..*?\.)/g, '$1')
     .replace(/(\.\d{2})\d+/g, '$1');
+};
+
+export const eventSchema = z.object({
+  start: z.string(),
+  end: z.string(),
+  clientId: z.number(),
+  notes: z.string(),
+  service: z.string(),
+  price: z.string(),
+});
+
+export const validateEvent = (data: EventForm) => {
+  return eventSchema.safeParse(data);
 };

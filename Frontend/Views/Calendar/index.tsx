@@ -16,6 +16,7 @@ import {
 } from '@howljs/calendar-kit';
 import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
+import { beautyTheme } from '@theme';
 import { EventForm } from '@types';
 import dayjs from 'dayjs';
 import 'intl-pluralrules';
@@ -37,13 +38,15 @@ export type CalendarRouteProp = {
 
 const fetchList = async () => {
   const { data } = await api.get('event/getEvents');
-  const parseEvents = data.map((event: any) => ({
-    ...event,
-    title: `${event.service}`,
-    start: { dateTime: event.startTime },
-    end: { dateTime: event.endTime },
-    color: '#4285F4',
-  }));
+  const parseEvents = data.map((event: any) => {
+    return {
+      ...event,
+      title: event.client,
+      start: { dateTime: event.startTime },
+      end: { dateTime: event.endTime },
+      color: beautyTheme.colors.inversePrimary,
+    };
+  });
 
   return parseEvents;
 };
@@ -51,13 +54,13 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(
   ({ params, onFormToggle, currentBottomSheetIndex }, ref) => {
     const { mode } = useMemo(() => params, [params]);
     const navigation = useNavigation();
-    const { userId } = useAuth();
 
     const { data, isLoading, refetch, dataUpdatedAt } = useQuery<EventItem[]>({
       queryKey: ['events'],
       queryFn: fetchList,
       enabled: true,
     });
+
 
     const bottomSheetRef = useRef<BottomSheet>(null);
     const [eventForm, setEventForm] = useState<EventForm>(eventEmptyState);
@@ -90,8 +93,7 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(
         end: end.dateTime || '',
         notes: eventToUpdate.notes,
       }));
-      onFormToggle({ start: start.dateTime, end: end.dateTime });
-      bottomSheetRef.current?.expand();
+      // onFormToggle({ start: start.dateTime, end: end.dateTime });
     };
 
     const handleDateChange = (date: string) => {

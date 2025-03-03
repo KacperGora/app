@@ -5,6 +5,7 @@ import CustomBottomSheet from './CustomButtomSheet';
 import DatePicker from './DatePicker';
 import KeyboardAvoidingContainer from './KeyboardAvoidingContainer';
 import Loader from './Loader';
+import NoData from './NoData';
 import Notification from './Notification';
 import PasswordStrength from './PasswordStrength';
 import ScreenWrapper from './ScreenWrapper';
@@ -24,4 +25,5 @@ export {
   PasswordStrength,
   KeyboardAvoidingContainer,
   CustomBottomSheet,
+  NoData,
 };

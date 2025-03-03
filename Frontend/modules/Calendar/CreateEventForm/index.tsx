@@ -20,6 +20,7 @@ import {
   handlePriceChange,
   initialFormState,
   isEventDurationLongerThanADay,
+  validateEvent,
 } from './utils';
 
 const {
@@ -51,6 +52,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
   });
 
   const [search, setSearch] = useState({ clientsSearch: '', servicesSearch: '' });
+  const [isFormValid, setIsFormValid] = useState(false);
   const [form, setForm] = useState<EventForm>(() => ({
     start: initialDateState.start,
     end: initialDateState.end,
@@ -129,10 +131,11 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
 
   const handleSubmit = async () => {
     try {
+      if (!isFormValid) return;
       await api.post(apiRoutes.event.create, form);
-      // await onEventCreateRequest();
+      await onEventCreateRequest();
     } catch (error) {
-      console.log(error);
+      console.error('Error while creating event', error);
     } finally {
       setForm(initialFormState);
       setSearch({ clientsSearch: '', servicesSearch: '' });
@@ -162,10 +165,16 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
       </TouchableOpacity>
     );
   };
+
   useEffect(() => {
     const { end, start } = initialDateState;
     setForm((prev) => ({ ...prev, start, end }));
   }, [initialDateState]);
+
+  useEffect(() => {
+    setIsFormValid(validateEvent(form).success);
+  }, [form]);
+
   useEffect(() => {
     if (isEventDurationLongerThanADay(form.start, form.end)) {
       setForm((prev) => ({ ...prev, end: form.start }));
@@ -255,7 +264,12 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
             minDate={form.start}
           />
         </View>
-        <Button label={t('form.save')} onPress={handleSubmit} labelStyle={styles.submitBtnLabel} />
+        <Button
+          label={t('form.save')}
+          onPress={handleSubmit}
+          labelStyle={styles.submitBtnLabel}
+          isDisabled={!isFormValid}
+        />
       </View>
     </>
   );
