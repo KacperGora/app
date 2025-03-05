@@ -1,8 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 
-import { Input } from '@components';
 import { CustomerType, ServiceType } from '@types';
 import i18next from 'i18next';
+
+import Input from '../TextInputWithCounter/index';
 
 type SearchWithListProps = {
   label: string;

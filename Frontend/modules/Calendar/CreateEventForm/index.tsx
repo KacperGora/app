@@ -4,7 +4,7 @@ import { TouchableOpacity, View } from 'react-native';
 
 import { Button, DatePicker, Input, SearchWithList } from '@components';
 import { api, apiRoutes, fromIntervalToMinutes, getFullName, useAuth } from '@helpers';
-import { CompanyServicesForm, CustomerForm } from '@modules';
+// import { CompanyServicesForm, CustomerForm } from '@modules';
 import { useQuery } from '@tanstack/react-query';
 import { beautyTheme } from '@theme';
 import { CustomerType, EventForm, EventFormOptionType, ServiceType } from '@types';
@@ -181,13 +181,13 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
     }
   }, [form.start, form.end]);
 
-  if (Object.values(isOptionFormVisible).some((value) => value)) {
-    return isOptionFormVisible.client ? (
-      <CustomerForm onSubmit={async () => {}} onClose={toggleCreateOption('client')} />
-    ) : (
-      <CompanyServicesForm onClose={toggleCreateOption('service')} />
-    );
-  }
+  // if (Object.values(isOptionFormVisible).some((value) => value)) {
+  //   return isOptionFormVisible.client ? (
+  //     <CustomerForm onSubmit={async () => {}} onClose={toggleCreateOption('client')} />
+  //   ) : (
+  //     <CompanyServicesForm onClose={toggleCreateOption('service')} />
+  //   );
+  // }
 
   return (
     <>

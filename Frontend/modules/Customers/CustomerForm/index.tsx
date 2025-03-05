@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Button, Input, KeyboardAvoidingContainer } from '@components';
+import { Button, CustomBottomSheet, Input, KeyboardAvoidingContainer } from '@components';
 import { api, apiRoutes } from '@helpers';
 import FormTitle from 'components/FormTitle';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +38,7 @@ const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) =
   };
 
   return (
-    <>
+    <CustomBottomSheet isVisible onClose={() => {}}>
       <FormTitle title={t('client.addCustomer')} onClose={onClose} />
       <View style={styles.formWrapper}>
         {customerFieldsConfig.map(({ placeholder, value, key, keyboardType }) => (
@@ -74,7 +74,7 @@ const CustomerForm: React.FC<CustomerComponentProps> = ({ onSubmit, onClose }) =
           // labelStyle={styles.goBackBtnLabel}
         />
       </View>
-    </>
+    </CustomBottomSheet>
   );
 };
 

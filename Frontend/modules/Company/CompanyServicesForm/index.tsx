@@ -1,16 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { api } from '@helpers';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import FormTitle from 'components/FormTitle';
 import KeyboardAvoidingContainer from 'components/KeyboardAvoidingContainer';
-import { debounce } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { Button, Divider, Text, TextInput } from 'react-native-paper';
 
-import { get15stepValue, validateServiceForm } from './utils';
+import { validateServiceForm } from './utils';
 
 const CompanyServicesForm: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
   const { t } = useTranslation();

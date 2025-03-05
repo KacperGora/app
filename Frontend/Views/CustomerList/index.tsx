@@ -16,6 +16,7 @@ type CustomerListType = {
   isSearchbarVisible: boolean;
   onSearchbarClose: () => void;
 };
+
 const CustomerList: React.FC<CustomerListType> = ({
   clients,
   isSearchbarVisible,

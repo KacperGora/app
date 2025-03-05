@@ -35,7 +35,7 @@ export const HomeTabs = () => {
         }}
       />
       <Tab.Screen
-        name={SCREEN_NAME_CONFIG.CustomerList}
+        name={SCREEN_NAME_CONFIG.CustomerListDrawer}
         component={CustomerListWithDrawer}
         options={{
           title: t('navigation.clients'),

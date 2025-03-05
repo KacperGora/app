@@ -1,9 +1,8 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 
-import { View } from 'react-native';
 
 import BottomSheet from '@gorhom/bottom-sheet';
-import { api, DATE_FORMAT_FULL_MONTH_WITH_YEAR, useAuth } from '@helpers';
+import { api, DATE_FORMAT_FULL_MONTH_WITH_YEAR } from '@helpers';
 import {
   CalendarBody,
   CalendarContainer,
@@ -12,7 +11,6 @@ import {
   EventItem,
   OnCreateEventResponse,
   OnEventResponse,
-  PackedEvent,
 } from '@howljs/calendar-kit';
 import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
@@ -20,8 +18,6 @@ import { beautyTheme } from '@theme';
 import { EventForm } from '@types';
 import dayjs from 'dayjs';
 import 'intl-pluralrules';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Text } from 'react-native-paper';
 
 import { CALENDAR_ENUM, calendarContainerConfig, eventEmptyState } from './utils';
 
@@ -37,10 +33,12 @@ export type CalendarRouteProp = {
 };
 
 const fetchList = async () => {
+  console.log('req');
   const { data } = await api.get('event/getEvents');
   const parseEvents = data.map((event: any) => {
     return {
       ...event,
+      id: Math.random().toString(),
       title: event.client,
       start: { dateTime: event.startTime },
       end: { dateTime: event.endTime },
@@ -60,7 +58,6 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(
       queryFn: fetchList,
       enabled: true,
     });
-
 
     const bottomSheetRef = useRef<BottomSheet>(null);
     const [eventForm, setEventForm] = useState<EventForm>(eventEmptyState);
@@ -126,14 +123,7 @@ const Calendar = forwardRef<CalendarKitHandle, CalendarRouteProp>(
         {...calendarContainerConfig}
       >
         <CalendarHeader />
-        <CalendarBody
-          showNowIndicator
-          renderEvent={(event: PackedEvent) => (
-            <View>
-              <Text>{event.title}</Text>
-            </View>
-          )}
-        />
+        <CalendarBody showNowIndicator />
       </CalendarContainer>
     );
   },

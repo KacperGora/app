@@ -3,7 +3,6 @@ import { compareUserPassword, hashUserPassword } from '../utils/authUtils';
 import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
 import { errors } from '../config/errors';
 import jwt from 'jsonwebtoken';
-import { changePassword, logout } from '../controllers/authcontrollers';
 
 export class CustomError extends Error {
   statusCode: number;
@@ -26,12 +25,13 @@ export type RegisterSuccess = {
   user: { login: string; id: string };
 };
 
+const { USER_ALREADY_EXISTS, USERNAME_AND_PASSWORD_REQUIRED, INTERNAL_SERVER_ERROR, INVALID_CREDENTIALS } = errors;
 export const userService = {
   async registerUser(username: string, password: string): Promise<RegisterSuccess> {
-    if (!username || !password) throw new CustomError(errors.USERNAME_AND_PASSWORD_REQUIRED.code, 400);
+    if (!username || !password) throw new CustomError(USERNAME_AND_PASSWORD_REQUIRED.code, 400);
 
     const existingUser = await findUserByKey('username', username);
-    if (existingUser) throw new CustomError(errors.USER_ALREADY_EXISTS.code, 400);
+    if (existingUser) throw new CustomError(USER_ALREADY_EXISTS.code, 400);
 
     const hashedPassword = await hashUserPassword(password);
     const newUser = await createUser({ username, password: hashedPassword });
@@ -41,7 +41,7 @@ export const userService = {
     try {
       await saveRefreshToken(newUser.id, refreshToken);
     } catch (error) {
-      throw new CustomError(errors.INTERNAL_SERVER_ERROR.code, 500);
+      throw new CustomError(INTERNAL_SERVER_ERROR.code, 500);
     }
 
     return {
@@ -54,10 +54,10 @@ export const userService = {
 
   async loginUser(username: string, password: string): Promise<LoginSuccess> {
     const user = await findUserByKey('username', username);
-    if (!user) throw new CustomError(errors.INVALID_CREDENTIALS.message, 401);
+    if (!user) throw new CustomError(INVALID_CREDENTIALS.message, 401);
 
     const passwordMatch = await compareUserPassword(password, user.password as string);
-    if (!passwordMatch) throw new CustomError(errors.INVALID_CREDENTIALS.message, 401);
+    if (!passwordMatch) throw new CustomError(INVALID_CREDENTIALS.message, 401);
 
     const token = generateAccessToken(user.id);
     const refreshToken = generateRefreshToken(user.id);
