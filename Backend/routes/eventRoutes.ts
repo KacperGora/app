@@ -1,8 +1,11 @@
 import { Router } from 'express';
-import { createEvent, getEvents, getEventsFormOptions, updateEvent } from '../controllers/eventsControllers';
+import { eventsController } from '../controllers/eventsControllers';
 import { authenticateToken } from '../middleware/authMiddleWare';
 
+const { createEvent, getEvents, getEventsFormOptions, updateEvent } = eventsController;
+
 const eventRouter = Router();
+
 eventRouter.use(authenticateToken);
 eventRouter.get('/fetchEventOptions', getEventsFormOptions);
 eventRouter.get(`/getEvents/`, getEvents);

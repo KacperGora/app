@@ -1,6 +1,6 @@
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 
-dotenv.config()
+dotenv.config();
 
-export const PORT = process.env.PORT || 3000
-export const SECRET_KEY = process.env.SECRET_KEY || 'your_secret_key'
+export const PORT = process.env.PORT || 3000;
+export const SECRET_KEY = process.env.SECRET_KEY;

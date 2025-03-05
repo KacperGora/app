@@ -1,12 +1,14 @@
-import express from 'express'
-import { addClient, deleteClient, getClients } from '../controllers/clientControllers'
-import { authenticateToken } from '../middleware/authMiddleWare'
+import { Router } from 'express';
+import { clientControllers } from '../controllers/clientControllers';
+import { authenticateToken } from '../middleware/authMiddleWare';
 
-const router = express.Router()
+const clientRouter = Router();
+const { addClient, deleteClient, getClients } = clientControllers;
 
-router.use(authenticateToken)
-router.get('/getClient', getClients)
-router.post('/addClient', addClient)
-router.post('/delete', deleteClient)
+clientRouter.use(authenticateToken);
 
-export default router
+clientRouter.get('/getClient', getClients);
+clientRouter.post('/addClient', addClient);
+clientRouter.post('/delete', deleteClient);
+
+export default clientRouter;

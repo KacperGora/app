@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Animated, FlatList, StyleSheet, Text } from 'react-native';
 
@@ -11,6 +11,7 @@ import { Searchbar, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import CustomerDetailListRow from '../CustomerDetailListRow';
+import CustomerForm from '../CustomerForm';
 import { styles } from './style';
 
 type CustomerListType = {
@@ -19,6 +20,7 @@ type CustomerListType = {
   onSearchbarClose: () => void;
   isAddCustomerFormVisible: boolean;
 };
+
 const CustomerList: React.FC<CustomerListType> = ({
   clients,
   isSearchbarVisible,
@@ -37,13 +39,18 @@ const CustomerList: React.FC<CustomerListType> = ({
   };
 
   const handleClearIconPress = () => {
+    console.log('press');
     setSearchQuery('');
     onSearchbarClose();
   };
 
-  const renderItem = ({ item }: { item: CustomerType }) => {
-    return <CustomerDetailListRow customer={item} />;
-  };
+  const renderItem = useMemo(
+    () =>
+      ({ item }: { item: CustomerType }) => {
+        return <CustomerDetailListRow customer={item} />;
+      },
+    [],
+  );
 
   useEffect(() => {
     Animated.timing(searchBarOpacity, {
@@ -55,6 +62,7 @@ const CustomerList: React.FC<CustomerListType> = ({
 
   return (
     <ScreenWrapper>
+      {isAddCustomerFormVisible && <CustomerForm onSubmit={async () => {}} />}
       <Animated.View style={[styles.animatedContainer, { opacity: searchBarOpacity }]}>
         {isSearchbarVisible && (
           <Searchbar
